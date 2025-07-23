@@ -1,17 +1,24 @@
-import React from "react";
+// src/components/Button.tsx
 
-interface Props {
+type Props = {
   label: string;
-  onClick: () => void;
-}
+  onClick?: () => void;
+  disabled?: boolean; // ✅ Add this line
+  className?: string;
+};
 
-const Button = ({ label, onClick }: Props) => (
-  <button
-    onClick={onClick}
-    className="w-full bg-purple-600 text-white py-2 rounded font-medium hover:bg-purple-700"
-  >
-    {label}
-  </button>
-);
+const Button = ({ label, onClick, disabled = false, className }: Props) => {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md w-full ${
+        disabled ? "opacity-50 cursor-not-allowed" : ""
+      } ${className || ""}`}
+    >
+      {label}
+    </button>
+  );
+};
 
 export default Button;

@@ -1,81 +1,86 @@
+// src/pages/Login.tsx
+
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import Input from "../components/Input";
-import Button from "../components/Button";
-import bgImage from "../assets/images/bg-image.png";
+import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../api/apiInstance";
-import OTPModal from "../components/modals/OTPModal";
+import bgImage from "../assets/images/bg-image.png";
 import { toast } from "react-toastify";
-import Cookies from "js-cookie";
+import OTPModal from "../components/modals/OTPModal"; // Adjust path if needed
+import Button from "../components/Button";
 
+const Register = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    restaurantName: "",
+    phone: "",
+    email: "",
+    foundedDate: "",
+  });
 
-const HomePage = () => {
-  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const [showOTP, setShowOTP] = useState(false);
-  const [generatedOTP, setGeneratedOTP] = useState(null);
   const [enteredOTP, setEnteredOTP] = useState("");
+  const [generatedOTP, setGeneratedOTP] = useState(""); // If backend sends OTP
 
   const navigate = useNavigate();
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const isValidPhone = (phone: string) => /^[6-9]\d{9}$/.test(phone);
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
+    const { name, restaurantName, phone, email, foundedDate } = formData;
+
     setError("");
-    if (!phone) {
-      setError("Phone number is required.");
+
+    if (!name || !restaurantName || !phone || !email || !foundedDate) {
+      setError("All fields are required.");
       return;
     }
+
     if (!isValidPhone(phone)) {
       setError("Please enter a valid 10-digit mobile number.");
       return;
     }
+
+    setLoading(true);
+
     try {
-      const response = await axiosInstance("post", "/vendor", {
+      const response = await axiosInstance("post", "/vendor/register", {
+        name,
+        restaurantName,
         phone: Number(phone),
+        email,
+        foundedDate,
       });
 
-      if (response.data ) {
-        setGeneratedOTP(response.data.data.otp);
-        toast.success("OTP sent successfully!");
-        setShowOTP(true);
+      if (response.status === 200) {
+        toast.success("Registration successful! Please verify your OTP.");
+        setGeneratedOTP(response.data?.otp || ""); // Optional if your backend sends it
+        setShowOTP(true); // Show OTP modal
       }
     } catch (err) {
-      console.error("Login error:", err);
-      setError("Login failed. Please try again.");
-    }
-  };
-
-  const handleOTPVerify = async () => {
-    setError("");
-    if (!enteredOTP) {
-      setError("Please enter the OTP.");
-      return;
-    }
-    
-    try {
-      const response = await axiosInstance("post", "/vendor/verify-otp", {
-        phone: Number(phone),
-        otp: Number(enteredOTP),
-      });
-
-      if (response.data.statusCode === 200) {
-        toast.success(response?.data?.message || "Login successful");
-        localStorage.setItem("accessToken", response?.data?.data?.access_token);
-        Cookies.set("authToken", response?.data?.data?.access_token);
-        setShowOTP(false);
-        navigate("/dashboard");
-      }
-    } catch (error) {
-      console.error("OTP verification error:", error);
-      setError("OTP verification failed. Please try again.");
+      console.error("Registration error:", err);
+      toast.error("Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleCloseModal = () => {
     setShowOTP(false);
-    setEnteredOTP("");
-    setError("");
+  };
+
+  const handleOTPVerify = () => {
+    // Handle OTP verification logic here
+    toast.success("OTP Verified!");
+    setShowOTP(false);
+    navigate("/dashboard"); // or wherever
   };
 
   return (
@@ -91,24 +96,65 @@ const HomePage = () => {
           </h1>
         </div>
 
+        {/* Register Form */}
         <div className="absolute top-20 right-8 bg-white rounded-lg p-6 shadow-lg w-full max-w-sm z-20">
-          <h2 className="text-xl font-semibold mb-4 text-black">Get Started</h2>
-          <Input
-            type="tel"
-            placeholder="Enter your registered mobile number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-          {error && <p className="text-sm text-red-600 mb-2">{error}</p>}
+          <h2 className="text-xl font-semibold mb-4 text-black">Create Account</h2>
 
-          <Button label="Login" onClick={handleLogin} />
+          <div className="space-y-4">
+            <input
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              className="w-full border px-4 py-2 rounded-md"
+              value={formData.name}
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="restaurantName"
+              placeholder="Restaurant Name"
+              className="w-full border px-4 py-2 rounded-md"
+              value={formData.restaurantName}
+              onChange={handleChange}
+            />
+            <input
+              type="tel"
+              name="phone"
+              placeholder="Registered Phone Number"
+              className="w-full border px-4 py-2 rounded-md"
+              value={formData.phone}
+              onChange={handleChange}
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email Address"
+              className="w-full border px-4 py-2 rounded-md"
+              value={formData.email}
+              onChange={handleChange}
+            />
+            <input
+              type="date"
+              name="foundedDate"
+              placeholder="Date of Founding"
+              className="w-full border px-4 py-2 rounded-md"
+              value={formData.foundedDate}
+              onChange={handleChange}
+            />
+          </div>
+
+          {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
+
+          <Button label={loading ? "Please wait..." : "Register"} onClick={handleRegister} disabled={loading} />
+
           <p className="text-sm mt-3 text-center text-gray-700">
-            Don't have an account?{" "}
-            <Link to="/register" className="text-purple-600 hover:underline">
-              Create account
+            Already have an account?{" "}
+            <Link to="/" className="text-purple-600 hover:underline">
+              Sign In
             </Link>
           </p>
         </div>
+
       </section>
 
       {/* Steps Section */}
@@ -124,19 +170,25 @@ const HomePage = () => {
           <div>
             <h3 className="text-xl font-bold text-orange-500 mb-2">STEP 1</h3>
             <p>
-              Download the DUUITT Restaurant App<br />Available on Android & iOS
+              Download the DUUITT Restaurant App
+              <br />
+              Available on Android & iOS
             </p>
           </div>
           <div>
             <h3 className="text-xl font-bold text-yellow-500 mb-2">STEP 2</h3>
             <p>
-              Sign in or create your account<br />Just use your mobile number and some details
+              Sign in or create your account
+              <br />
+              Just use your mobile number and some details
             </p>
           </div>
           <div>
             <h3 className="text-xl font-bold text-purple-500 mb-2">STEP 3</h3>
             <p>
-              Add your restaurant details & menu<br />We'll help you get listed and ready to serve
+              Add your restaurant details & menu
+              <br />
+              We'll help you get listed and ready to serve
             </p>
           </div>
         </div>
@@ -180,7 +232,10 @@ const HomePage = () => {
           <div>
             <h4 className="font-semibold mb-2">Social Links</h4>
             <div className="flex gap-2">
-              <span>○</span><span>○</span><span>○</span><span>○</span>
+              <span>○</span>
+              <span>○</span>
+              <span>○</span>
+              <span>○</span>
             </div>
           </div>
         </div>
@@ -188,9 +243,9 @@ const HomePage = () => {
       </footer>
 
       {/* OTP Modal */}
-      {showOTP && (
+      {/* {showOTP && (
         <OTPModal
-          phone={phone}
+          phone={formData.phone}s
           backendOtp={generatedOTP}
           onClose={handleCloseModal}
           onVerify={handleOTPVerify}
@@ -198,9 +253,9 @@ const HomePage = () => {
           setOtp={setEnteredOTP}
           error={error}
         />
-      )}
+      )} */}
     </div>
   );
 };
 
-export default HomePage;
+export default Register;
