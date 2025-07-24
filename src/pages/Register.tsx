@@ -13,7 +13,7 @@ const Register = () => {
     restaurant_name: "",
     phone: "",
     email: "",
-    date_of_birth: "",
+    date_of_founding: "",
   });
   const [showOTP, setShowOTP] = useState(false);
   const [generatedOTP, setGeneratedOTP] = useState(null);
@@ -30,9 +30,9 @@ const Register = () => {
   const isValidPhone = (phone: string) => /^[6-9]\d{9}$/.test(phone);
 
   const handleRegister = async () => {
-    const { name, restaurant_name, phone, email, date_of_birth } = formData;
+    const { name, restaurant_name, phone, email, date_of_founding } = formData;
     setError("");
-    if (!name || !restaurant_name || !phone || !email || !date_of_birth) {
+    if (!name || !restaurant_name || !phone || !email || !date_of_founding) {
       setError("All fields are required.");
       return;
     }
@@ -192,9 +192,9 @@ const Register = () => {
                 </label>
                 <input
                   type="date"
-                  name="date_of_birth"
+                  name="date_of_founding"
                   className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
-                  value={formData.date_of_birth}
+                  value={formData.date_of_founding}
                   onChange={handleChange}
                 />
               </div>
