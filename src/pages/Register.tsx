@@ -1,32 +1,28 @@
-// src/pages/Login.tsx
-
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import Footer from "../components/layout/Footer";
 import axiosInstance from "../api/apiInstance";
-import bgImage from "../assets/images/bg-image.png";
+import OTPModal from "../components/modals/OTPModal";
 import { toast } from "react-toastify";
-import OTPModal from "../components/modals/OTPModal"; // Adjust path if needed
-import Button from "../components/Button";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+
 
 const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
-    restaurantName: "",
+    restaurant_name: "",
     phone: "",
     email: "",
-    foundedDate: "",
+    date_of_birth: "",
   });
-
+  const [showOTP, setShowOTP] = useState(false);
+  const [generatedOTP, setGeneratedOTP] = useState(null);
+  const [enteredOTP, setEnteredOTP] = useState("");
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const [showOTP, setShowOTP] = useState(false);
-  const [enteredOTP, setEnteredOTP] = useState("");
-  const [generatedOTP, setGeneratedOTP] = useState(""); // If backend sends OTP
-
-  const navigate = useNavigate();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -34,218 +30,263 @@ const Register = () => {
   const isValidPhone = (phone: string) => /^[6-9]\d{9}$/.test(phone);
 
   const handleRegister = async () => {
-    const { name, restaurantName, phone, email, foundedDate } = formData;
-
+    const { name, restaurant_name, phone, email, date_of_birth } = formData;
     setError("");
-
-    if (!name || !restaurantName || !phone || !email || !foundedDate) {
+    if (!name || !restaurant_name || !phone || !email || !date_of_birth) {
       setError("All fields are required.");
       return;
     }
-
     if (!isValidPhone(phone)) {
       setError("Please enter a valid 10-digit mobile number.");
       return;
     }
-
     setLoading(true);
 
     try {
-      const response = await axiosInstance("post", "/vendor/register", {
-        name,
-        restaurantName,
-        phone: Number(phone),
-        email,
-        foundedDate,
-      });
-
-      if (response.status === 200) {
-        toast.success("Registration successful! Please verify your OTP.");
-        setGeneratedOTP(response.data?.otp || ""); // Optional if your backend sends it
-        setShowOTP(true); // Show OTP modal
+      const response = await axiosInstance("post", "/vendor/sign-up", formData);
+      if (response.data) {
+        console.log(generatedOTP, ' thisis is trhe otp ')
+        setGeneratedOTP(response.data.data.otp);
+        toast.success("OTP sent successfully!");
+        setShowOTP(true);
       }
+      setTimeout(() => {
+        console.log("Registration successful", formData);
+        setLoading(false);
+      }, 2000);
     } catch (err) {
       console.error("Registration error:", err);
-      toast.error("Registration failed. Please try again.");
-    } finally {
       setLoading(false);
     }
   };
+  const handleOTPVerify = async () => {
+    setError("");
+    if (!enteredOTP) {
+      setError("Please enter the OTP.");
+      return;
+    }
 
+    try {
+      const response = await axiosInstance("post", "/vendor/verify-otp", {
+        phone: Number(formData.phone),
+        otp: Number(enteredOTP),
+      });
+
+      if (response.data.statusCode === 200) {
+        toast.success(response?.data?.message || "Login successful");
+        localStorage.setItem("accessToken", response?.data?.data?.access_token);
+        Cookies.set("authToken", response?.data?.data?.access_token);
+        setShowOTP(false);
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      console.error("OTP verification error:", error);
+      setError("OTP verification failed. Please try again.");
+    }
+  };
   const handleCloseModal = () => {
     setShowOTP(false);
+    setEnteredOTP("");
+    setError("");
   };
-
-  const handleOTPVerify = () => {
-    // Handle OTP verification logic here
-    toast.success("OTP Verified!");
-    setShowOTP(false);
-    navigate("/dashboard"); // or wherever
-  };
-
   return (
-    <div className="font-sans text-gray-800">
-      {/* Hero Section */}
-      <section
-        className="relative text-white min-h-screen flex flex-col justify-center items-start px-8 lg:px-24 pt-20 pb-12 bg-cover bg-center"
-        style={{ backgroundImage: `url(${bgImage})` }}
-      >
-        <div className="max-w-xl bg-black bg-opacity-50 p-6 rounded z-10">
-          <h1 className="text-4xl lg:text-5xl font-extrabold leading-tight mb-4">
-            BRING YOUR KITCHEN ONLINE — REACH THOUSANDS OF LOCAL FOODIES
-          </h1>
-        </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section with Form */}
+      <section className="relative min-h-screen bg-gradient-to-r from-black via-gray-900 to-black">
+        {/* Background with food image overlay */}
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        ></div>
 
-        {/* Register Form */}
-        <div className="absolute top-20 right-8 bg-white rounded-lg p-6 shadow-lg w-full max-w-sm z-20">
-          <h2 className="text-xl font-semibold mb-4 text-black">Create Account</h2>
+        <div className="relative z-10 flex min-h-screen">
+          {/* Left side - Logo and Headline */}
+          <div className="flex-1 flex flex-col justify-center px-8 lg:px-16">
+            {/* Logo */}
+            <div className="mb-12">
+              <div className="text-white">
+                <div className="text-4xl font-bold mb-2">
+                  <span className="bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">DUU</span>
+                  <span className="text-white">ITT</span>
+                </div>
+                <div className="text-sm text-gray-300">Restaurant</div>
+              </div>
+            </div>
+
+            {/* Main Headline */}
+            <div className="max-w-2xl">
+              <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight mb-8">
+                BRING YOUR KITCHEN ONLINE — REACH THOUSANDS OF LOCAL FOODIES
+              </h1>
+            </div>
+          </div>
+
+          {/* Right side - Registration Form */}
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl m-8 p-8 h-fit self-center">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">Create Account</h2>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Enter your full name"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                  value={formData.name}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Restaurant Name
+                </label>
+                <input
+                  type="text"
+                  name="restaurant_name"
+                  placeholder="Enter restaurant name"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                  value={formData.restaurant_name}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Registered Phone Number
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Enter 10-digit phone number"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter email address"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Date of Birth
+                </label>
+                <input
+                  type="date"
+                  name="date_of_birth"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                  value={formData.date_of_birth}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            {error && <p className="text-sm text-red-600 mt-3 p-2 bg-red-50 rounded">{error}</p>}
+
+            <button
+              onClick={handleRegister}
+              disabled={loading}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg mt-6 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Creating Account..." : "Create Account"}
+            </button>
+
+            <p className="text-sm mt-4 text-center text-gray-600">
+              Already have an account?{" "}
+              <a href="/" className="text-purple-600 hover:underline font-medium">
+                Login
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Documents Section */}
+      <section className="py-16 px-8 lg:px-16 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">
+            Quick Tip: Keep These Docs Ready Before You Start
+          </h2>
+          <p className="text-gray-600 mb-8 text-lg">
+            Keep these ready so you can breeze through the setup:
+          </p>
 
           <div className="space-y-4">
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              className="w-full border px-4 py-2 rounded-md"
-              value={formData.name}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="restaurantName"
-              placeholder="Restaurant Name"
-              className="w-full border px-4 py-2 rounded-md"
-              value={formData.restaurantName}
-              onChange={handleChange}
-            />
-            <input
-              type="tel"
-              name="phone"
-              placeholder="Registered Phone Number"
-              className="w-full border px-4 py-2 rounded-md"
-              value={formData.phone}
-              onChange={handleChange}
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email Address"
-              className="w-full border px-4 py-2 rounded-md"
-              value={formData.email}
-              onChange={handleChange}
-            />
-            <input
-              type="date"
-              name="foundedDate"
-              placeholder="Date of Founding"
-              className="w-full border px-4 py-2 rounded-md"
-              value={formData.foundedDate}
-              onChange={handleChange}
-            />
-          </div>
+            <div className="flex items-start space-x-3">
+              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <div className="flex-1">
+                <span className="text-gray-800 font-medium">FSSAI license</span>
+                <span className="text-gray-500 ml-2">Don't have a FSSAI license?</span>
+                <a href="#" className="text-purple-600 hover:underline ml-1 font-medium">Apply here</a>
+              </div>
+            </div>
 
-          {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
+            <div className="flex items-start space-x-3">
+              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <span className="text-gray-800 font-medium">GST number, if applicable</span>
+            </div>
 
-          <Button label={loading ? "Please wait..." : "Register"} onClick={handleRegister} disabled={loading} />
+            <div className="flex items-start space-x-3">
+              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <span className="text-gray-800 font-medium">Your restaurant menu</span>
+            </div>
 
-          <p className="text-sm mt-3 text-center text-gray-700">
-            Already have an account?{" "}
-            <Link to="/" className="text-purple-600 hover:underline">
-              Sign In
-            </Link>
-          </p>
-        </div>
+            <div className="flex items-start space-x-3">
+              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <span className="text-gray-800 font-medium">PAN card copy</span>
+            </div>
 
-      </section>
-
-      {/* Steps Section */}
-      <section className="py-16 px-6 lg:px-24 bg-white text-center">
-        <h2 className="text-3xl font-bold mb-2">
-          Get your restaurant live and ready for orders in 3 easy steps
-        </h2>
-        <p className="text-lg text-gray-600 mb-10">
-          Start receiving orders within 24 hours!
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-left">
-          <div>
-            <h3 className="text-xl font-bold text-orange-500 mb-2">STEP 1</h3>
-            <p>
-              Download the DUUITT Restaurant App
-              <br />
-              Available on Android & iOS
-            </p>
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-yellow-500 mb-2">STEP 2</h3>
-            <p>
-              Sign in or create your account
-              <br />
-              Just use your mobile number and some details
-            </p>
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-purple-500 mb-2">STEP 3</h3>
-            <p>
-              Add your restaurant details & menu
-              <br />
-              We'll help you get listed and ready to serve
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-purple-700 text-white py-10 px-6 lg:px-24">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 text-sm">
-          <div className="col-span-1">
-            <div className="text-3xl font-bold mb-2">DUUITT</div>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-2">For Restaurants</h4>
-            <p>Partner With Us</p>
-            <a
-              href="https://drive.google.com/file/d/1VRzcB28w3yfe8-gRC70m8fqj4EGe9LAt/view?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white hover:underline"
-            >
-              Download App
-            </a>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-2">For Delivery Partners</h4>
-            <p>Partner With Us</p>
-            <a
-              href="https://drive.google.com/file/d/1NDMuQOHo2X21gg3X04aN_jMtOAcSe80Z/view?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white hover:underline"
-            >
-              Download App
-            </a>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-2">Learn More</h4>
-            <p>Terms & Conditions</p>
-            <p>Privacy Policy</p>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-2">Social Links</h4>
-            <div className="flex gap-2">
-              <span>○</span>
-              <span>○</span>
-              <span>○</span>
-              <span>○</span>
+            <div className="flex items-start space-x-3">
+              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <span className="text-gray-800 font-medium">Bank account details</span>
             </div>
           </div>
         </div>
-        <p className="text-center mt-6 text-sm">Copyright © 2025 Duuitt</p>
-      </footer>
+      </section>
 
-      {/* OTP Modal */}
-      {/* {showOTP && (
+      <Footer />
+      {showOTP && (
         <OTPModal
-          phone={formData.phone}s
+          phone={formData.phone}
           backendOtp={generatedOTP}
           onClose={handleCloseModal}
           onVerify={handleOTPVerify}
@@ -253,7 +294,7 @@ const Register = () => {
           setOtp={setEnteredOTP}
           error={error}
         />
-      )} */}
+      )}
     </div>
   );
 };

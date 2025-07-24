@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import Input from "../components/Input";
-import Button from "../components/Button";
 import bgImage from "../assets/images/bg-image.png";
 import axiosInstance from "../api/apiInstance";
 import OTPModal from "../components/modals/OTPModal";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
+import Navbar from "../components/layout/Navbar";
+import Footer from "../components/layout/Footer";
 
 
 const HomePage = () => {
@@ -35,7 +35,7 @@ const HomePage = () => {
         phone: Number(phone),
       });
 
-      if (response.data ) {
+      if (response.data) {
         setGeneratedOTP(response.data.data.otp);
         toast.success("OTP sent successfully!");
         setShowOTP(true);
@@ -52,7 +52,7 @@ const HomePage = () => {
       setError("Please enter the OTP.");
       return;
     }
-    
+
     try {
       const response = await axiosInstance("post", "/vendor/verify-otp", {
         phone: Number(phone),
@@ -80,7 +80,7 @@ const HomePage = () => {
 
   return (
     <div className="font-sans text-gray-800">
-      {/* Hero Section */}
+      <Navbar />
       <section
         className="relative text-white min-h-screen flex flex-col justify-center items-start px-8 lg:px-24 pt-20 pb-12 bg-cover bg-center"
         style={{ backgroundImage: `url(${bgImage})` }}
@@ -93,15 +93,22 @@ const HomePage = () => {
 
         <div className="absolute top-20 right-8 bg-white rounded-lg p-6 shadow-lg w-full max-w-sm z-20">
           <h2 className="text-xl font-semibold mb-4 text-black">Get Started</h2>
-          <Input
+
+          <input
             type="tel"
-            placeholder="Enter your registered mobile number"
+            name="phone"
+            placeholder="Enter 10-digit phone number"
+            className="w-full text-black border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
           {error && <p className="text-sm text-red-600 mb-2">{error}</p>}
 
-          <Button label="Login" onClick={handleLogin} />
+          <button
+            onClick={handleLogin}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg mt-6 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >Sign In
+          </button>
           <p className="text-sm mt-3 text-center text-gray-700">
             Don't have an account?{" "}
             <Link to="/register" className="text-purple-600 hover:underline">
@@ -143,49 +150,7 @@ const HomePage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-purple-700 text-white py-10 px-6 lg:px-24">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 text-sm">
-          <div className="col-span-1">
-            <div className="text-3xl font-bold mb-2">DUUITT</div>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-2">For Restaurants</h4>
-            <p>Partner With Us</p>
-            <a
-              href="https://drive.google.com/file/d/1VRzcB28w3yfe8-gRC70m8fqj4EGe9LAt/view?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white hover:underline"
-            >
-              Download App
-            </a>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-2">For Delivery Partners</h4>
-            <p>Partner With Us</p>
-            <a
-              href="https://drive.google.com/file/d/1NDMuQOHo2X21gg3X04aN_jMtOAcSe80Z/view?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white hover:underline"
-            >
-              Download App
-            </a>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-2">Learn More</h4>
-            <p>Terms & Conditions</p>
-            <p>Privacy Policy</p>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-2">Social Links</h4>
-            <div className="flex gap-2">
-              <span>○</span><span>○</span><span>○</span><span>○</span>
-            </div>
-          </div>
-        </div>
-        <p className="text-center mt-6 text-sm">Copyright © 2025 Duuitt</p>
-      </footer>
+      <Footer />
 
       {/* OTP Modal */}
       {showOTP && (

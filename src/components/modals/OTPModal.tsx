@@ -1,5 +1,3 @@
-import React from "react";
-import logo from "../../assets/images/logo.svg";
 import Button from "../Button";
 
 
@@ -31,30 +29,71 @@ const OTPModal: React.FC<OTPModalProps> = ({ phone, onClose, onVerify, otp, setO
                     {/* Icon */}
                     <div className="mb-6">
                         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto bg-white">
-                            <img src={logo} alt="Logo" className="w-12 h-12 object-contain" />
+                            {/* <img src={logo} alt="Logo" className="w-12 h-12 object-contain" /> */}
+                            <div className="text-4xl flex-inline font-bold mb-2">
+                                <span className="bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">DUU</span>
+                                <span className="text-black">ITT</span>
+                            </div>
                         </div>
 
                     </div>
 
                     {/* Title */}
-                    <h2 className="text-lg font-medium text-gray-800 mb-6">
-                        Enter OTP Code
+                    <h2 className="text-lg font-medium text-green-500 mb-6">
+                        Enter OTP Code Sent to  Sent to {phone}
                     </h2>
 
                     {/* OTP Input */}
-                    <div className="mb-6">
-                        <input
-                            type="text"
-                            placeholder="Enter 4-digit code"
-                            value={otp}
-                            onChange={(e) => setOtp(e.target.value)}
-                            maxLength={6}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg text-center text-lg font-medium tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                        <p className="text-sm text-gray-500 mt-2">
-                            Sent to {phone}
-                        </p>
+                    {/* OTP Input Boxes */}
+                    <div className="mb-6 flex justify-center space-x-2">
+                        {otp.split('').map((digit, index) => (
+                            <input
+                                key={index}
+                                type="text"
+                                inputMode="numeric"
+                                maxLength={1}
+                                value={digit}
+                                onChange={(e) => {
+                                    const newOtp = otp.split('');
+                                    newOtp[index] = e.target.value.replace(/\D/, '');
+                                    setOtp(newOtp.join(''));
+
+                                    // Move to next box
+                                    if (e.target.value && index < 5) {
+                                        document.getElementById(`otp-input-${index + 1}`)?.focus();
+                                    }
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+                                        document.getElementById(`otp-input-${index - 1}`)?.focus();
+                                    }
+                                }}
+                                id={`otp-input-${index}`}
+                                className="w-10 h-12 text-center text-lg border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        ))}
+                        {/* Fill empty boxes if otp length < 6 */}
+                        {Array.from({ length: 4 - otp.length }).map((_, index) => (
+                            <input
+                                key={otp.length + index}
+                                id={`otp-input-${otp.length + index}`}
+                                type="text"
+                                inputMode="numeric"
+                                maxLength={1}
+                                value=""
+                                onChange={(e) => {
+                                    const newOtp = otp + e.target.value.replace(/\D/, '');
+                                    setOtp(newOtp.slice(0, 4));
+
+                                    if (e.target.value && otp.length + index < 3) {
+                                        document.getElementById(`otp-input-${otp.length + index + 1}`)?.focus();
+                                    }
+                                }}
+                                className="w-10 h-12 text-center text-lg border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        ))}
                     </div>
+
 
                     {error && (
                         <p className="text-sm text-red-500 mb-4">{error}</p>
@@ -63,15 +102,6 @@ const OTPModal: React.FC<OTPModalProps> = ({ phone, onClose, onVerify, otp, setO
                     {/* Verify Button */}
 
                     <Button label="Verify OTP" onClick={onVerify} />
-                   
-
-                    {/* Resend link */}
-                    <div className="mt-4">
-                        
-                        <button className="text-blue-500 text-sm hover:underline">
-                            Didn't receive code? Resend
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
