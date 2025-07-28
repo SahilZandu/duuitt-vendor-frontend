@@ -1,4 +1,4 @@
-import Button from "../Button";
+import Spinner from "../loader/Spinner";
 
 
 interface OTPModalProps {
@@ -9,9 +9,10 @@ interface OTPModalProps {
     setOtp: (value: string) => void;
     error?: string;
     backendOtp?: number | null;
+    isVerfied: boolean;
 }
 
-const OTPModal: React.FC<OTPModalProps> = ({ phone, onClose, onVerify, otp, setOtp, error }) => {
+const OTPModal: React.FC<OTPModalProps> = ({ phone, onClose, onVerify, otp, setOtp, error, isVerfied }) => {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 p-8">
@@ -101,7 +102,14 @@ const OTPModal: React.FC<OTPModalProps> = ({ phone, onClose, onVerify, otp, setO
 
                     {/* Verify Button */}
 
-                    <Button label="Verify OTP" onClick={onVerify} />
+                    <button
+                        onClick={onVerify}
+                        className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg mt-4 transition-colors disabled:opacity-50 flex items-center justify-center"
+                        disabled={isVerfied}
+                    >
+                        {isVerfied ? <Spinner /> : "Verify OTP"}
+                    </button>
+
                 </div>
             </div>
         </div>
