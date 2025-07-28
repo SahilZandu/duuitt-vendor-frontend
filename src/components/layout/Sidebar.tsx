@@ -61,6 +61,16 @@ const Sidebar: React.FC = () => {
   const isActive = (path?: string) =>
     path ? location.pathname.startsWith(path) : false;
 
+  // const handleLogout = () => {
+  //   setIsLoggingOut(true);
+  //   setTimeout(() => {
+  //     localStorage.removeItem("accessToken");
+  //     document.cookie = "authToken=; Max-Age=0; path=/";
+  //     setIsLoggingOut(false);
+  //     navigate("/");
+  //   }, 1000);
+  // };
+
   return (
     <aside className="w-64 bg-[#8E3CF7] text-white min-h-screen flex flex-col justify-between py-6 px-4">
       <nav className="space-y-2">

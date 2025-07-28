@@ -7,9 +7,12 @@ import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
+import Spinner from "../components/loader/Spinner";
 
 
 const HomePage = () => {
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isVerfied, setIsVerifed] = useState(false);
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
   const [showOTP, setShowOTP] = useState(false);
@@ -22,6 +25,7 @@ const HomePage = () => {
 
   const handleLogin = async () => {
     setError("");
+
     if (!phone) {
       setError("Phone number is required.");
       return;
@@ -30,6 +34,7 @@ const HomePage = () => {
       setError("Please enter a valid 10-digit mobile number.");
       return;
     }
+    setIsLoggingIn(true);
     try {
       const response = await axiosInstance("post", "/vendor", {
         phone: Number(phone),
@@ -43,6 +48,8 @@ const HomePage = () => {
     } catch (err) {
       console.error("Login error:", err);
       setError("Login failed. Please try again.");
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -52,7 +59,7 @@ const HomePage = () => {
       setError("Please enter the OTP.");
       return;
     }
-
+    setIsVerifed(true)
     try {
       const response = await axiosInstance("post", "/vendor/verify-otp", {
         phone: Number(phone),
@@ -71,6 +78,9 @@ const HomePage = () => {
     } catch (error) {
       console.error("OTP verification error:", error);
       setError("OTP verification failed. Please try again.");
+    }
+    finally {
+      setIsVerifed(false);
     }
   };
 
@@ -108,8 +118,10 @@ const HomePage = () => {
 
           <button
             onClick={handleLogin}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg mt-6 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >Sign In
+            disabled={isLoggingIn}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg mt-6 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          >
+            {isLoggingIn ? <Spinner /> : "Sign In"}
           </button>
           <p className="text-sm mt-3 text-center text-gray-700">
             Don't have an account?{" "}
@@ -164,6 +176,7 @@ const HomePage = () => {
           otp={enteredOTP}
           setOtp={setEnteredOTP}
           error={error}
+          isVerfied={isVerfied}
         />
       )}
     </div>
