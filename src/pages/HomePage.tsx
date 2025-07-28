@@ -58,10 +58,12 @@ const HomePage = () => {
         phone: Number(phone),
         otp: Number(enteredOTP),
       });
+      console.log({ response });
 
       if (response.data.statusCode === 200) {
         toast.success(response?.data?.message || "Login successful");
         localStorage.setItem("accessToken", response?.data?.data?.access_token);
+        localStorage.setItem("restaurant_id", response?.data?.data?.restaurant?._id);
         Cookies.set("authToken", response?.data?.data?.access_token);
         setShowOTP(false);
         navigate("/dashboard");

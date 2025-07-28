@@ -6,12 +6,14 @@ import Dashboard from "../pages/authenticatedPages/Dashboard";
 import MainLayout from "../components/layout/MainLayout";
 import ProtectedRoute from "../api/ProtectedRoute";
 import PublicRoute from "../api/PublicRoute";
+import OrderHistory from "../pages/authenticatedPages/Settings/OrderHistory/OrderHistory";
+import ViewOrderDetails from "../pages/authenticatedPages/Settings/OrderHistory/ViewOrderDetails";
 
 const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route element={<PublicRoute  />}>
+      <Route element={<PublicRoute />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<Register />} />
         {/* You can add /login here too if needed */}
@@ -26,6 +28,10 @@ const AppRoutes = () => {
         }
       >
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/outlet/order-history" element={<OrderHistory />} />
+        <Route path="/outlet/order-history/view/:id" element={<ViewOrderDetails />} />
+
+
       </Route>
 
       {/* Catch-all Route */}
