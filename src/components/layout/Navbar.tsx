@@ -13,7 +13,6 @@ const Navbar = () => {
             </span>
             <span className="text-white">ITT</span>
           </div>
-         
         </Link>
 
         {/* Optional Right Side (Menu, Login, etc.) */}

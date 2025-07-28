@@ -1,39 +1,28 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import HomePage from "../pages/HomePage";
-import MainLayout from "../components/layout/MainLayout";
 import Dashboard from "../pages/authenticatedPages/Dashboard";
+import MainLayout from "../components/layout/MainLayout";
 
 const AppRoutes = () => {
   return (
-    // <Router>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/" element={<HomePage />} />
 
-        {/* Protected Routes */}
-        <Route
-          path="/"
-          element={
-            <MainLayout>
-              <HomePage />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <MainLayout>
-              <Dashboard />
-            </MainLayout>
-          }
-        />
-        {/* Redirect unknown routes */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    // </Router>
+      {/* Protected Routes with layout */}
+      <Route element={<MainLayout />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        {/* <Route path="/profile" element={<Profile />} /> */}
+        {/* <Route path="/settings" element={<Settings />} /> */}
+      </Route>
+
+      {/* Catch-all Route */}
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
   );
 };
 

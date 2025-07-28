@@ -4,8 +4,7 @@ import { Link } from "react-router-dom";
 const Sidebar: React.FC = () => {
   return (
     <aside className="w-64 bg-gray-800 text-white min-h-screen p-4">
-      <h2 className="text-xl font-semibold mb-6">Dashboard</h2>
-      <nav className="flex flex-col space-y-4">
+      <nav className="flex flex-col space-y-4 mt-[100px]">
         <Link to="/dashboard" className="hover:bg-gray-700 px-3 py-2 rounded">
           Dashboard
         </Link>
