@@ -57,11 +57,12 @@ export const fetchVendorDetails = async (
 };
 
 export const updateVendorProfile = async (
-    vendor_id: string,
-    formData: FormData
+    profileData: Record<string, any> // Plain object
 ): Promise<Restaurant | null> => {
     try {
-        const response = await apiRequest("post", "/vendor/update-profile", formData);
+        const response = await apiRequest("post", "/vendor/update-profile", {
+            ...profileData,
+        });
         return response?.data?.data || null;
     } catch (error) {
         console.error("Error updating restaurant profile:", error);

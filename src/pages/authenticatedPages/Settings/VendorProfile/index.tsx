@@ -63,14 +63,9 @@ const VendorProfile = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const vendor_id = localStorage.getItem("vendor_id");
-        if (!vendor_id) {
-            console.error("Restaurant ID not found.");
-            return;
-        }
         setIsSubmitting(true);
         try {
-            const res = await updateVendorProfile(vendor_id, formData);
+            const res = await updateVendorProfile(formData);
             console.log("Profile updated successfully:", res);
             toast.success("Profile Updated Successfully");
         } catch (err) {
