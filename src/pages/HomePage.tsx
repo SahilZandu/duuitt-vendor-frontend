@@ -53,35 +53,76 @@ const HomePage = () => {
     }
   };
 
+  // const handleOTPVerify = async () => {
+  //   setError("");
+  //   if (!enteredOTP) {
+  //     setError("Please enter the OTP.");
+  //     return;
+  //   }
+  //   setIsVerifed(true)
+  //   try {
+  //     const response = await axiosInstance("post", "/vendor/verify-otp", {
+  //       phone: Number(phone),
+  //       otp: Number(enteredOTP),
+  //     });
+
+  //     if (response.data.statusCode === 200) {
+  //       toast.success(response?.data?.message || "Login successful");
+  //       localStorage.setItem("accessToken", response?.data?.data?.access_token);
+  //       Cookies.set("authToken", response?.data?.data?.access_token);
+  //       setShowOTP(false);
+  //       navigate("/dashboard");
+  //     }
+  //   } catch (error) {
+  //     console.error("OTP verification error:", error);
+  //     setError("OTP verification failed. Please try again.");
+  //   }
+  //   finally {
+  //     setIsVerifed(false);
+  //   }
+  // };
   const handleOTPVerify = async () => {
     setError("");
     if (!enteredOTP) {
       setError("Please enter the OTP.");
       return;
     }
-    setIsVerifed(true)
+  
+    setIsVerifed(true);
+  
     try {
       const response = await axiosInstance("post", "/vendor/verify-otp", {
         phone: Number(phone),
         otp: Number(enteredOTP),
       });
-
+  
       if (response.data.statusCode === 200) {
         toast.success(response?.data?.message || "Login successful");
+  
         localStorage.setItem("accessToken", response?.data?.data?.access_token);
         Cookies.set("authToken", response?.data?.data?.access_token);
-        setShowOTP(false);
-        navigate("/dashboard");
+        
+        
+        const vendorProfile = response?.data?.data;
+        localStorage.setItem("is_kyc_completed", vendorProfile?.is_kyc_completed);
+        localStorage.setItem("vendor_id", vendorProfile?._id);
+
+  
+        if (vendorProfile?.is_kyc_completed) {
+          navigate("/dashboard");
+        } else {
+          navigate("/vendor-kyc");
+        }
       }
     } catch (error) {
       console.error("OTP verification error:", error);
       setError("OTP verification failed. Please try again.");
-    }
-    finally {
+    } finally {
       setIsVerifed(false);
     }
   };
-
+  
+  
   const handleCloseModal = () => {
     setShowOTP(false);
     setEnteredOTP("");
