@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import MenuIcon from "../../lib/MenuIcon";
 import Cookies from "js-cookie"; // Make sure you have this installed: `npm install js-cookie`
 import Spinner from "../loader/Spinner";
-import logo from "../../assets/images/logo.svg";
+import logo from "../../assets/images/logo.png";
 
 type MenuItem = {
   label: string;
