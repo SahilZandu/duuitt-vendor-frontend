@@ -36,8 +36,7 @@ const ProtectedRoute = () => {
   if (loading) return <div>Loading...</div>;
   if (!vendor) return <Navigate to="/login" replace />;
 
-  const isKycCompleted = vendor?.is_kyc_completed ?? localStorage.getItem('is_kyc_completed');
-  console.log("Vendor API response:", vendor?.is_kyc_completed);
+  const isKycCompleted = vendor?.is_kyc_completed === true;
 
 
   if (!isKycCompleted && location.pathname !== "/vendor-kyc") {

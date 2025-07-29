@@ -70,6 +70,7 @@ const Sidebar: React.FC = () => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("isKycCompleted");
       localStorage.removeItem("vendor_id");
+      localStorage.removeItem("restaurant_id");
       Cookies.remove("authToken");
 
       setIsLoggingOut(false);
