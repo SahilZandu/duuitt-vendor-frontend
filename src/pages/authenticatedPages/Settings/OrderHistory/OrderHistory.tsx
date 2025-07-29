@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import type { TableColumn } from "react-data-table-component";
 import { fetchOrdersByStatus, type Order } from "../../../../api/settingsApi";
 import GlobalDataTable from "../../../../components/layout/GlobalDataTable";
-import FormatDate from "../../../../components/FormatDate";
+import FormatDate from "../../../../components/Ui/FormatDate";
 import MenuIcon from "../../../../lib/MenuIcon";
 import { useNavigate } from "react-router-dom";
 

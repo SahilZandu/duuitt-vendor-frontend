@@ -8,6 +8,7 @@ import ProtectedRoute from "../api/ProtectedRoute";
 import PublicRoute from "../api/PublicRoute";
 import OrderHistory from "../pages/authenticatedPages/Settings/OrderHistory/OrderHistory";
 import ViewOrderDetails from "../pages/authenticatedPages/Settings/OrderHistory/ViewOrderDetails";
+import RestaurantProfile from "../pages/authenticatedPages/Settings/RestaurantProfile";
 
 const AppRoutes = () => {
   return (
@@ -30,7 +31,7 @@ const AppRoutes = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/outlet/order-history" element={<OrderHistory />} />
         <Route path="/outlet/order-history/view/:id" element={<ViewOrderDetails />} />
-
+        <Route path="/outlet/restaurant-profile" element={<RestaurantProfile />} />
 
       </Route>
 

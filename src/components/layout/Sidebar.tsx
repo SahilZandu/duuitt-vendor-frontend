@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import MenuIcon from "../../lib/MenuIcon";
+import { toast } from "react-toastify";
 
 type MenuItem = {
   label: string;
@@ -30,7 +31,7 @@ const bottomMenuItems: MenuItem[] = [
   {
     label: "Settings",
     icon: "settings",
-     to: "/setting",
+    to: "/setting",
   },
   { label: "Get Help", to: "/help", icon: "help" },
   { label: "Sign out", to: "/logout", icon: "logout" },
@@ -53,7 +54,7 @@ const Sidebar: React.FC = () => {
   };
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(getInitialOpenMenus);
-
+  const navigate = useNavigate();
   const toggleMenu = (label: string) => {
     setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
   };
@@ -61,15 +62,12 @@ const Sidebar: React.FC = () => {
   const isActive = (path?: string) =>
     path ? location.pathname.startsWith(path) : false;
 
-  // const handleLogout = () => {
-  //   setIsLoggingOut(true);
-  //   setTimeout(() => {
-  //     localStorage.removeItem("accessToken");
-  //     document.cookie = "authToken=; Max-Age=0; path=/";
-  //     setIsLoggingOut(false);
-  //     navigate("/");
-  //   }, 1000);
-  // };
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    document.cookie = "authToken=; Max-Age=0; path=/";
+    toast.success("Signed out successfully");
+    navigate("/");
+  };
 
   return (
     <aside className="w-64 bg-[#8E3CF7] text-white min-h-screen flex flex-col justify-between py-6 px-4">
@@ -131,6 +129,21 @@ const Sidebar: React.FC = () => {
       <div className="space-y-2">
         {bottomMenuItems.map((item, idx) => {
           const hasChildren = !!item.children?.length;
+
+          // Special handling for sign out
+          if (item.label === "Sign out") {
+            return (
+              <button
+                key={idx}
+                onClick={handleLogout}
+                className="w-full flex items-center space-x-2 px-3 py-2 rounded hover:bg-[#7b2de6]"
+              >
+                {item.icon && <MenuIcon name={item.icon} />}
+                <span>{item.label}</span>
+              </button>
+            );
+          }
+
           return (
             <div key={idx}>
               {item.to && !hasChildren && (
@@ -172,6 +185,7 @@ const Sidebar: React.FC = () => {
             </div>
           );
         })}
+
       </div>
     </aside>
   );
