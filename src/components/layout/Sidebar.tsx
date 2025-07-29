@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import MenuIcon from "../../lib/MenuIcon";
-import { toast } from "react-toastify";
+import Cookies from "js-cookie"; // Make sure you have this installed: `npm install js-cookie`
+import Spinner from "../loader/Spinner";
+import logo from "../../assets/images/logo.png";
 
 type MenuItem = {
   label: string;
@@ -28,17 +30,16 @@ const topMenuItems: MenuItem[] = [
 ];
 
 const bottomMenuItems: MenuItem[] = [
-  {
-    label: "Settings",
-    icon: "settings",
-    to: "/setting",
-  },
+  { label: "Settings", icon: "settings", to: "/setting" },
   { label: "Get Help", to: "/help", icon: "help" },
-  { label: "Sign out", to: "/logout", icon: "logout" },
+  { label: "Sign out", to: "/logout", icon: "logout" }, // this will be handled manually
 ];
 
+
 const Sidebar: React.FC = () => {
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const getInitialOpenMenus = () => {
     const openState: Record<string, boolean> = {};
@@ -54,7 +55,6 @@ const Sidebar: React.FC = () => {
   };
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(getInitialOpenMenus);
-  const navigate = useNavigate();
   const toggleMenu = (label: string) => {
     setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
   };
@@ -63,10 +63,18 @@ const Sidebar: React.FC = () => {
     path ? location.pathname.startsWith(path) : false;
 
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    document.cookie = "authToken=; Max-Age=0; path=/";
-    toast.success("Signed out successfully");
-    navigate("/");
+    setIsLoggingOut(true);
+
+    setTimeout(() => {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("isKycCompleted");
+      localStorage.removeItem("vendor_id");
+      localStorage.removeItem("restaurant_id");
+      Cookies.remove("authToken");
+
+      setIsLoggingOut(false);
+      navigate("/login");
+    }, 1000);
   };
 
   return (
@@ -74,7 +82,7 @@ const Sidebar: React.FC = () => {
       <nav className="space-y-2">
         <a href="/" className="mb-8 cursor-pointer">
           <img
-            src="/src/assets/images/logo.png"
+            src={logo}
             alt="Logo"
             className="h-[120px] w-[200px]"
           />
@@ -130,7 +138,7 @@ const Sidebar: React.FC = () => {
         {bottomMenuItems.map((item, idx) => {
           const hasChildren = !!item.children?.length;
 
-          // Special handling for sign out
+          // Handle "Sign out" separately
           if (item.label === "Sign out") {
             return (
               <button
@@ -139,7 +147,7 @@ const Sidebar: React.FC = () => {
                 className="w-full flex items-center space-x-2 px-3 py-2 rounded hover:bg-[#7b2de6]"
               >
                 {item.icon && <MenuIcon name={item.icon} />}
-                <span>{item.label}</span>
+                {isLoggingOut ? <Spinner /> : <span>{item.label}</span>}
               </button>
             );
           }

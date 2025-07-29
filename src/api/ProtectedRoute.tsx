@@ -1,19 +1,50 @@
-// src/components/ProtectedRoute.tsx
-import type { JSX } from "react";
-import { Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import axiosInstance from "../api/apiInstance";
+import Loader from "../components/loader/Loader";
 
-interface Props {
-  children: JSX.Element;
-}
-
-const ProtectedRoute = ({ children }: Props) => {
+const ProtectedRoute = () => {
   const token = localStorage.getItem("accessToken");
+  const vendor_id = localStorage.getItem("vendor_id");
+  const location = useLocation();
 
-  if (!token) {
-    return <Navigate to="/login" replace />;
+  const [loading, setLoading] = useState(true);
+  const [vendor, setVendor] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!token || !vendor_id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await axiosInstance("post", "/vendor/get", {
+          vendor_id: vendor_id,
+        });
+        setVendor(response?.data?.data[0]);
+      } catch (err) {
+        console.error("Failed to fetch vendor profile", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [token, vendor_id]);
+
+  if (!token) return <Navigate to="/login" replace />;
+  if (loading) return <div><Loader /> </div>;
+  if (!vendor) return <Navigate to="/login" replace />;
+
+  const isKycCompleted = vendor?.is_kyc_completed === true;
+
+
+  if (!isKycCompleted && location.pathname !== "/vendor-kyc") {
+    return <Navigate to="/vendor-kyc" replace />;
   }
 
-  return children;
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

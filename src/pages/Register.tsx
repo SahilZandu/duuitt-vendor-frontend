@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 
 
 const Register = () => {
+  const [isVerfied, setIsVerifed] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     restaurant_name: "",
@@ -65,7 +67,7 @@ const Register = () => {
       setError("Please enter the OTP.");
       return;
     }
-
+    setIsVerifed(true);
     try {
       const response = await axiosInstance("post", "/vendor/verify-otp", {
         phone: Number(formData.phone),
@@ -82,6 +84,8 @@ const Register = () => {
     } catch (error) {
       console.error("OTP verification error:", error);
       setError("OTP verification failed. Please try again.");
+    } finally {
+      setIsVerifed(false);
     }
   };
   const handleCloseModal = () => {
@@ -293,6 +297,7 @@ const Register = () => {
           otp={enteredOTP}
           setOtp={setEnteredOTP}
           error={error}
+          isVerfied={isVerfied}
         />
       )}
     </div>

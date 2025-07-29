@@ -43,16 +43,28 @@ export const updateRestaurantProfile = async (
     }
 };
 
-// export const fetchVendorDetails = async (
-//     vendor_id: string
-// ): Promise<Restaurant | null> => {
-//     try {
-//         const payload = { vendor_id };
-//         const response = await apiRequest("post", "/vendor/get", payload);
-//         return response?.data?.data || null;
-//     } catch (error) {
-//         console.error("Error fetching restaurant details:", error);
-//         return null;
-//     }
-// };
+export const fetchVendorDetails = async (
+    vendor_id: string
+): Promise<Restaurant | null> => {
+    try {
+        const payload = { vendor_id };
+        const response = await apiRequest("post", "/vendor/get", payload);
+        return response?.data?.data || null;
+    } catch (error) {
+        console.error("Error fetching restaurant details:", error);
+        return null;
+    }
+};
 
+export const updateVendorProfile = async (
+    vendor_id: string,
+    formData: FormData
+): Promise<Restaurant | null> => {
+    try {
+        const response = await apiRequest("post", "/vendor/update-profile", formData);
+        return response?.data?.data || null;
+    } catch (error) {
+        console.error("Error updating restaurant profile:", error);
+        return null;
+    }
+};

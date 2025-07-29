@@ -2,43 +2,57 @@ import React, { useEffect, useState } from "react";
 import Button from "../../../../components/Ui/Button";
 import Input from "../../../../components/Ui/Input";
 import PageTitle from "../../../../components/Ui/PageTitle";
-import { fetchRestaurantDetails, updateRestaurantProfile } from "../../../../api/ProfileUpdateApi";
+import { fetchVendorDetails, updateVendorProfile } from "../../../../api/ProfileUpdateApi";
 import Loader from "../../../../components/loader/Loader";
 import { toast } from "react-toastify";
 
 type FormDataType = {
-    banner: string | File;
-    assets: (string | File)[];
     name: string;
-    about: string;
-    address: string;
     phone: string;
     email: string;
-    date_of_founding: string;
-    veg_non_veg: string;
-    minimum_order_value: string;
-    minimum_order_preparation_time: string;
-};
-
-const RestaurantProfile = () => {
+}
+const VendorProfile = () => {
     const [formData, setFormData] = useState<FormDataType>({
-        banner: "",
-        assets: [],
         name: "",
-        about: "",
-        address: "",
         phone: "",
         email: "",
-        date_of_founding: "",
-        veg_non_veg: "",
-        minimum_order_value: "",
-        minimum_order_preparation_time: "",
     });
     console.log({ formData });
 
     const [loading, setLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    useEffect(() => {
+        const loadRestaurant = async () => {
+            setLoading(true);
+            try {
+                const vendor_id = localStorage.getItem("vendor_id");
+                if (!vendor_id) {
+                    console.warn("Restaurant ID not found in localStorage.");
+                    setLoading(false);
+                    return;
+                }
+                const fetchedData = await fetchVendorDetails(vendor_id);
+                console.log({fetchedData});
+                
+                if (Array.isArray(fetchedData) && fetchedData.length > 0) {
+                    setFormData({
+                        name: fetchedData[0]?.name,
+                        phone: fetchedData[0]?.phone,
+                        email: fetchedData[0]?.email,
+                    });
+                } else {
+                    console.warn("No restaurant data returned.");
+                }
+            } catch (error) {
+                console.error("Failed to load restaurant details:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadRestaurant();
+    }, []);
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -49,22 +63,22 @@ const RestaurantProfile = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // const restaurant_id = localStorage.getItem("restaurant_id");
-        // if (!restaurant_id) {
-        //     console.error("Restaurant ID not found.");
-        //     return;
-        // }
-        // setIsSubmitting(true);
-        // try {
-        //     const res = await updateRestaurantProfile(restaurant_id, formData);
-        //     console.log("Profile updated successfully:", res);
-        //     toast.success("Profile Updated Successfully");
-        // } catch (err) {
-        //     console.error("Failed to update restaurant:", err);
-        //     toast.error("Failed to update profile");
-        // } finally {
-        //     setIsSubmitting(false);
-        // }
+        const vendor_id = localStorage.getItem("vendor_id");
+        if (!vendor_id) {
+            console.error("Restaurant ID not found.");
+            return;
+        }
+        setIsSubmitting(true);
+        try {
+            const res = await updateVendorProfile(vendor_id, formData);
+            console.log("Profile updated successfully:", res);
+            toast.success("Profile Updated Successfully");
+        } catch (err) {
+            console.error("Failed to update restaurant:", err);
+            toast.error("Failed to update profile");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (loading) {
@@ -73,7 +87,7 @@ const RestaurantProfile = () => {
 
     return (
         <form onSubmit={handleSubmit} className="px-4 py-6 md:px-8 bg-white">
-            <PageTitle title="Restaurant Profile" subtitle="Update your restaurant details here" align="left" />
+            <PageTitle title="Manage Profile" align="left" />
 
             {/* Form Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -81,7 +95,7 @@ const RestaurantProfile = () => {
                     <Input
                         type="text"
                         name="name"
-                        label="Restaurant Name"
+                        label="Name"
                         value={formData.name}
                         onChange={handleChange}
                         className="input"
@@ -122,4 +136,4 @@ const RestaurantProfile = () => {
     );
 };
 
-export default RestaurantProfile;
+export default VendorProfile;
