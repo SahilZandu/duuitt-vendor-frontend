@@ -1,39 +1,59 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import MenuIcon from "../../lib/MenuIcon";
+import Cookies from "js-cookie"; // Make sure you have this installed: `npm install js-cookie`
 import Spinner from "../loader/Spinner";
 
 type MenuItem = {
   label: string;
   to?: string;
+  icon?: string;
   children?: MenuItem[];
 };
 
-const menuItems: MenuItem[] = [
-  { label: "Dashboard", to: "/dashboard" },
-  { label: "Profile", to: "/profile" },
+const topMenuItems: MenuItem[] = [
+  { label: "Home", to: "/dashboard", icon: "home" },
+  { label: "Orders", to: "/orders", icon: "order" },
+  { label: "Team Members", to: "/team", icon: "team" },
   {
-    label: "Settings",
-    children: [
-      { label: "Restaurant Profile", to: "/settings/restaurant-profile" },
-      { label: "Order History", to: "/settings/order-history" },
-      { label: "Manage Profile", to: "/settings/manage-profile" },
+    label: "Outlet Info", to: "/outlet", icon: "outlet", children: [
+      { label: "Restaurant Profile", to: "/outlet/restaurant-profile", icon: "restaurant" },
+      { label: "Order History", to: "/outlet/order-history", icon: "order" },
+      { label: "Manage Profile", to: "/outlet/manage-profile", icon: "manage" },
     ],
   },
-  {
-    label: "Management",
-    children: [
-      { label: "Users", to: "/management/users" },
-      { label: "Permissions", to: "/management/permissions" },
-    ],
-  },
-  { label: "Logout" }, // no 'to' — it will trigger function
+  { label: "Messages", to: "/messages", icon: "message" },
+  { label: "Offers", to: "/offers", icon: "offer" },
+  { label: "KYC Documents", to: "/kyc", icon: "kyc" },
+  { label: "Reports", to: "/reports", icon: "report" },
 ];
+
+const bottomMenuItems: MenuItem[] = [
+  { label: "Settings", icon: "settings", to: "/setting" },
+  { label: "Get Help", to: "/help", icon: "help" },
+  { label: "Sign out", to: "/logout", icon: "logout" }, // this will be handled manually
+];
+const [isLoggingOut, setIsLoggingOut] = useState(false);
+
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const getInitialOpenMenus = () => {
+    const openState: Record<string, boolean> = {};
+    [...topMenuItems, ...bottomMenuItems].forEach((item) => {
+      if (item.children?.length) {
+        const hasActiveChild = item.children.some((child) =>
+          location.pathname.startsWith(child.to || "")
+        );
+        openState[item.label] = hasActiveChild;
+      }
+    });
+    return openState;
+  };
+
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(getInitialOpenMenus);
 
   const toggleMenu = (label: string) => {
     setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -44,49 +64,38 @@ const Sidebar: React.FC = () => {
 
   const handleLogout = () => {
     setIsLoggingOut(true);
+
     setTimeout(() => {
       localStorage.removeItem("accessToken");
-      document.cookie = "authToken=; Max-Age=0; path=/";
+      localStorage.removeItem("isKycCompleted");
+      localStorage.removeItem("vendor_id");
+      Cookies.remove("authToken");
+
       setIsLoggingOut(false);
-      navigate("/");
+      navigate("/login");
     }, 1000);
   };
 
   return (
-    <aside className="w-64 bg-gray-800 text-white min-h-screen p-4 fixed top-0 left-0 z-50">
-      <div className="mb-8">
-        <Link to="/" className="flex items-center space-x-2 px-3">
-          <div className="text-2xl font-extrabold leading-none">
-            <span className="bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">
-              DUU
-            </span>
-            <span className="text-white">ITT</span>
-          </div>
-        </Link>
-      </div>
-      <nav className="flex flex-col space-y-2 mt-24">
-        {menuItems.map((item, idx) => {
+    <aside className="w-64 bg-[#8E3CF7] text-white min-h-screen flex flex-col justify-between py-6 px-4">
+      <nav className="space-y-2">
+        <a href="/" className="mb-8 cursor-pointer">
+          <img
+            src="/src/assets/images/logo.png"
+            alt="Logo"
+            className="h-[120px] w-[200px]"
+          />
+        </a>
+
+        {topMenuItems.map((item, idx) => {
           const hasChildren = !!item.children?.length;
-
-          if (item.label === "Logout") {
-            return (
-              <button
-                key={idx}
-                onClick={handleLogout}
-                className="w-full text-left px-3 py-2 rounded hover:bg-gray-700 flex items-center space-x-2"
-                disabled={isLoggingOut}
-              >
-                {isLoggingOut ? <Spinner /> : <span>Logout</span>}
-              </button>
-            );
-          }
-
           return (
             <div key={idx}>
               {item.to && !hasChildren && (
                 <SidebarLink
                   to={item.to}
                   label={item.label}
+                  icon={item.icon}
                   active={isActive(item.to)}
                 />
               )}
@@ -95,19 +104,23 @@ const Sidebar: React.FC = () => {
                 <>
                   <button
                     onClick={() => toggleMenu(item.label)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded hover:bg-gray-700 focus:outline-none ${openMenus[item.label] ? "bg-gray-700" : ""
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded hover:bg-[#7b2de6] focus:outline-none ${openMenus[item.label] ? "bg-[#7b2de6]" : ""
                       }`}
                   >
-                    <span>{item.label}</span>
+                    <div className="flex items-center space-x-2">
+                      {item.icon && <MenuIcon name={item.icon} />}
+                      <span>{item.label}</span>
+                    </div>
+                    <MenuIcon name={openMenus[item.label] ? "dropdown-up" : "dropdown"} />
                   </button>
-
                   {openMenus[item.label] && (
                     <ul className="ml-4 mt-1 space-y-1">
-                      {item.children!.map((subItem, subIdx) => (
+                      {item?.children?.map((subItem, subIdx) => (
                         <SidebarLink
                           key={subIdx}
                           to={subItem.to!}
                           label={subItem.label}
+                          icon={subItem.icon}
                           active={isActive(subItem.to)}
                         />
                       ))}
@@ -119,6 +132,68 @@ const Sidebar: React.FC = () => {
           );
         })}
       </nav>
+
+      <div className="space-y-2">
+        {bottomMenuItems.map((item, idx) => {
+          const hasChildren = !!item.children?.length;
+
+          // Handle "Sign out" separately
+          if (item.label === "Sign out") {
+            return (
+              <button
+                key={idx}
+                onClick={handleLogout}
+                className="w-full flex items-center space-x-2 px-3 py-2 rounded hover:bg-[#7b2de6]"
+              >
+                {item.icon && <MenuIcon name={item.icon} />}
+                <span>{item.label}</span>
+                {isLoggingOut ? <Spinner /> : <span>Logout</span>}
+              </button>
+            );
+          }
+
+          return (
+            <div key={idx}>
+              {item.to && !hasChildren && (
+                <SidebarLink
+                  to={item.to}
+                  label={item.label}
+                  icon={item.icon}
+                  active={isActive(item.to)}
+                />
+              )}
+              {hasChildren && (
+                <>
+                  <button
+                    onClick={() => toggleMenu(item.label)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded hover:bg-[#7b2de6] focus:outline-none ${openMenus[item.label] ? "bg-[#7b2de6]" : ""
+                      }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      {item.icon && <MenuIcon name={item.icon} />}
+                      <span>{item.label}</span>
+                    </div>
+                    <MenuIcon name={openMenus[item.label] ? "dropdown-up" : "dropdown"} />
+                  </button>
+                  {openMenus[item.label] && (
+                    <ul className="ml-4 mt-1 space-y-1">
+                      {item?.children?.map((subItem, subIdx) => (
+                        <SidebarLink
+                          key={subIdx}
+                          to={subItem.to!}
+                          label={subItem.label}
+                          icon={subItem.icon}
+                          active={isActive(subItem.to)}
+                        />
+                      ))}
+                    </ul>
+                  )}
+                </>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </aside>
   );
 };
@@ -126,16 +201,18 @@ const Sidebar: React.FC = () => {
 interface SidebarLinkProps {
   to: string;
   label: string;
+  icon?: string;
   active?: boolean;
 }
 
-const SidebarLink: React.FC<SidebarLinkProps> = ({ to, label, active }) => (
+const SidebarLink: React.FC<SidebarLinkProps> = ({ to, label, icon, active }) => (
   <Link
     to={to}
-    className={`block px-3 py-2 rounded hover:bg-gray-700 ${active ? "bg-gray-700 font-semibold" : ""
+    className={`flex items-center space-x-2 px-3 py-2 rounded hover:bg-[#7b2de6] ${active ? "bg-[#7b2de6] font-semibold" : ""
       }`}
   >
-    {label}
+    {icon && <MenuIcon name={icon} />}
+    <span>{label}</span>
   </Link>
 );
 

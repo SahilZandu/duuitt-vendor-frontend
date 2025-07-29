@@ -1,4 +1,4 @@
-import { useEffect, useState, type JSX } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import axiosInstance from "../api/apiInstance";
 
@@ -18,9 +18,6 @@ const ProtectedRoute = () => {
       }
 
       try {
-        const formData = new FormData();
-        formData.append("vendor_id", vendor_id);
-
         const response = await axiosInstance("post", "/vendor/get", {
           vendor_id: vendor_id,
         });
@@ -37,15 +34,16 @@ const ProtectedRoute = () => {
 
   if (!token) return <Navigate to="/login" replace />;
   if (loading) return <div>Loading...</div>;
+  if (!vendor) return <Navigate to="/login" replace />;
 
-  const isKycCompleted = vendor?.is_kyc_completed;
+  const isKycCompleted = vendor?.is_kyc_completed ?? localStorage.getItem('is_kyc_completed');
+  console.log("Vendor API response:", vendor?.is_kyc_completed);
 
-  // Prevent access to all protected routes except /vendor-kyc if KYC incomplete
+
   if (!isKycCompleted && location.pathname !== "/vendor-kyc") {
     return <Navigate to="/vendor-kyc" replace />;
   }
 
-  // ✅ Only Outlet is needed here
   return <Outlet context={{ vendor }} />;
 };
 

@@ -6,6 +6,8 @@ import MainLayout from "../components/layout/MainLayout";
 import ProtectedRoute from "../api/ProtectedRoute";
 import PublicRoute from "../api/PublicRoute";
 import VendorKycPage from "../pages/kyc/VendorKycPage";
+import OrderHistory from "../pages/authenticatedPages/Settings/OrderHistory/OrderHistory";
+import ViewOrderDetails from "../pages/authenticatedPages/Settings/OrderHistory/ViewOrderDetails";
 
 const AppRoutes = () => {
   return (
@@ -22,6 +24,8 @@ const AppRoutes = () => {
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/vendor-kyc" element={<VendorKycPage />} />
+          <Route path="/outlet/order-history" element={<OrderHistory />} />
+          <Route path="/outlet/order-history/view/:id" element={<ViewOrderDetails />} />
         </Route>
       </Route>
 

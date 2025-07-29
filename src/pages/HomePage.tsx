@@ -87,27 +87,28 @@ const HomePage = () => {
       setError("Please enter the OTP.");
       return;
     }
-  
+
     setIsVerifed(true);
-  
+
     try {
       const response = await axiosInstance("post", "/vendor/verify-otp", {
         phone: Number(phone),
         otp: Number(enteredOTP),
       });
-  
+
       if (response.data.statusCode === 200) {
         toast.success(response?.data?.message || "Login successful");
-  
+
         localStorage.setItem("accessToken", response?.data?.data?.access_token);
+        localStorage.setItem("restaurant_id", response?.data?.data?.restaurant?._id);
         Cookies.set("authToken", response?.data?.data?.access_token);
-        
-        
+
+
         const vendorProfile = response?.data?.data;
         localStorage.setItem("is_kyc_completed", vendorProfile?.is_kyc_completed);
         localStorage.setItem("vendor_id", vendorProfile?._id);
 
-  
+        console.log(vendorProfile, ' this is the venodr data');
         if (vendorProfile?.is_kyc_completed) {
           navigate("/dashboard");
         } else {
@@ -121,8 +122,8 @@ const HomePage = () => {
       setIsVerifed(false);
     }
   };
-  
-  
+
+
   const handleCloseModal = () => {
     setShowOTP(false);
     setEnteredOTP("");
