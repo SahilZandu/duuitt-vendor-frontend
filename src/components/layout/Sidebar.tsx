@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import MenuIcon from "../../lib/MenuIcon";
 import Cookies from "js-cookie"; // Make sure you have this installed: `npm install js-cookie`
 import Spinner from "../loader/Spinner";
+import logo from "../../assets/images/logo.svg";
 
 type MenuItem = {
   label: string;
@@ -81,7 +82,7 @@ const Sidebar: React.FC = () => {
       <nav className="space-y-2">
         <a href="/" className="mb-8 cursor-pointer">
           <img
-            src="/src/assets/images/logo.png"
+            src={logo}
             alt="Logo"
             className="h-[120px] w-[200px]"
           />
