@@ -1,5 +1,4 @@
 
-import Logo from '../../assets/images/logo.svg';
 const documentList = [
     { label: "Vehicle Type", status: "Verified" },
     { label: "Driving License", status: "Verified" },

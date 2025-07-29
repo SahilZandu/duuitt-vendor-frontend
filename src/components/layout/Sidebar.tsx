@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import MenuIcon from "../../lib/MenuIcon";
+import Cookies from "js-cookie"; // Make sure you have this installed: `npm install js-cookie`
+import Spinner from "../loader/Spinner";
 
 type MenuItem = {
   label: string;
@@ -14,10 +16,7 @@ const topMenuItems: MenuItem[] = [
   { label: "Orders", to: "/orders", icon: "order" },
   { label: "Team Members", to: "/team", icon: "team" },
   {
-    label: "Outlet Info",
-    to: "/outlet",
-    icon: "outlet",
-    children: [
+    label: "Outlet Info", to: "/outlet", icon: "outlet", children: [
       { label: "Restaurant Profile", to: "/outlet/restaurant-profile", icon: "restaurant" },
       { label: "Order History", to: "/outlet/order-history", icon: "order" },
       { label: "Manage Profile", to: "/outlet/manage-profile", icon: "manage" },
@@ -32,13 +31,16 @@ const topMenuItems: MenuItem[] = [
 const bottomMenuItems: MenuItem[] = [
   { label: "Settings", icon: "settings", to: "/setting" },
   { label: "Get Help", to: "/help", icon: "help" },
-  { label: "Sign out", to: "/logout", icon: "logout" },
+  { label: "Sign out", to: "/logout", icon: "logout" }, // this will be handled manually
 ];
 
-const Sidebar: React.FC = () => {
-  const location = useLocation();
 
-  const getInitialOpenMenus = (): Record<string, boolean> => {
+const Sidebar: React.FC = () => {
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const getInitialOpenMenus = () => {
     const openState: Record<string, boolean> = {};
     [...topMenuItems, ...bottomMenuItems].forEach((item) => {
       if (item.children?.length) {
@@ -51,7 +53,7 @@ const Sidebar: React.FC = () => {
     return openState;
   };
 
-  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(getInitialOpenMenus());
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(getInitialOpenMenus);
 
   const toggleMenu = (label: string) => {
     setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -59,6 +61,20 @@ const Sidebar: React.FC = () => {
 
   const isActive = (path?: string) =>
     path ? location.pathname.startsWith(path) : false;
+
+  const handleLogout = () => {
+    setIsLoggingOut(true);
+
+    setTimeout(() => {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("isKycCompleted");
+      localStorage.removeItem("vendor_id");
+      Cookies.remove("authToken");
+
+      setIsLoggingOut(false);
+      navigate("/login");
+    }, 1000);
+  };
 
   return (
     <aside className="w-64 bg-[#8E3CF7] text-white min-h-screen flex flex-col justify-between py-6 px-4">
@@ -88,17 +104,14 @@ const Sidebar: React.FC = () => {
                 <>
                   <button
                     onClick={() => toggleMenu(item.label)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded hover:bg-[#7b2de6] focus:outline-none ${
-                      openMenus[item.label] ? "bg-[#7b2de6]" : ""
-                    }`}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded hover:bg-[#7b2de6] focus:outline-none ${openMenus[item.label] ? "bg-[#7b2de6]" : ""
+                      }`}
                   >
                     <div className="flex items-center space-x-2">
                       {item.icon && <MenuIcon name={item.icon} />}
                       <span>{item.label}</span>
                     </div>
-                    <MenuIcon
-                      name={openMenus[item.label] ? "dropdown-up" : "dropdown"}
-                    />
+                    <MenuIcon name={openMenus[item.label] ? "dropdown-up" : "dropdown"} />
                   </button>
                   {openMenus[item.label] && (
                     <ul className="ml-4 mt-1 space-y-1">
@@ -123,6 +136,21 @@ const Sidebar: React.FC = () => {
       <div className="space-y-2">
         {bottomMenuItems.map((item, idx) => {
           const hasChildren = !!item.children?.length;
+
+          // Handle "Sign out" separately
+          if (item.label === "Sign out") {
+            return (
+              <button
+                key={idx}
+                onClick={handleLogout}
+                className="w-full flex items-center space-x-2 px-3 py-2 rounded hover:bg-[#7b2de6]"
+              >
+                {item.icon && <MenuIcon name={item.icon} />}
+                {isLoggingOut ? <Spinner /> : <span>{item.label}</span>}
+              </button>
+            );
+          }
+
           return (
             <div key={idx}>
               {item.to && !hasChildren && (
@@ -137,17 +165,14 @@ const Sidebar: React.FC = () => {
                 <>
                   <button
                     onClick={() => toggleMenu(item.label)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded hover:bg-[#7b2de6] focus:outline-none ${
-                      openMenus[item.label] ? "bg-[#7b2de6]" : ""
-                    }`}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded hover:bg-[#7b2de6] focus:outline-none ${openMenus[item.label] ? "bg-[#7b2de6]" : ""
+                      }`}
                   >
                     <div className="flex items-center space-x-2">
                       {item.icon && <MenuIcon name={item.icon} />}
                       <span>{item.label}</span>
                     </div>
-                    <MenuIcon
-                      name={openMenus[item.label] ? "dropdown-up" : "dropdown"}
-                    />
+                    <MenuIcon name={openMenus[item.label] ? "dropdown-up" : "dropdown"} />
                   </button>
                   {openMenus[item.label] && (
                     <ul className="ml-4 mt-1 space-y-1">
@@ -182,9 +207,8 @@ interface SidebarLinkProps {
 const SidebarLink: React.FC<SidebarLinkProps> = ({ to, label, icon, active }) => (
   <Link
     to={to}
-    className={`flex items-center space-x-2 px-3 py-2 rounded hover:bg-[#7b2de6] ${
-      active ? "bg-[#7b2de6] font-semibold" : ""
-    }`}
+    className={`flex items-center space-x-2 px-3 py-2 rounded hover:bg-[#7b2de6] ${active ? "bg-[#7b2de6] font-semibold" : ""
+      }`}
   >
     {icon && <MenuIcon name={icon} />}
     <span>{label}</span>
