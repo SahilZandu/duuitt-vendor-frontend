@@ -1,4 +1,5 @@
 import Spinner from "../loader/Spinner";
+import logo from "../../assets/images/logo.svg";
 
 
 interface OTPModalProps {
@@ -30,11 +31,11 @@ const OTPModal: React.FC<OTPModalProps> = ({ phone, onClose, onVerify, otp, setO
                     {/* Icon */}
                     <div className="mb-6">
                         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto bg-white">
-                            {/* <img src={logo} alt="Logo" className="w-12 h-12 object-contain" /> */}
-                            <div className="text-4xl flex-inline font-bold mb-2">
+                            <img src={logo} alt="Logo" className="w-124 object-contain" />
+                            {/* <div className="text-4xl flex-inline font-bold mb-2">
                                 <span className="bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">DUU</span>
                                 <span className="text-black">ITT</span>
-                            </div>
+                            </div> */}
                         </div>
 
                     </div>

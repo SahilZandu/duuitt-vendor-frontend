@@ -95,16 +95,37 @@ const TeamManagement: React.FC = () => {
                     + Add Team Member
                 </button>
             </div>
-
             <DataTable
-                columns={columns}
-                data={team}
-                progressPending={loading}
-                pagination
-                highlightOnHover
-                responsive
-                noDataComponent="No team members found."
-            />
+                    columns={columns}
+                    data={team}
+                    progressPending={loading}
+                    pagination
+                    highlightOnHover
+                    noDataComponent={<div className="py-4 text-gray-600">No team member found</div>}
+                    paginationRowsPerPageOptions={[10, 25, 50]}
+                    paginationPerPage={25}
+                    paginationComponentOptions={{
+                        rowsPerPageText: 'Rows per page:',
+                        rangeSeparatorText: 'of',
+                    }}
+                    customStyles={{
+                        rows: {
+                            style: {
+                                borderBottom: '1px solid #e5e7eb',
+                                fontSize: 14,
+                            },
+                        },
+                        headRow: {
+                            style: {
+                                fontWeight: 500,
+                                fontSize: 16,
+                                color: '#fff',
+                                backgroundColor: '#a855f7',
+                            },
+                        },
+                    }}
+                />
+
             <AddTeamMemberModal
                 isOpen={showModal}
                 onClose={() => setShowModal(false)}

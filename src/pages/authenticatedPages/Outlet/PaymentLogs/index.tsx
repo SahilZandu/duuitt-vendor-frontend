@@ -5,6 +5,7 @@ import GlobalDataTable from "../../../../components/layout/GlobalDataTable";
 import Loader from "../../../../components/loader/Loader";
 import PageTitle from "../../../../components/Ui/PageTitle";
 import { fetchRestaurantPaymentLogs } from "../../../../api/RatingAndPaymentLogsApi";
+import DataTable from "react-data-table-component";
 
 interface PaymentLog {
     _id: string;
@@ -166,16 +167,46 @@ const PaymentLogs = () => {
                     />
                 </div>
             </div>
+            <DataTable
+                    columns={columns}
+                    data={orders}
+                    progressPending={loading}
+                    pagination
+                    highlightOnHover
+                    noDataComponent={<div className="py-4 text-gray-600">No payment found</div>}
+                    paginationRowsPerPageOptions={[10, 25, 50]}
+                    paginationPerPage={25}
+                    paginationComponentOptions={{
+                        rowsPerPageText: 'Rows per page:',
+                        rangeSeparatorText: 'of',
+                    }}
+                    customStyles={{
+                        rows: {
+                            style: {
+                                borderBottom: '1px solid #e5e7eb',
+                                fontSize: 14,
+                            },
+                        },
+                        headRow: {
+                            style: {
+                                fontWeight: 500,
+                                fontSize: 16,
+                                color: '#fff',
+                                backgroundColor: '#a855f7',
+                            },
+                        },
+                    }}
+                />
 
             {/* Table */}
-            <GlobalDataTable
+            {/* <GlobalDataTable
                 columns={columns}
                 data={orders}
                 pagination
                 selectableRows={false}
             />
 
-            {loading && <Loader />}
+            {loading && <Loader />} */}
         </div>
     );
 };

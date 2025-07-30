@@ -14,7 +14,7 @@ type MenuItem = {
 
 const topMenuItems: MenuItem[] = [
   { label: "Dashboard", to: "/dashboard", icon: "home" },
-  { label: "Orders", to: "/orders", icon: "order" },
+  // { label: "Orders", to: "/orders", icon: "order" },
   { label: "Team Members", to: "/team", icon: "team" },
   {
     label: "Outlet Info", to: "/outlet", icon: "outlet", children: [
@@ -27,13 +27,13 @@ const topMenuItems: MenuItem[] = [
   },
   { label: "Messages", to: "/messages", icon: "message" },
   { label: "Offers", to: "/offers", icon: "offer" },
-  { label: "KYC Documents", to: "/kyc", icon: "kyc" },
-  { label: "Reports", to: "/reports", icon: "report" },
+  // { label: "KYC Documents", to: "/kyc", icon: "kyc" },
+  // { label: "Reports", to: "/reports", icon: "report" },
 ];
 
 const bottomMenuItems: MenuItem[] = [
   { label: "Settings", icon: "settings", to: "/setting" },
-  { label: "Get Help", to: "/help", icon: "help" },
+  // { label: "Get Help", to: "/help", icon: "help" },
   { label: "Sign out", to: "/logout", icon: "logout" },
 ];
 

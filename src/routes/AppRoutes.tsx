@@ -14,6 +14,7 @@ import VendorProfile from "../pages/authenticatedPages/Outlet/VendorProfile";
 import Rating from "../pages/authenticatedPages/Outlet/Rating";
 import PaymentLogs from "../pages/authenticatedPages/Outlet/PaymentLogs";
 import KycSubmitted from "../components/kyc/KycSubmitted";
+import OfferManagement from "../pages/authenticatedPages/offer/OfferManagement";
 
 const AppRoutes = () => {
   return (
@@ -40,6 +41,7 @@ const AppRoutes = () => {
           <Route path="/outlet/manage-profile" element={<VendorProfile />} />
           <Route path="/outlet/rating" element={<Rating />} />
           <Route path="/outlet/payment-logs" element={<PaymentLogs />} />
+          <Route path="/offers" element={<OfferManagement />} />
         </Route>
       </Route>
 

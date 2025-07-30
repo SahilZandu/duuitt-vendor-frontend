@@ -31,37 +31,34 @@ const ViewOrderDetails = () => {
     if (!order) return <div className="p-4">No order found.</div>;
 
     return (
-        <div className="p-6 space-y-4 bg-white rounded shadow">
+        <div className="max-w-5xl mx-auto p-6 space-y-6 bg-white rounded-xl shadow-md">
             <button
                 onClick={() => navigate('/outlet/order-history')}
-                className="cursor-pointer inline-flex items-center text-base px-3 py-1 bg-gray-200 rounded-lg"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
             >
-                <span className="icon mr-2 text-lg">←</span>
-                Back
+                <span className="mr-2">←</span> Back
             </button>
 
-            <h2 className="text-xl font-bold">Order Details - #{order?.invoice_no || 'N/A'}</h2>
+            <h2 className="text-2xl font-bold text-gray-800">
+                Order Details - #{order?.invoice_no || 'N/A'}
+            </h2>
 
-            <div className="grid grid-cols-2 gap-4">
-                <div><strong>Status:</strong> {order?.status || 'N/A'}</div>
-                <div><strong>Order ID:</strong> {order?.order_id || 'N/A'}</div>
-                <div><strong>Payment:</strong> {order?.payment_method_id || 'N/A'} ({order?.payment_status || 'N/A'})</div>
-                <div><strong>Total: </strong> ₹{order?.total_amount ? order.total_amount.toFixed(2) : '0.00'}</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+                <div><span className="font-semibold">Status:</span> {order?.status || 'N/A'}</div>
+                <div><span className="font-semibold">Order ID:</span> {order?.order_id || 'N/A'}</div>
+                <div><span className="font-semibold">Payment:</span> {order?.payment_method_id || 'N/A'} ({order?.payment_status || 'N/A'})</div>
+                <div><span className="font-semibold">Total:</span> ₹{order?.total_amount?.toFixed(2) || '0.00'}</div>
                 <div>
-                    <strong>Customer:</strong> 
-                    {order?.delivery_address?.name || 'N/A'} 
-                    ({order?.delivery_address?.phone || 'N/A'})
+                    <span className="font-semibold">Customer:</span> {order?.delivery_address?.name || 'N/A'} ({order?.delivery_address?.phone || 'N/A'})
                 </div>
                 <div>
-                    <strong>Address:</strong> 
-                    {order?.delivery_address?.address_detail || 'N/A'}, 
-                    {order?.delivery_address?.address || 'N/A'}
+                    <span className="font-semibold">Address:</span> {order?.delivery_address?.address_detail || 'N/A'}, {order?.delivery_address?.address || 'N/A'}
                 </div>
 
                 {(order?.status === "cancelled" || order?.status === "declined") && (
                     <>
-                        <div>
-                            <strong className="text-red-500">Cancellation Reason:</strong> {order?.reason_of_cancellation || "N/A"}
+                        <div className="text-red-600">
+                            <strong>Cancellation Reason:</strong> {order?.reason_of_cancellation || "N/A"}
                         </div>
                         <div>
                             <strong>Refund Status:</strong> {order?.refund_status || "N/A"}
@@ -71,29 +68,27 @@ const ViewOrderDetails = () => {
             </div>
 
             <div>
-                <h3 className="text-lg font-semibold mt-4 mb-2">Ordered Items:</h3>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <h3 className="text-xl font-semibold text-gray-800 mt-6 mb-3">Ordered Items:</h3>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {order?.cartitems?.length > 0 ? (
                         order.cartitems.map((item: any, idx: number) => (
-                            <li key={idx} className="p-4 border rounded bg-gray-50 flex">
-                                <div className="w-1/2">
-                                    <img
-                                        src={
-                                            item?.food_item_image
-                                                ? `${import.meta.env.VITE_BACKEND_BASE_URL}${item.food_item_image}`
-                                                : "/public/images/default-food-image.png"
-                                        }
-                                        alt={item?.food_item_name || "Food Image"}
-                                        className="w-full h-36 object-cover rounded"
-                                        onError={(e) => {
-                                            e.currentTarget.onerror = null;
-                                            e.currentTarget.src = "/public/images/default-food-image.png";
-                                        }}
-                                    />
-                                </div>
+                            <li key={idx} className="flex flex-col bg-gray-50 rounded-lg shadow-sm overflow-hidden border border-gray-200">
+                                <img
+                                    src={
+                                        item?.food_item_image
+                                            ? `${import.meta.env.VITE_BACKEND_BASE_URL}${item.food_item_image}`
+                                            : "/public/images/default-food-image.png"
+                                    }
+                                    alt={item?.food_item_name || "Food Image"}
+                                    className="w-full h-48 object-cover"
+                                    onError={(e) => {
+                                        e.currentTarget.onerror = null;
+                                        e.currentTarget.src = "/public/images/default-food-image.png";
+                                    }}
+                                />
 
-                                <div className="w-1/2 pl-4 flex flex-col gap-1">
-                                    <div className="text-base font-semibold text-gray-800">
+                                <div className="p-4 space-y-2">
+                                    <div className="text-lg font-semibold text-gray-800">
                                         {item?.food_item_name || 'N/A'}
                                     </div>
                                     <div className="text-sm text-gray-600">Quantity: {item?.quantity || 0}</div>
@@ -102,7 +97,7 @@ const ViewOrderDetails = () => {
                                     {item?.selected_add_on?.length > 0 && (
                                         <div className="text-sm text-gray-700">
                                             <strong>Addons:</strong>
-                                            <ul className="list-disc ml-5">
+                                            <ul className="list-disc ml-5 mt-1">
                                                 {item.selected_add_on.map((addon: any, i: number) => (
                                                     <li key={i}>
                                                         {addon?.addon_name || 'N/A'} - ₹{addon?.addon_price || '0.00'}
@@ -121,6 +116,7 @@ const ViewOrderDetails = () => {
             </div>
         </div>
     );
+
 };
 
 export default ViewOrderDetails;

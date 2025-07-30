@@ -8,6 +8,7 @@ import MenuIcon from "../../../../lib/MenuIcon";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../../../components/loader/Loader";
 import PageTitle from "../../../../components/Ui/PageTitle";
+import DataTable from "react-data-table-component";
 
 const OrderHistory = () => {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -84,6 +85,7 @@ const OrderHistory = () => {
                 </span>
             ),
             sortable: true,
+            width:"170px"
         },
         {
             name: "Action",
@@ -132,16 +134,46 @@ const OrderHistory = () => {
                     />
                 </div>
             </div>
+            <DataTable
+                    columns={columns}
+                    data={orders}
+                    progressPending={loading}
+                    pagination
+                    highlightOnHover
+                    noDataComponent={<div className="py-4 text-gray-600">No order found</div>}
+                    paginationRowsPerPageOptions={[10, 25, 50]}
+                    paginationPerPage={25}
+                    paginationComponentOptions={{
+                        rowsPerPageText: 'Rows per page:',
+                        rangeSeparatorText: 'of',
+                    }}
+                    customStyles={{
+                        rows: {
+                            style: {
+                                borderBottom: '1px solid #e5e7eb',
+                                fontSize: 14,
+                            },
+                        },
+                        headRow: {
+                            style: {
+                                fontWeight: 500,
+                                fontSize: 16,
+                                color: '#fff',
+                                backgroundColor: '#a855f7',
+                            },
+                        },
+                    }}
+                />
 
             {/* Table */}
-            <GlobalDataTable
+            {/* <GlobalDataTable
                 columns={columns}
                 data={orders}
                 pagination={true}
                 selectableRows={false}
             />
 
-            {loading && <Loader />}
+            {loading && <Loader />} */}
 
 
         </div>
