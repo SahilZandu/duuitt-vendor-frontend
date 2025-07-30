@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { TableColumn } from "react-data-table-component";
-import GlobalDataTable from "../../../../components/layout/GlobalDataTable";
 import Loader from "../../../../components/loader/Loader";
 import PageTitle from "../../../../components/Ui/PageTitle";
 import { fetchRestaurantPaymentLogs } from "../../../../api/RatingAndPaymentLogsApi";
