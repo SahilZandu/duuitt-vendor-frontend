@@ -202,7 +202,7 @@ const RestaurantProfile = () => {
         setIsSubmitting(true);
         try {
             const formDataToSend = convertToFormData(formData, restaurant_id);
-            const res = await updateRestaurantProfile(formDataToSend);
+             await updateRestaurantProfile(formDataToSend);
             toast.success("Profile Updated Successfully");
         } catch (err) {
             toast.error("Failed to update profile");
