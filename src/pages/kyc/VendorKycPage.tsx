@@ -356,27 +356,61 @@ const VendorKycPage = () => {
                     {currentStep === 0 && (
                         <form onSubmit={(e) => handleSubmit(e, "FSSAI")}>
                             <h2 className="text-xl font-semibold mb-4">FSSAI Detail</h2>
+
                             <div className="grid grid-cols-2 gap-4 mb-4">
-                                <input
-                                    placeholder="FSSAI Number"
-                                    className="border p-2 rounded"
-                                    value={fssaiDetail.account_number}
-                                    onChange={(e) => setFssaiDetail({ ...fssaiDetail, account_number: e.target.value })}
-                                />
-                                <input
-                                    type="date"
-                                    className="border p-2 rounded"
-                                    value={fssaiDetail.expiration_date}
-                                    onChange={(e) => setFssaiDetail({ ...fssaiDetail, expiration_date: e.target.value })}
-                                />
+                                <div>
+                                    <input
+                                        placeholder="FSSAI Number (e.g., 12345678901234)"
+                                        className="border p-2 rounded w-full"
+                                        value={fssaiDetail.account_number}
+                                        onChange={(e) =>
+                                            setFssaiDetail({
+                                                ...fssaiDetail,
+                                                account_number: e.target.value,
+                                            })
+                                        }
+                                    />
+                                    <small className="text-sm text-gray-500 block mt-1">
+                                        Enter your 14-digit FSSAI license number 12345678901234
+                                    </small>
+                                </div>
+
+                                <div>
+                                    <input
+                                        type="date"
+                                        className="border p-2 rounded w-full"
+                                        value={fssaiDetail.expiration_date}
+                                        onChange={(e) =>
+                                            setFssaiDetail({
+                                                ...fssaiDetail,
+                                                expiration_date: e.target.value,
+                                            })
+                                        }
+                                    />
+                                    <small className="text-sm text-gray-500 block mt-1">
+                                        Expiration date of your FSSAI license
+                                    </small>
+                                </div>
                             </div>
-                            <input
-                                type="file"
-                                accept="image/*,application/pdf"
-                                onChange={(e) => setFssaiDetail({ ...fssaiDetail, image: e.target.files?.[0] || null })}
-                            />
+
+                            <div className="mb-4">
+                                <input
+                                    type="file"
+                                    accept="image/*,application/pdf"
+                                    onChange={(e) =>
+                                        setFssaiDetail({
+                                            ...fssaiDetail,
+                                            image: e.target.files?.[0] || null,
+                                        })
+                                    }
+                                />
+                                <small className="text-sm text-gray-500 block mt-1">
+                                    Upload FSSAI document (JPG, PNG, or PDF)
+                                </small>
+                            </div>
+
                             <div className="mt-4">{renderFilePreview(fssaiDetail.image)}</div>
-                            {/* <div className="flex justify-end gap-2 mt-6">{renderSubmitButton("FSSAI")}</div> */}
+
                             <div className="flex justify-between gap-2 mt-6">
                                 {currentStep > 0 && (
                                     <button
@@ -389,34 +423,62 @@ const VendorKycPage = () => {
                                 )}
                                 {renderSubmitButton("FSSAI")}
                             </div>
-
                         </form>
+
                     )}
 
                     {currentStep === 1 && (
                         <form onSubmit={(e) => handleSubmit(e, "gst")}>
                             <h2 className="text-xl font-semibold mb-4">GST Detail</h2>
+
                             <div className="grid grid-cols-2 gap-4 mb-4">
-                                <input
-                                    placeholder="GST Number"
-                                    className="border p-2 rounded"
-                                    value={gstDetail.gstn_number}
-                                    onChange={(e) => setGstDetail({ ...gstDetail, gstn_number: e.target.value })}
-                                />
-                                <input
-                                    type="date"
-                                    className="border p-2 rounded"
-                                    value={gstDetail.expiration_date}
-                                    onChange={(e) => setGstDetail({ ...gstDetail, expiration_date: e.target.value })}
-                                />
+                                <div>
+                                    <input
+                                        placeholder="GST Number (e.g., 22AAAAA0000A1Z5)"
+                                        className="border p-2 rounded w-full"
+                                        value={gstDetail.gstn_number}
+                                        onChange={(e) =>
+                                            setGstDetail({ ...gstDetail, gstn_number: e.target.value })
+                                        }
+                                    />
+                                    <small className="text-sm text-gray-500 block mt-1">
+                                        For example: 22AAAAA0000A1Z5
+                                    </small>
+                                </div>
+
+                                <div>
+                                    <input
+                                        type="date"
+                                        className="border p-2 rounded w-full"
+                                        value={gstDetail.expiration_date}
+                                        onChange={(e) =>
+                                            setGstDetail({ ...gstDetail, expiration_date: e.target.value })
+                                        }
+                                    />
+                                    <small className="text-sm text-gray-500 block mt-1">
+                                        Expiration date of your GST
+                                    </small>
+                                </div>
                             </div>
-                            <input
-                                type="file"
-                                accept="image/*,application/pdf"
-                                onChange={(e) => setGstDetail({ ...gstDetail, image: e.target.files?.[0] || null })}
-                            />
+
+                            <div className="mb-4">
+                                <input
+                                    type="file"
+                                    accept="image/*,application/pdf"
+                                    onChange={(e) =>
+                                        setGstDetail({
+                                            ...gstDetail,
+                                            image: e.target.files?.[0] || null,
+                                        })
+                                    }
+                                />
+                                <small className="text-sm text-gray-500 block mt-1">
+                                    Upload GST document (jpg, png, or PDF)
+                                </small>
+                            </div>
+
                             <div className="mt-4">{renderFilePreview(gstDetail.image)}</div>
-                            {/* <div className="flex justify-end gap-2 mt-6">{renderSubmitButton("gst")}</div> */}
+
                             <div className="flex justify-between gap-2 mt-6">
                                 {currentStep > 0 && (
                                     <button
@@ -429,28 +491,48 @@ const VendorKycPage = () => {
                                 )}
                                 {renderSubmitButton("gst")}
                             </div>
-
                         </form>
+
                     )}
 
                     {currentStep === 2 && (
                         <form onSubmit={(e) => handleSubmit(e, "PAN")}>
                             <h2 className="text-xl font-semibold mb-4">PAN Detail</h2>
+
                             <div className="grid grid-cols-2 gap-4 mb-4">
-                                <input
-                                    placeholder="PAN Number"
-                                    className="border p-2 rounded"
-                                    value={panDetail.pan_number}
-                                    onChange={(e) => setPanDetail({ ...panDetail, pan_number: e.target.value })}
-                                />
+                                <div>
+                                    <input
+                                        placeholder="PAN Number (e.g., ABCDE1234F)"
+                                        className="border p-2 rounded w-full"
+                                        value={panDetail.pan_number}
+                                        onChange={(e) =>
+                                            setPanDetail({ ...panDetail, pan_number: e.target.value })
+                                        }
+                                    />
+                                    <small className="text-sm text-gray-500 block mt-1">
+                                        For example: ABCDE1234F
+                                    </small>
+                                </div>
                             </div>
-                            <input
-                                type="file"
-                                accept="image/*,application/pdf"
-                                onChange={(e) => setPanDetail({ ...panDetail, image: e.target.files?.[0] || null })}
-                            />
+
+                            <div className="mb-4">
+                                <input
+                                    type="file"
+                                    accept="image/*,application/pdf"
+                                    onChange={(e) =>
+                                        setPanDetail({
+                                            ...panDetail,
+                                            image: e.target.files?.[0] || null,
+                                        })
+                                    }
+                                />
+                                <small className="text-sm text-gray-500 block mt-1">
+                                    Upload PAN image (jpg, png, or PDF)
+                                </small>
+                            </div>
+
                             <div className="mt-4">{renderFilePreview(panDetail.image)}</div>
-                            {/* <div className="flex justify-end gap-2 mt-6">{renderSubmitButton("PAN")}</div> */}
+
                             <div className="flex justify-between gap-2 mt-6">
                                 {currentStep > 0 && (
                                     <button
@@ -466,30 +548,43 @@ const VendorKycPage = () => {
                         </form>
                     )}
 
+
                     {currentStep === 3 && (
                         <form onSubmit={(e) => handleSubmit(e, "Bank")}>
                             <h2 className="text-xl font-semibold mb-4">Bank Detail</h2>
                             <div className="grid grid-cols-2 gap-4 mb-4">
-                                <input
-                                    placeholder="Bank Name"
-                                    className="border p-2 rounded"
-                                    value={bankDetail.bank_name}
-                                    onChange={(e) => setBankDetail({ ...bankDetail, bank_name: e.target.value })}
-                                />
-                                <input
-                                    placeholder="Account Number"
-                                    className="border p-2 rounded"
-                                    value={bankDetail.account_number}
-                                    onChange={(e) => setBankDetail({ ...bankDetail, account_number: e.target.value })}
-                                />
-                                <input
-                                    placeholder="IFSC"
-                                    className="border p-2 rounded"
-                                    value={bankDetail.ifsc_code}
-                                    onChange={(e) => setBankDetail({ ...bankDetail, ifsc_code: e.target.value })}
-                                />
+
+                                <div>
+                                    <input
+                                        placeholder="Bank Name"
+                                        className="border p-2 rounded w-full"
+                                        value={bankDetail.bank_name}
+                                        onChange={(e) => setBankDetail({ ...bankDetail, bank_name: e.target.value })}
+                                    />
+                                </div>
+
+                                <div>
+                                    <input
+                                        placeholder="Account Number (e.g., 123456789012)"
+                                        className="border p-2 rounded w-full"
+                                        value={bankDetail.account_number}
+                                        onChange={(e) => setBankDetail({ ...bankDetail, account_number: e.target.value })}
+                                    />
+                                    <small className="text-sm text-gray-500 block mt-1">For example: 123456789012</small>
+                                </div>
+
+                                <div>
+                                    <input
+                                        placeholder="IFSC Code (e.g., ICIC0000269)"
+                                        className="border p-2 rounded w-full"
+                                        value={bankDetail.ifsc_code}
+                                        onChange={(e) => setBankDetail({ ...bankDetail, ifsc_code: e.target.value })}
+                                    />
+                                    <small className="text-sm text-gray-500 block mt-1">For example: ICIC0000269</small>
+                                </div>
+
                             </div>
-                            {/* <div className="flex justify-end gap-2 mt-6">{renderSubmitButton("Bank")}</div> */}
+
                             <div className="flex justify-between gap-2 mt-6">
                                 {currentStep > 0 && (
                                     <button
@@ -503,6 +598,7 @@ const VendorKycPage = () => {
                                 {renderSubmitButton("Bank")}
                             </div>
                         </form>
+
                     )}
                 </div>
             </div>
