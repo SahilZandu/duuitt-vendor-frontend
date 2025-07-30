@@ -102,7 +102,11 @@ const OrderHistory = () => {
             button: true,
         },
     ];
-
+    if (loading) {
+        return (
+            <Loader />
+        )
+    }
     return (
         <div className="p-6">
             <div className="flex flex-wrap justify-between items-center gap-4 mb-4">

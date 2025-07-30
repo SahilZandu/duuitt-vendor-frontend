@@ -94,11 +94,11 @@ const Sidebar: React.FC = () => {
   return (
     <aside className="w-64 bg-[#8E3CF7] text-white min-h-screen flex flex-col justify-between py-6 px-4">
       <nav className="space-y-2">
-        <Link to="/" className="mb-8 cursor-pointer">
+        <Link to="/" className="mb-8 cursor-pointer flex justify-center items-center">
           <img
             src={logo}
             alt="Logo"
-            className="h-[120px] w-[200px]"
+            className="max-w-[160px] h-auto object-contain"
           />
         </Link>
 
@@ -160,7 +160,7 @@ const Sidebar: React.FC = () => {
               <button
                 key={idx}
                 onClick={handleLogout}
-                className="w-full flex items-center space-x-2 px-3 py-2 rounded hover:bg-[#ffff] text-black"
+               className="w-full flex items-center space-x-2 px-3 py-2 rounded text-white hover:bg-white hover:text-[#8E3CF7] transition-colors"
               >
                 {item.icon && <MenuIcon name={item.icon} />}
                 {isLoggingOut ? <Spinner /> : <span>{item.label}</span>}
