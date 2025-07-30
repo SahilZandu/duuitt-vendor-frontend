@@ -55,7 +55,6 @@ const Sidebar: React.FC = () => {
   };
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(getInitialOpenMenus);
-
   const toggleMenu = (label: string) => {
     setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
   };
@@ -194,6 +193,7 @@ const Sidebar: React.FC = () => {
             </div>
           );
         })}
+
       </div>
     </aside>
   );

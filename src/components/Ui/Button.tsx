@@ -1,0 +1,84 @@
+import React from "react";
+import clsx from "clsx";
+
+type Variant =
+  | "primary"
+  | "secondary"
+  | "danger"
+  | "outline"
+  | "success"
+  | "soft-success"
+  | "outline-success";
+
+type Props = {
+  label: string;
+  onClick?: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+  className?: string;
+  variant?: Variant;
+  type?: "button" | "submit" | "reset";
+};
+
+const variantClasses: Record<Variant, string> = {
+  primary: "bg-purple-600 hover:bg-purple-700 text-white",
+  secondary: "bg-gray-200 hover:bg-gray-300 text-black",
+  danger: "bg-red-600 hover:bg-red-700 text-white",
+  outline: "bg-transparent border border-gray-400 text-gray-700 hover:bg-gray-100",
+  success: "bg-green-600 hover:bg-green-700 text-white",
+  "soft-success": "bg-green-100 text-green-700",
+  "outline-success": "border border-green-500 text-green-600 bg-white hover:bg-green-50",
+};
+
+const Button = ({
+  label,
+  onClick,
+  disabled = false,
+  loading = false,
+  className = "",
+  variant = "primary",
+  type = "button",
+}: Props) => {
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled || loading}
+      className={clsx(
+        "px-4 py-2 rounded-[10px] font-medium transition duration-200 w-full text-sm flex items-center justify-center gap-2",
+        variantClasses[variant],
+        {
+          "opacity-50 cursor-not-allowed": disabled || loading,
+        },
+        className
+      )}
+    >
+      {loading && (
+        <svg
+          className="animate-spin h-4 w-4 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          ></circle>
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+          ></path>
+        </svg>
+      )}
+      {label}
+    </button>
+  );
+};
+
+export default Button;

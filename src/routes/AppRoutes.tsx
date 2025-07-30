@@ -8,8 +8,10 @@ import PublicRoute from "../api/PublicRoute";
 import VendorKycPage from "../pages/kyc/VendorKycPage";
 import OrderHistory from "../pages/authenticatedPages/Settings/OrderHistory/OrderHistory";
 import ViewOrderDetails from "../pages/authenticatedPages/Settings/OrderHistory/ViewOrderDetails";
+import RestaurantProfile from "../pages/authenticatedPages/Settings/RestaurantProfile";
 import TeamManagement from "../pages/authenticatedPages/team/TeamManagement";
 import KycSubmitted from "../components/kyc/KycSubmitted";
+import VendorProfile from "../pages/authenticatedPages/Settings/VendorProfile";
 
 const AppRoutes = () => {
   return (
@@ -32,6 +34,8 @@ const AppRoutes = () => {
           <Route path="/outlet/order-history" element={<OrderHistory />} />
           <Route path="/outlet/order-history/view/:id" element={<ViewOrderDetails />} />
           <Route path="/team" element={<TeamManagement />} />
+          <Route path="/outlet/restaurant-profile" element={<RestaurantProfile />} />
+          <Route path="/outlet/manage-profile" element={<VendorProfile />} />
         </Route>
       </Route>
 

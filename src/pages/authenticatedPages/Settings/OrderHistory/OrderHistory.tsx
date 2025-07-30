@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import type { TableColumn } from "react-data-table-component";
 import { fetchOrdersByStatus, type Order } from "../../../../api/settingsApi";
 import GlobalDataTable from "../../../../components/layout/GlobalDataTable";
-import FormatDate from "../../../../components/FormatDate";
+import FormatDate from "../../../../components/Ui/FormatDate";
 import MenuIcon from "../../../../lib/MenuIcon";
 import { useNavigate } from "react-router-dom";
+import Loader from "../../../../components/loader/Loader";
+import PageTitle from "../../../../components/Ui/PageTitle";
 
 const OrderHistory = () => {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -102,7 +104,8 @@ const OrderHistory = () => {
     return (
         <div className="p-6">
             <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
-                <h1 className="text-2xl font-bold mb-4">Order History</h1>
+                {/* <h1 className="text-2xl font-bold mb-4">Order History</h1> */}
+                <PageTitle title="Order History"/>
 
                 {/* Filters */}
                 <div className="flex justify-between items-center gap-4 mb-4">
@@ -138,7 +141,7 @@ const OrderHistory = () => {
                 selectableRows={false}
             />
 
-            {loading && <p className="mt-2 text-gray-500 text-sm">Loading more orders...</p>}
+            {loading && <Loader />}
 
 
         </div>

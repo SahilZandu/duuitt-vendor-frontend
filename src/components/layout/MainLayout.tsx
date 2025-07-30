@@ -1,22 +1,19 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-// import Navbar from "./Navbar";
-import Footer from "./Footer";
 import Sidebar from "./Sidebar";
 
 const MainLayout: React.FC = () => {
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* <Navbar /> */}
-
-      <div className="flex flex-1">
+    <div className="flex min-h-screen">
+      {/* Fixed Sidebar */}
+      <aside className="w-64 h-screen sticky top-0 left-0 bg-white shadow z-10">
         <Sidebar />
-        <main className="flex-1 p-6 bg-gray-100">
-          <Outlet />
-        </main>
-      </div>
+      </aside>
 
-      <Footer />
+      {/* Main Content */}
+      <main className="flex-1 p-6 bg-gray-100 overflow-y-auto">
+        <Outlet />
+      </main>
     </div>
   );
 };

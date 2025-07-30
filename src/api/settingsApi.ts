@@ -31,7 +31,7 @@ type FetchOrdersParams = {
     limit?: number;
 };
 
-// Unified order fetcher
+// fetch order by status
 export const fetchOrdersByStatus = async ({
     restaurant_id,
     status,
@@ -52,6 +52,7 @@ export const fetchOrdersByStatus = async ({
     return response?.data?.data || [];
 };
 
+// fetch order by id for single order details view
 export const fetchOrderById = async (order_id: string): Promise<Order | null> => {
   try {
     const payload = { order_id };

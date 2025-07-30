@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import axiosInstance from "../api/apiInstance";
+import Loader from "../components/loader/Loader";
 
 const ProtectedRoute = () => {
   const token = localStorage.getItem("accessToken");
@@ -63,7 +64,7 @@ const ProtectedRoute = () => {
     return <Navigate to="/vendor-kyc" replace />;
   }
 
-  return <Outlet context={{ vendor }} />;
+  return <Outlet />;
 };
 
 export default ProtectedRoute;
