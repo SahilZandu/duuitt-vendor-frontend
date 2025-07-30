@@ -53,6 +53,26 @@ const iconMap = {
             <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     ),
+    rating: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+            <path d="M12 17.27L18.18 21 16.54 13.97 
+             22 9.24l-7.19-.61L12 2 9.19 8.63 
+             2 9.24l5.46 4.73L5.82 21z" />
+        </svg>
+    ),
+    payment: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+            <path d="M2 4C1.45 4 1 4.45 1 5V19C1 19.55 1.45 20 2 20H22C22.55 20 23 19.55 23 19V5C23 4.45 22.55 4 22 4H2ZM21 8H3V6H21V8ZM3 18V10H21V18H3ZM5 14H7V16H5V14ZM9 14H11V16H9V14Z" />
+        </svg>
+    ),
+
+    close: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 6L6 18" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M6 6l12 12" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    ),
+
     dropdown: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path d="M6 9l6 6 6-6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

@@ -6,11 +6,13 @@ import MainLayout from "../components/layout/MainLayout";
 import ProtectedRoute from "../api/ProtectedRoute";
 import PublicRoute from "../api/PublicRoute";
 import VendorKycPage from "../pages/kyc/VendorKycPage";
-import OrderHistory from "../pages/authenticatedPages/Settings/OrderHistory/OrderHistory";
-import ViewOrderDetails from "../pages/authenticatedPages/Settings/OrderHistory/ViewOrderDetails";
-import RestaurantProfile from "../pages/authenticatedPages/Settings/RestaurantProfile";
+import OrderHistory from "../pages/authenticatedPages/Outlet/OrderHistory/OrderHistory";
+import ViewOrderDetails from "../pages/authenticatedPages/Outlet/OrderHistory/ViewOrderDetails";
+import RestaurantProfile from "../pages/authenticatedPages/Outlet/RestaurantProfile";
 import TeamManagement from "../pages/authenticatedPages/team/TeamManagement";
-import VendorProfile from "../pages/authenticatedPages/Settings/VendorProfile";
+import VendorProfile from "../pages/authenticatedPages/Outlet/VendorProfile";
+import Rating from "../pages/authenticatedPages/Outlet/Rating";
+import PaymentLogs from "../pages/authenticatedPages/Outlet/PaymentLogs";
 
 const AppRoutes = () => {
   return (
@@ -32,6 +34,8 @@ const AppRoutes = () => {
           <Route path="/team" element={<TeamManagement />} />
           <Route path="/outlet/restaurant-profile" element={<RestaurantProfile />} />
           <Route path="/outlet/manage-profile" element={<VendorProfile />} />
+          <Route path="/outlet/rating" element={<Rating />} />
+          <Route path="/outlet/payment-logs" element={<PaymentLogs />} />
         </Route>
       </Route>
 

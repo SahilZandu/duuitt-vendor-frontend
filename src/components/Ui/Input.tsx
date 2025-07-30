@@ -12,7 +12,8 @@ interface Props {
   disabled?: boolean;
   className?: string;
   multiline?: boolean;
-  rows?: number; // optional rows for textarea
+  rows?: number;
+  required?: boolean;
 }
 
 const Input: React.FC<Props> = ({
@@ -27,6 +28,7 @@ const Input: React.FC<Props> = ({
   className = "",
   multiline = false,
   rows = 4,
+  required= false,
 }) => {
   const baseClass = clsx(
     "w-full px-4 py-2 border rounded-md text-sm transition duration-200",
@@ -45,9 +47,10 @@ const Input: React.FC<Props> = ({
           htmlFor={name}
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          {label}
+          {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
+
 
       {multiline ? (
         <textarea

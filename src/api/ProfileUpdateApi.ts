@@ -69,3 +69,20 @@ export const updateVendorProfile = async (
         return null;
     }
 };
+
+export const deleteRestaurantAsset = async ({
+  restaurantId,
+  index,
+}: {
+  restaurantId: string;
+  index: number;
+}) => {
+  try {
+    const payload = { restaurantId, index };
+    const response = await apiRequest("post", "/restaurant/delete-restaurant-asset", payload);
+    return response?.data;
+  } catch (error) {
+    console.error("Error deleting asset:", error);
+    throw error;
+  }
+};
