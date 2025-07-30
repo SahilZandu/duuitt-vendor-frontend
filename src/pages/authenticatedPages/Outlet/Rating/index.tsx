@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import PageTitle from "../../../../components/Ui/PageTitle";
 import Loader from "../../../../components/loader/Loader";
-import { fetchRestaurantReviews } from "../../../../api/ratingAndPaymentLogsApi";
+import { fetchRestaurantReviews } from "../../../../api/RatingAndPaymentLogsApi";
 interface Customer {
     name?: string;
     profile_pic?: string;

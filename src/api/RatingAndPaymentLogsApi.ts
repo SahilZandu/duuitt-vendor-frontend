@@ -40,10 +40,10 @@ interface PaymentLog {
   [key: string]: any; // for flexibility
 }
 
-interface PaymentLogsResponse {
+type GroupedPaymentLogsResponse = {
+  title: string;
   data: PaymentLog[];
-  total: number;
-}
+}[];
 
 export const fetchRestaurantReviews = async ({
   restaurant_id,
@@ -65,7 +65,7 @@ export const fetchRestaurantPaymentLogs = async ({
   restaurant_id: string;
   search?: string;
   status?: "all" | "captured" | "refund" | "withdraw";
-}): Promise<PaymentLogsResponse> => {
+}): Promise<GroupedPaymentLogsResponse> => {
   const payload = { restaurant_id, search, status };
   const response = await apiRequest("post", "/food-order/get-restaurant-payment-collection-logs", payload);
   return response?.data?.data;

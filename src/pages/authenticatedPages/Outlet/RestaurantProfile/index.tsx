@@ -61,8 +61,6 @@ const RestaurantProfile = () => {
                 console.log({ fetchedData });
 
                 if (Array.isArray(fetchedData) && fetchedData.length > 0) {
-                    const baseURL = import.meta.env.VITE_BACKEND_BASE_URL;
-
                     setFormData({
                         banner: fetchedData[0]?.banner,
                         files: fetchedData[0]?.assets,
@@ -162,7 +160,7 @@ const RestaurantProfile = () => {
         }
 
         // Assets
-        data?.files?.forEach((asset, index) => {
+        data?.files?.forEach((asset) => {
             if (typeof asset === "string") {
                 const assetPath = asset.replace(import.meta.env.VITE_BACKEND_BASE_URL, "");
                 formDataToSend.append(`files`, assetPath);
@@ -204,7 +202,7 @@ const RestaurantProfile = () => {
         setIsSubmitting(true);
         try {
             const formDataToSend = convertToFormData(formData, restaurant_id);
-            const res = await updateRestaurantProfile(restaurant_id, formDataToSend);
+            const res = await updateRestaurantProfile(formDataToSend);
             toast.success("Profile Updated Successfully");
         } catch (err) {
             toast.error("Failed to update profile");

@@ -28,7 +28,6 @@ export const fetchRestaurantDetails = async (
 };
 
 export const updateRestaurantProfile = async (
-    restaurant_id: string,
     formData: FormData
 ): Promise<Restaurant | null> => {
     try {

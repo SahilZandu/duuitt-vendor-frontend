@@ -2,12 +2,9 @@
 import { useEffect, useState } from "react";
 import type { TableColumn } from "react-data-table-component";
 import GlobalDataTable from "../../../../components/layout/GlobalDataTable";
-import FormatDate from "../../../../components/Ui/FormatDate";
-import MenuIcon from "../../../../lib/MenuIcon";
-import { useNavigate } from "react-router-dom";
 import Loader from "../../../../components/loader/Loader";
 import PageTitle from "../../../../components/Ui/PageTitle";
-import { fetchRestaurantPaymentLogs } from "../../../../api/ratingAndPaymentLogsApi";
+import { fetchRestaurantPaymentLogs } from "../../../../api/RatingAndPaymentLogsApi";
 
 interface PaymentLog {
     _id: string;
@@ -29,7 +26,6 @@ const PaymentLogs = () => {
     const [statusFilter, setStatusFilter] = useState<"all" | "captured" | "refund" | "withdraw">("all");
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
     const restaurantId = localStorage.getItem("restaurant_id") || "";
 
     const getOrders = async () => {
