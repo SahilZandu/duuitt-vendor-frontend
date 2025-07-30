@@ -5,7 +5,7 @@ import OTPModal from "../components/modals/OTPModal";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
-
+import logo from "../assets/images/logo.png";
 
 const Register = () => {
   const [isVerfied, setIsVerifed] = useState(false);
@@ -34,33 +34,50 @@ const Register = () => {
   const handleRegister = async () => {
     const { name, restaurant_name, phone, email, date_of_founding } = formData;
     setError("");
+  
     if (!name || !restaurant_name || !phone || !email || !date_of_founding) {
       setError("All fields are required.");
       return;
     }
+  
     if (!isValidPhone(phone)) {
       setError("Please enter a valid 10-digit mobile number.");
       return;
     }
+  
     setLoading(true);
-
+  
     try {
       const response = await axiosInstance("post", "/vendor/sign-up", formData);
-      if (response.data) {
-        console.log(generatedOTP, ' thisis is trhe otp ')
-        setGeneratedOTP(response.data.data.otp);
-        toast.success("OTP sent successfully!");
-        setShowOTP(true);
+  
+      const { data, statusCode, message } = response.data;
+  
+      if (statusCode !== 200 || !data) {
+        toast.error(message || "Something went wrong.");
+        setLoading(false);
+        return;
       }
+  
+      // success
+      setGeneratedOTP(data.otp);
+      toast.success("OTP sent successfully!");
+      setShowOTP(true);
+  
       setTimeout(() => {
         console.log("Registration successful", formData);
         setLoading(false);
       }, 2000);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Registration error:", err);
       setLoading(false);
+      const message =
+        err?.response?.data?.message || "Something went wrong. Please try again.";
+      toast.error(message);
     }
   };
+  
+
+
   const handleOTPVerify = async () => {
     setError("");
     if (!enteredOTP) {
@@ -112,12 +129,8 @@ const Register = () => {
           <div className="flex-1 flex flex-col justify-center px-8 lg:px-16">
             {/* Logo */}
             <div className="mb-12">
-              <div className="text-white">
-                <div className="text-4xl font-bold mb-2">
-                  <span className="bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">DUU</span>
-                  <span className="text-white">ITT</span>
-                </div>
-                <div className="text-sm text-gray-300">Restaurant</div>
+              <div className="mb-12">
+                <img src={logo} alt="Logo" className="w-24" />
               </div>
             </div>
 

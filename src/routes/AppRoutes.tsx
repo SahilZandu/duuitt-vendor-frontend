@@ -9,6 +9,7 @@ import VendorKycPage from "../pages/kyc/VendorKycPage";
 import OrderHistory from "../pages/authenticatedPages/Settings/OrderHistory/OrderHistory";
 import ViewOrderDetails from "../pages/authenticatedPages/Settings/OrderHistory/ViewOrderDetails";
 import TeamManagement from "../pages/authenticatedPages/team/TeamManagement";
+import KycSubmitted from "../components/kyc/KycSubmitted";
 
 const AppRoutes = () => {
   return (
@@ -20,11 +21,14 @@ const AppRoutes = () => {
       </Route>
 
       {/* Protected routes */}
+      <Route path="/kyc-submitted" element={<KycSubmitted />} />
       <Route element={<ProtectedRoute />}>
+      <Route path="/vendor-kyc" element={<VendorKycPage />} />
+
         {/* All protected routes use layout */}
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/vendor-kyc" element={<VendorKycPage />} />
+          {/* <Route path="/vendor-kyc" element={<VendorKycPage />} /> */}
           <Route path="/outlet/order-history" element={<OrderHistory />} />
           <Route path="/outlet/order-history/view/:id" element={<ViewOrderDetails />} />
           <Route path="/team" element={<TeamManagement />} />

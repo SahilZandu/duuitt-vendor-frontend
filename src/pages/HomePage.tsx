@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import bgImage from "../assets/images/bg-image.png";
 import axiosInstance from "../api/apiInstance";
 import OTPModal from "../components/modals/OTPModal";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
-import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import Spinner from "../components/loader/Spinner";
+import logo from "../assets/images/logo.png";
 
 
 const HomePage = () => {
@@ -53,34 +52,6 @@ const HomePage = () => {
     }
   };
 
-  // const handleOTPVerify = async () => {
-  //   setError("");
-  //   if (!enteredOTP) {
-  //     setError("Please enter the OTP.");
-  //     return;
-  //   }
-  //   setIsVerifed(true)
-  //   try {
-  //     const response = await axiosInstance("post", "/vendor/verify-otp", {
-  //       phone: Number(phone),
-  //       otp: Number(enteredOTP),
-  //     });
-
-  //     if (response.data.statusCode === 200) {
-  //       toast.success(response?.data?.message || "Login successful");
-  //       localStorage.setItem("accessToken", response?.data?.data?.access_token);
-  //       Cookies.set("authToken", response?.data?.data?.access_token);
-  //       setShowOTP(false);
-  //       navigate("/dashboard");
-  //     }
-  //   } catch (error) {
-  //     console.error("OTP verification error:", error);
-  //     setError("OTP verification failed. Please try again.");
-  //   }
-  //   finally {
-  //     setIsVerifed(false);
-  //   }
-  // };
   const handleOTPVerify = async () => {
     setError("");
     if (!enteredOTP) {
@@ -100,6 +71,7 @@ const HomePage = () => {
         toast.success(response?.data?.message || "Login successful");
 
         localStorage.setItem("accessToken", response?.data?.data?.access_token);
+        console.log(response?.data?.data,' this is the datajfdsajkfsdkjfadjkhdsfjkah')
         localStorage.setItem("restaurant_id", response?.data?.data?.restaurant?._id);
         Cookies.set("authToken", response?.data?.data?.access_token);
 
@@ -132,45 +104,71 @@ const HomePage = () => {
 
   return (
     <div className="font-sans text-gray-800">
-      <Navbar />
-      <section
-        className="relative text-white min-h-screen flex flex-col justify-center items-start px-8 lg:px-24 pt-20 pb-12 bg-cover bg-center"
-        style={{ backgroundImage: `url(${bgImage})` }}
-      >
-        <div className="max-w-xl bg-black bg-opacity-50 p-6 rounded z-10">
-          <h1 className="text-4xl lg:text-5xl font-extrabold leading-tight mb-4">
-            BRING YOUR KITCHEN ONLINE — REACH THOUSANDS OF LOCAL FOODIES
-          </h1>
-        </div>
+      <section className="relative min-h-screen bg-gradient-to-r from-black via-gray-900 to-black">
+        {/* Background with food image overlay */}
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        ></div>
 
-        <div className="absolute top-20 right-8 bg-white rounded-lg p-6 shadow-lg w-full max-w-sm z-20">
-          <h2 className="text-xl font-semibold mb-4 text-black">Get Started</h2>
+        <div className="relative z-10 flex min-h-screen">
+          {/* Left side - Logo and Headline */}
+          <div className="flex-1 flex flex-col justify-center px-8 lg:px-16">
+            {/* Logo */}
+            <div className="mb-12">
+                <img src={logo} alt="Logo" className="w-24" />
+            </div>
 
-          <input
-            type="tel"
-            name="phone"
-            placeholder="Enter 10-digit phone number"
-            className="w-full text-black border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-          {error && <p className="text-sm text-red-600 mb-2">{error}</p>}
+            {/* Main Headline */}
+            <div className="max-w-2xl">
+              <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight mb-8">
+                BRING YOUR KITCHEN ONLINE — REACH THOUSANDS OF LOCAL FOODIES
+              </h1>
+            </div>
+          </div>
 
-          <button
-            onClick={handleLogin}
-            disabled={isLoggingIn}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg mt-6 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-          >
-            {isLoggingIn ? <Spinner /> : "Sign In"}
-          </button>
-          <p className="text-sm mt-3 text-center text-gray-700">
-            Don't have an account?{" "}
-            <Link to="/register" className="text-purple-600 hover:underline">
-              Create account
-            </Link>
-          </p>
+          {/* Right side - Registration Form */}
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl m-8 p-8 h-fit self-center">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">Get Started</h2>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Enter 10-digit phone number"
+                  className="w-full text-black border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+                {error && <p className="text-sm text-red-600 mb-2">{error}</p>}
+              </div>
+            </div>
+            <button
+              onClick={handleLogin}
+              disabled={isLoggingIn}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg mt-6 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {isLoggingIn ? <Spinner /> : "Sign In"}
+            </button>
+
+            <p className="text-sm mt-3 text-center text-gray-700">
+              Don't have an account?{" "}
+              <Link to="/register" className="text-purple-600 hover:underline">
+                Create account
+              </Link>
+            </p>
+          </div>
         </div>
       </section>
+
 
       {/* Steps Section */}
       <section className="py-16 px-6 lg:px-24 bg-white text-center">
