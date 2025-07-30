@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { TableColumn } from "react-data-table-component";
-import { fetchOrdersByStatus, type Order } from "../../../../api/settingsApi";
+import { fetchOrdersByStatus, type Order } from "../../../../api/OrderApi";
 import GlobalDataTable from "../../../../components/layout/GlobalDataTable";
 import FormatDate from "../../../../components/Ui/FormatDate";
 import MenuIcon from "../../../../lib/MenuIcon";

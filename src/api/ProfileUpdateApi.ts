@@ -28,7 +28,6 @@ export const fetchRestaurantDetails = async (
 };
 
 export const updateRestaurantProfile = async (
-    restaurant_id: string,
     formData: FormData
 ): Promise<Restaurant | null> => {
     try {
@@ -68,4 +67,21 @@ export const updateVendorProfile = async (
         console.error("Error updating restaurant profile:", error);
         return null;
     }
+};
+
+export const deleteRestaurantAsset = async ({
+  restaurantId,
+  index,
+}: {
+  restaurantId: string;
+  index: number;
+}) => {
+  try {
+    const payload = { restaurantId, index };
+    const response = await apiRequest("post", "/restaurant/delete-restaurant-asset", payload);
+    return response?.data;
+  } catch (error) {
+    console.error("Error deleting asset:", error);
+    throw error;
+  }
 };

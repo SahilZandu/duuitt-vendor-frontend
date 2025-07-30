@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchOrderById } from "../../../../api/settingsApi";
+import { fetchOrderById } from "../../../../api/OrderApi";
 
 const ViewOrderDetails = () => {
     const { id } = useParams();

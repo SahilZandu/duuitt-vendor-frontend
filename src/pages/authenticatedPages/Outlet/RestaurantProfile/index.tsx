@@ -3,10 +3,13 @@ import Button from "../../../../components/Ui/Button";
 import Input from "../../../../components/Ui/Input";
 import PageTitle from "../../../../components/Ui/PageTitle";
 import RadioButton from "../../../../components/Ui/RadioButton";
-import { fetchRestaurantDetails, updateRestaurantProfile } from "../../../../api/ProfileUpdateApi";
+import { deleteRestaurantAsset, fetchRestaurantDetails, updateRestaurantProfile } from "../../../../api/ProfileUpdateApi";
 import Loader from "../../../../components/loader/Loader";
 import { toast } from "react-toastify";
-
+import { validateFormData } from "../../../../utils/validateForm";
+import { restaurantProfileSchema } from "../../../../validations/restaurantProfileSchema";
+import DeleteModal from "../../../../components/modals/DeleteModal";
+import MenuIcon from "../../../../lib/MenuIcon";
 type FormDataType = {
     banner: string | File;
     files: (string | File)[];
@@ -36,10 +39,13 @@ const RestaurantProfile = () => {
         minimum_order_preparation_time: "",
     });
     console.log({ formData });
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const [visibleCount, setVisibleCount] = useState(4);
     const [loading, setLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [assetToDeleteIndex, setAssetToDeleteIndex] = useState<number | null>(null);
 
     useEffect(() => {
         const loadRestaurant = async () => {
@@ -52,9 +58,9 @@ const RestaurantProfile = () => {
                     return;
                 }
                 const fetchedData = await fetchRestaurantDetails(restaurant_id);
-                if (Array.isArray(fetchedData) && fetchedData.length > 0) {
-                    const baseURL = import.meta.env.VITE_BACKEND_BASE_URL;
+                console.log({ fetchedData });
 
+                if (Array.isArray(fetchedData) && fetchedData.length > 0) {
                     setFormData({
                         banner: fetchedData[0]?.banner,
                         files: fetchedData[0]?.assets,
@@ -88,32 +94,56 @@ const RestaurantProfile = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+        setErrors((prev) => ({ ...prev, [name]: "" }));
     };
 
     const handleRadioChange = (value: string) => {
         setFormData((prev) => ({ ...prev, veg_non_veg: value }));
     };
 
-    const handleDeleteAsset = (indexToRemove: number) => {
-        setFormData((prev) => ({
-            ...prev,
-            files: prev.files.filter((_, index) => index !== indexToRemove),
-        }));
+    const handleConfirmDelete = async () => {
+        if (assetToDeleteIndex === null) return;
+
+        const restaurant_id = localStorage.getItem("restaurant_id");
+        if (!restaurant_id) {
+            toast.error("Restaurant ID not found.");
+            return;
+        }
+
+        try {
+            await deleteRestaurantAsset({
+                restaurantId: restaurant_id,
+                index: assetToDeleteIndex,
+            });
+
+            toast.success("Image deleted successfully");
+
+            setFormData((prev) => ({
+                ...prev,
+                files: prev.files.filter((_, idx) => idx !== assetToDeleteIndex),
+            }));
+
+            setIsDeleteModalOpen(false);
+            setAssetToDeleteIndex(null);
+        } catch (error) {
+            console.error("Failed to delete image", error);
+            toast.error("Failed to delete image");
+        }
     };
 
-  const getImageSrc = (urlOrFile: string | File) => {
-  if (!urlOrFile) return "";
+    const getImageSrc = (urlOrFile: string | File) => {
+        if (!urlOrFile) return "";
 
-  if (typeof urlOrFile === "string") {
-    if (urlOrFile.startsWith("http") || urlOrFile.startsWith("blob:")) {
-      return urlOrFile; // full URL or blob URL, return as-is
-    }
-    return `${import.meta.env.VITE_BACKEND_BASE_URL}${urlOrFile}`; // prepend base URL for relative paths
-  } else {
-    // It's a File, create a blob URL for preview
-    return URL.createObjectURL(urlOrFile);
-  }
-};
+        if (typeof urlOrFile === "string") {
+            if (urlOrFile.startsWith("http") || urlOrFile.startsWith("blob:")) {
+                return urlOrFile; // full URL or blob URL, return as-is
+            }
+            return `${import.meta.env.VITE_BACKEND_BASE_URL}${urlOrFile}`; // prepend base URL for relative paths
+        } else {
+            // It's a File, create a blob URL for preview
+            return URL.createObjectURL(urlOrFile);
+        }
+    };
 
     const convertToFormData = (data: FormDataType, restaurant_id: string) => {
         const formDataToSend = new FormData();
@@ -130,7 +160,7 @@ const RestaurantProfile = () => {
         }
 
         // Assets
-        data?.files?.forEach((asset, index) => {
+        data?.files?.forEach((asset) => {
             if (typeof asset === "string") {
                 const assetPath = asset.replace(import.meta.env.VITE_BACKEND_BASE_URL, "");
                 formDataToSend.append(`files`, assetPath);
@@ -160,14 +190,21 @@ const RestaurantProfile = () => {
             console.error("Restaurant ID not found.");
             return;
         }
+
+        const { valid, errors } = await validateFormData(restaurantProfileSchema, formData);
+
+        if (!valid) {
+            setErrors(errors);
+            return;
+        }
+
+        setErrors({});
         setIsSubmitting(true);
         try {
             const formDataToSend = convertToFormData(formData, restaurant_id);
-            const res = await updateRestaurantProfile(restaurant_id, formDataToSend);
-            console.log("Profile updated successfully:", res);
+             await updateRestaurantProfile(formDataToSend);
             toast.success("Profile Updated Successfully");
         } catch (err) {
-            console.error("Failed to update restaurant:", err);
             toast.error("Failed to update profile");
         } finally {
             setIsSubmitting(false);
@@ -262,11 +299,15 @@ const RestaurantProfile = () => {
                                         className="w-full h-32 object-cover rounded-lg border shadow-sm"
                                     />
                                     <button
-                                        onClick={() => handleDeleteAsset(index)}
+                                        onClick={() => {
+                                            setAssetToDeleteIndex(index);
+                                            setIsDeleteModalOpen(true);
+                                        }}
                                         className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded opacity-80 hover:opacity-100 transition"
                                         type="button"
                                     >
-                                        ✕
+                                        {/* ✕ */}
+                                        <MenuIcon name="close"/>
                                     </button>
                                 </div>
                             ))}
@@ -294,10 +335,12 @@ const RestaurantProfile = () => {
                         type="text"
                         name="name"
                         label="Restaurant Name"
-                        value={formData.name}
+                        value={formData?.name}
                         onChange={handleChange}
                         className="input"
                         placeholder="Enter full name"
+                        error={errors?.name}
+                        required
                     />
                 </div>
 
@@ -306,10 +349,12 @@ const RestaurantProfile = () => {
                         label="About"
                         name="about"
                         placeholder="Write about your restaurant"
-                        value={formData.about}
+                        value={formData?.about}
                         onChange={handleChange}
                         multiline
                         rows={5}
+                        error={errors?.about}
+                        required
                     />
                 </div>
 
@@ -318,35 +363,42 @@ const RestaurantProfile = () => {
                         type="text"
                         name="address"
                         label="Restaurant Address"
-                        value={formData.address}
+                        value={formData?.address}
                         onChange={handleChange}
                         className="input"
                         placeholder="Enter restaurant address"
+                        error={errors?.address}
+                        required
                     />
                 </div>
 
                 <Input
-                    type="text"
+                    type="number"
                     name="phone"
                     label="Phone Number"
-                    value={formData.phone}
+                    value={formData?.phone}
                     onChange={handleChange}
                     placeholder="Enter phone number"
+                    error={errors?.phone}
+                    required
                 />
                 <Input
-                    type="email"
                     name="email"
                     label="Email Address"
-                    value={formData.email}
+                    value={formData?.email}
                     onChange={handleChange}
                     placeholder="Enter email"
+                    error={errors?.email}
+                    required
                 />
                 <Input
                     name="date_of_founding"
                     label="Date of Founding"
                     type="date"
-                    value={formData.date_of_founding}
+                    value={formData?.date_of_founding}
                     onChange={handleChange}
+                    error={errors?.date_of_founding}
+                    required
                 />
 
                 <div className="flex gap-3">
@@ -359,6 +411,7 @@ const RestaurantProfile = () => {
                         ]}
                         selected={formData.veg_non_veg}
                         onChange={handleRadioChange}
+
                     />
                 </div>
                 <div>
@@ -366,10 +419,12 @@ const RestaurantProfile = () => {
                         type="number"
                         label="Minimum Order Value"
                         name="minimum_order_value"
-                        value={formData.minimum_order_value}
+                        value={formData?.minimum_order_value}
                         onChange={handleChange}
                         className="input"
                         placeholder="Enter minimum order value"
+                        error={errors?.minimum_order_value}
+                        required
                     />
                 </div>
 
@@ -378,10 +433,12 @@ const RestaurantProfile = () => {
                         type="number"
                         label="Minimum Order Preparation Time (in minutes)"
                         name="minimum_order_preparation_time"
-                        value={formData.minimum_order_preparation_time}
+                        value={formData?.minimum_order_preparation_time}
                         onChange={handleChange}
                         className="input"
                         placeholder="Enter preparation time"
+                        error={errors?.minimum_order_preparation_time}
+                        required
                     />
                 </div>
             </div>
@@ -396,6 +453,16 @@ const RestaurantProfile = () => {
                     className="text-sm !w-auto px-4 py-2"
                 />
             </div>
+            <DeleteModal
+                isOpen={isDeleteModalOpen}
+                title="Delete Restaurant Image"
+                onClose={() => {
+                    setIsDeleteModalOpen(false);
+                    setAssetToDeleteIndex(null);
+                }}
+                onDelete={handleConfirmDelete}
+            />
+
         </form>
     );
 };

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import MenuIcon from "../../lib/MenuIcon";
 import Cookies from "js-cookie"; // Make sure you have this installed: `npm install js-cookie`
@@ -13,7 +13,7 @@ type MenuItem = {
 };
 
 const topMenuItems: MenuItem[] = [
-  { label: "Home", to: "/dashboard", icon: "home" },
+  { label: "Dashboard", to: "/dashboard", icon: "home" },
   { label: "Orders", to: "/orders", icon: "order" },
   { label: "Team Members", to: "/team", icon: "team" },
   {
@@ -21,6 +21,8 @@ const topMenuItems: MenuItem[] = [
       { label: "Restaurant Profile", to: "/outlet/restaurant-profile", icon: "restaurant" },
       { label: "Order History", to: "/outlet/order-history", icon: "order" },
       { label: "Manage Profile", to: "/outlet/manage-profile", icon: "manage" },
+      { label: "Rating", to: "/outlet/rating", icon: "rating" },
+      { label: "Payment Logs", to: "/outlet/payment-logs", icon: "payment" },
     ],
   },
   { label: "Messages", to: "/messages", icon: "message" },
@@ -32,7 +34,7 @@ const topMenuItems: MenuItem[] = [
 const bottomMenuItems: MenuItem[] = [
   { label: "Settings", icon: "settings", to: "/setting" },
   { label: "Get Help", to: "/help", icon: "help" },
-  { label: "Sign out", to: "/logout", icon: "logout" }, // this will be handled manually
+  { label: "Sign out", to: "/logout", icon: "logout" },
 ];
 
 
@@ -53,6 +55,18 @@ const Sidebar: React.FC = () => {
     });
     return openState;
   };
+  useEffect(() => {
+    const updatedOpenMenus: Record<string, boolean> = {};
+    topMenuItems.forEach((item) => {
+      if (item.children?.length) {
+        const hasActiveChild = item.children.some((child) =>
+          location.pathname.startsWith(child.to || "")
+        );
+        updatedOpenMenus[item.label] = hasActiveChild;
+      }
+    });
+    setOpenMenus(updatedOpenMenus);
+  }, [location.pathname]);
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(getInitialOpenMenus);
   const toggleMenu = (label: string) => {
@@ -80,13 +94,13 @@ const Sidebar: React.FC = () => {
   return (
     <aside className="w-64 bg-[#8E3CF7] text-white min-h-screen flex flex-col justify-between py-6 px-4">
       <nav className="space-y-2">
-        <a href="/" className="mb-8 cursor-pointer">
+        <Link to="/" className="mb-8 cursor-pointer">
           <img
             src={logo}
             alt="Logo"
             className="h-[120px] w-[200px]"
           />
-        </a>
+        </Link>
 
         {topMenuItems.map((item, idx) => {
           const hasChildren = !!item.children?.length;
@@ -105,7 +119,9 @@ const Sidebar: React.FC = () => {
                 <>
                   <button
                     onClick={() => toggleMenu(item.label)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded hover:bg-[#7b2de6] focus:outline-none ${openMenus[item.label] ? "bg-[#7b2de6]" : ""
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded transition-colors duration-150 ${openMenus[item.label]
+                      ? "bg-white text-[#8E3CF7] font-semibold"
+                      : "text-white hover:bg-white hover:text-[#8E3CF7]"
                       }`}
                   >
                     <div className="flex items-center space-x-2">
@@ -144,7 +160,7 @@ const Sidebar: React.FC = () => {
               <button
                 key={idx}
                 onClick={handleLogout}
-                className="w-full flex items-center space-x-2 px-3 py-2 rounded hover:bg-[#7b2de6]"
+                className="w-full flex items-center space-x-2 px-3 py-2 rounded hover:bg-[#ffff] text-black"
               >
                 {item.icon && <MenuIcon name={item.icon} />}
                 {isLoggingOut ? <Spinner /> : <span>{item.label}</span>}
@@ -166,7 +182,7 @@ const Sidebar: React.FC = () => {
                 <>
                   <button
                     onClick={() => toggleMenu(item.label)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded hover:bg-[#7b2de6] focus:outline-none ${openMenus[item.label] ? "bg-[#7b2de6]" : ""
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded hover:bg-[#ffff] text-black focus:outline-none ${openMenus[item.label] ? "bg-[#fff]" : ""
                       }`}
                   >
                     <div className="flex items-center space-x-2">
@@ -209,12 +225,15 @@ interface SidebarLinkProps {
 const SidebarLink: React.FC<SidebarLinkProps> = ({ to, label, icon, active }) => (
   <Link
     to={to}
-    className={`flex items-center space-x-2 px-3 py-2 rounded hover:bg-[#7b2de6] ${active ? "bg-[#7b2de6] font-semibold" : ""
+    className={`flex items-center space-x-2 px-3 py-2 rounded transition-colors duration-150 ${active
+      ? "bg-white text-[#8E3CF7] font-semibold"
+      : "text-white hover:bg-white hover:text-[#8E3CF7]"
       }`}
   >
     {icon && <MenuIcon name={icon} />}
     <span>{label}</span>
   </Link>
 );
+
 
 export default Sidebar;
