@@ -18,7 +18,7 @@ const KycSubmitted = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Logo Header */}
-      <div className="p-4">
+      <div className="p-3 bg-purple-800">
         <img src={logo} alt="Logo" className="w-28" />
       </div>
 

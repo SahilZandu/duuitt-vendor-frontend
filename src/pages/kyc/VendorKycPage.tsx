@@ -88,45 +88,44 @@ const VendorKycPage = () => {
                 account_number: vendor?.fssai_detail?.account_number || "",
                 expiration_date: vendor?.fssai_detail?.expiration_date || "",
                 status: vendor?.fssai_detail?.status || "pending",
-                image: null
+                image: null,
             });
 
             setGstDetail({
                 gstn_number: vendor?.gstn_detail?.gstn_number || "",
                 expiration_date: vendor?.gstn_detail?.expiration_date || "",
                 status: vendor?.gstn_detail?.status || "pending",
-                image: null
+                image: null,
             });
 
             setPanDetail({
                 pan_number: vendor?.pan_detail?.pan_number || "",
                 status: vendor?.pan_detail?.status || "pending",
-                image: null
+                image: null,
             });
 
             setBankDetail({
                 bank_name: vendor?.bank_detail?.bank_name || "",
                 account_number: vendor?.bank_detail?.account_number || "",
                 ifsc_code: vendor?.bank_detail?.ifsc_code || "",
-                status: vendor?.bank_detail?.status || "pending"
+                status: vendor?.bank_detail?.status || "pending",
             });
+
+            // Reset submitted steps based on what's already there
+            const completed: string[] = [];
+            if (vendor?.fssai_detail?.account_number && vendor?.fssai_detail?.status === "pending") completed.push("FSSAI");
+            if (vendor?.gstn_detail?.gstn_number && vendor?.gstn_detail?.status === "pending") completed.push("gst");
+            if (vendor?.pan_detail?.pan_number && vendor?.pan_detail?.status === "pending") completed.push("PAN");
+            if (vendor?.bank_detail?.account_number && vendor?.bank_detail?.status === "pending") completed.push("Bank");
+            setSubmittedSteps(completed);
         }
     }, [vendor]);
 
-    const allDocsFilledAndPending = (
-        fssaiDetail.account_number &&
-        fssaiDetail.expiration_date &&
-        fssaiDetail.status === "pending" &&
-        gstDetail.gstn_number &&
-        gstDetail.expiration_date &&
-        gstDetail.status === "pending" &&
-        panDetail.pan_number &&
-        panDetail.status === "pending" &&
-        bankDetail.bank_name &&
-        bankDetail.account_number &&
-        bankDetail.ifsc_code &&
-        bankDetail.status === "pending"
-    );
+    const allDocsFilledAndPending =
+        vendor?.fssai_detail?.status === "pending" &&
+        vendor?.gstn_detail?.status === "pending" &&
+        vendor?.pan_detail?.status === "pending" &&
+        vendor?.bank_detail?.status === "pending";
 
     const showPendingNotice = !vendor?.is_kyc_completed && allDocsFilledAndPending;
 
@@ -141,30 +140,57 @@ const VendorKycPage = () => {
         let key = "", dataToSend: any = {};
         const formData = new FormData();
 
-        // VALIDATIONS
+        // Error handler
         const showError = (msg: string) => { toast.error(msg); return false; };
+
+        const isNumeric = (val: string) => /^\d+$/.test(val);
+        const isDate = (val: string) => /^\d{4}-\d{2}-\d{2}$/.test(val);
+        const isIFSC = (val: string) => /^[A-Z]{4}0[A-Z0-9]{6}$/.test(val);
 
         if (formName === "FSSAI") {
             const { account_number, expiration_date, image } = fssaiDetail;
+
             if (!account_number || !expiration_date || !image) return showError("All FSSAI fields are required");
+            if (!isNumeric(account_number)) return showError("FSSAI account number must be numeric");
+            if (!isDate(expiration_date)) return showError("Invalid expiration date format (YYYY-MM-DD)");
+
             key = "fssai_detail";
             dataToSend = { account_number, expiration_date, status: "pending" };
             formData.append("image", image);
-        } else if (formName === "gst") {
+        }
+
+        else if (formName === "gst") {
             const { gstn_number, expiration_date, image } = gstDetail;
+
             if (!gstn_number || !expiration_date || !image) return showError("All GST fields are required");
+            if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gstn_number)) {
+                return showError("Invalid GST number format");
+            }
+            if (!isDate(expiration_date)) return showError("Invalid expiration date format (YYYY-MM-DD)");
+
             key = "gstn_detail";
             dataToSend = { gstn_number, expiration_date, status: "pending" };
             formData.append("image", image);
-        } else if (formName === "PAN") {
+        }
+
+        else if (formName === "PAN") {
             const { pan_number, image } = panDetail;
+
             if (!pan_number || !image) return showError("PAN number and image are required");
+            if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan_number)) return showError("Invalid PAN number format");
+
             key = "pan_detail";
             dataToSend = { pan_number, status: "pending" };
             formData.append("image", image);
-        } else if (formName === "Bank") {
+        }
+
+        else if (formName === "Bank") {
             const { bank_name, account_number, ifsc_code } = bankDetail;
+
             if (!bank_name || !account_number || !ifsc_code) return showError("All bank fields are required");
+            if (!isNumeric(account_number)) return showError("Account number must be numeric");
+            if (!isIFSC(ifsc_code)) return showError("Invalid IFSC code format");
+
             key = "bank_detail";
             dataToSend = { bank_name, account_number, ifsc_code, status: "pending" };
         }
@@ -176,9 +202,8 @@ const VendorKycPage = () => {
         try {
             setLoading(true);
             const response = await axiosInstance("post", "/vendor/update-kyc-detail", formData);
-            console.log("Success:", response.data);
             toast.success("Submitted successfully!");
-            setSubmittedSteps([...submittedSteps, formName]);
+            console.log(response, 'this is the response');
             const newSubmittedSteps = [...submittedSteps, formName];
             setSubmittedSteps(newSubmittedSteps);
 
@@ -187,8 +212,7 @@ const VendorKycPage = () => {
 
             if (allSubmitted) {
                 window.location.href = "/kyc-submitted";
-            }
-            else {
+            } else {
                 setCurrentStep((prev) => Math.min(prev + 1, documentSteps.length - 1));
             }
         } catch (error) {
@@ -198,6 +222,7 @@ const VendorKycPage = () => {
             setLoading(false);
         }
     };
+
     const fssaiHasData =
         vendor?.fssai_detail?.account_number &&
         vendor?.fssai_detail?.expiration_date &&
