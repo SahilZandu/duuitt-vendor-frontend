@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import Modal from "../layout/Modal";
-import axiosInstance from "../../api/apiInstance"; // <-- Make sure path is correct
+import axiosInstance from "../../api/apiInstance";
+import { toast } from "react-toastify";
 
 interface Permission {
+  id: number;
+  name: string;
+  active: boolean;
+}
+
+interface Role {
   id: number;
   name: string;
   active: boolean;
@@ -29,16 +36,24 @@ const defaultPermissions: Permission[] = [
   { id: 12, name: "Product Management", active: false },
 ];
 
+const roles: Role[] = [
+  { id: 1, name: "cook", active: true },
+  { id: 2, name: "manager", active: true },
+  { id: 3, name: "accountant", active: true },
+  { id: 4, name: "customer", active: true },
+];
+
 const AddTeamMemberModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
   const [form, setForm] = useState({
     name: "",
     phone: "",
     email: "",
-    role: "",
+    role: null as Role | null,
     permissions: defaultPermissions,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -47,11 +62,22 @@ const AddTeamMemberModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
     else if (!/^\d{10}$/.test(form.phone)) newErrors.phone = "Phone must be 10 digits";
     if (!form.email.trim()) newErrors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(form.email)) newErrors.email = "Invalid email format";
-    if (!form.role.trim()) newErrors.role = "Role is required";
+    if (!form.role) newErrors.role = "Role is required";
     const selected = form.permissions.filter(p => p.active);
     if (selected.length === 0) newErrors.permissions = "Select at least one permission";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const isFormValid = () => {
+    return (
+      form.name.trim() &&
+      /^\d{10}$/.test(form.phone) &&
+      /\S+@\S+\.\S+/.test(form.email) &&
+      form.role !== null &&
+      form.permissions.some(p => p.active)
+    );
   };
 
   const handlePermissionToggle = (id: number) => {
@@ -65,36 +91,48 @@ const AddTeamMemberModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validate()) return;
+
+    setIsSubmitting(true);
 
     const payload = {
       name: form.name,
       email: form.email,
-      phone: form.phone,
-      role: form.role,
+      phone: Number(form.phone),
       restaurant_id: localStorage.getItem("restaurant_id"),
-      permissions: form.permissions.filter(p => p.active).map(p => ({
-        id: p.id,
-        name: p.name,
+      roles: {
+        id: form.role?.id,
+        name: form.role?.name,
         active: true,
-      })),
+      },
+      is_active: false,
+      permissions: form.permissions
+        .filter(p => p.active)
+        .map(p => ({
+          id: p.id,
+          name: p.name,
+          active: true,
+        })),
     };
 
     try {
-      await axiosInstance("post", "/vendor/create-team-member", payload);
-      onSuccess(); // refresh team list
-      onClose(); // close modal
+      await axiosInstance("post", "/vendor/add-team-member", payload);
+      toast.success("Team member added successfully");
+      onSuccess();
+      onClose();
       setForm({
         name: "",
         phone: "",
         email: "",
-        role: "",
+        role: null,
         permissions: defaultPermissions,
       });
       setErrors({});
     } catch (err) {
       console.error("Failed to add team member", err);
+      toast.error("Failed to add team member");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -103,58 +141,71 @@ const AddTeamMemberModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
   return (
     <Modal title="Add Team Member" onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-4">
+
+        {/* Name */}
         <div>
-          <label>Name</label>
+          <label className="block font-medium mb-1">Name</label>
           <input
             type="text"
-            className="input"
+            className="w-full border p-2 rounded"
+            placeholder="Enter full name"
             value={form.name}
             onChange={e => setForm({ ...form, name: e.target.value })}
           />
           {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
         </div>
 
+        {/* Phone */}
         <div>
-          <label>Phone</label>
+          <label className="block font-medium mb-1">Phone</label>
           <input
             type="text"
-            className="input"
+            className="w-full border p-2 rounded"
+            placeholder="Enter phone number"
             value={form.phone}
             onChange={e => setForm({ ...form, phone: e.target.value })}
           />
           {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
         </div>
 
+        {/* Email */}
         <div>
-          <label>Email</label>
+          <label className="block font-medium mb-1">Email</label>
           <input
             type="email"
-            className="input"
+            className="w-full border p-2 rounded"
+            placeholder="Enter email"
             value={form.email}
             onChange={e => setForm({ ...form, email: e.target.value })}
           />
           {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
         </div>
 
+        {/* Role */}
         <div>
-          <label>Role</label>
+          <label className="block font-medium mb-1">Role</label>
           <select
-            className="input"
-            value={form.role}
-            onChange={e => setForm({ ...form, role: e.target.value })}
+            className="w-full border p-2 rounded"
+            value={form.role?.id || ""}
+            onChange={e => {
+              const selectedRole = roles.find(r => r.id === parseInt(e.target.value));
+              setForm({ ...form, role: selectedRole || null });
+            }}
           >
             <option value="">Select role</option>
-            <option value="manager">Manager</option>
-            <option value="accountant">Accountant</option>
-            <option value="cook">Cook</option>
-            <option value="customer">Customer</option>
+            {roles.map(role => (
+              <option key={role.id} value={role.id}>
+                {role.name}
+              </option>
+            ))}
           </select>
           {errors.role && <p className="text-red-500 text-sm">{errors.role}</p>}
         </div>
 
+        {/* Permissions */}
         <div>
-          <label className="block mb-1">Permissions</label>
-          <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+          <label className="block font-medium mb-1">Permissions</label>
+          <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border p-2 rounded">
             {form.permissions.map(p => (
               <label key={p.id} className="flex items-center space-x-2">
                 <input
@@ -171,12 +222,24 @@ const AddTeamMemberModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
           )}
         </div>
 
+        {/* Buttons */}
         <div className="flex justify-end space-x-2 mt-4">
-          <button type="button" className="bg-gray-300 px-4 py-2 rounded" onClick={onClose}>
+          <button
+            type="button"
+            className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded"
+            onClick={onClose}
+          >
             Cancel
           </button>
-          <button type="submit" className="bg-purple-600 text-white px-4 py-2 rounded">
-            Save
+          <button
+            type="submit"
+            disabled={!isFormValid() || isSubmitting}
+            className={`${!isFormValid() || isSubmitting
+                ? "bg-purple-300 cursor-not-allowed"
+                : "bg-purple-600 hover:bg-purple-700"
+              } text-white px-4 py-2 rounded`}
+          >
+            {isSubmitting ? "Saving..." : "Save"}
           </button>
         </div>
       </form>

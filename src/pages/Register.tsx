@@ -34,35 +34,35 @@ const Register = () => {
   const handleRegister = async () => {
     const { name, restaurant_name, phone, email, date_of_founding } = formData;
     setError("");
-  
+
     if (!name || !restaurant_name || !phone || !email || !date_of_founding) {
       setError("All fields are required.");
       return;
     }
-  
+
     if (!isValidPhone(phone)) {
       setError("Please enter a valid 10-digit mobile number.");
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       const response = await axiosInstance("post", "/vendor/sign-up", formData);
-  
+
       const { data, statusCode, message } = response.data;
-  
+
       if (statusCode !== 200 || !data) {
         toast.error(message || "Something went wrong.");
         setLoading(false);
         return;
       }
-  
+
       // success
       setGeneratedOTP(data.otp);
       toast.success("OTP sent successfully!");
       setShowOTP(true);
-  
+
       setTimeout(() => {
         console.log("Registration successful", formData);
         setLoading(false);
@@ -75,28 +75,48 @@ const Register = () => {
       toast.error(message);
     }
   };
-  
+
 
 
   const handleOTPVerify = async () => {
     setError("");
+
     if (!enteredOTP) {
       setError("Please enter the OTP.");
       return;
     }
+
     setIsVerifed(true);
+
     try {
       const response = await axiosInstance("post", "/vendor/verify-otp", {
         phone: Number(formData.phone),
         otp: Number(enteredOTP),
       });
 
-      if (response.data.statusCode === 200) {
-        toast.success(response?.data?.message || "Login successful");
-        localStorage.setItem("accessToken", response?.data?.data?.access_token);
-        Cookies.set("authToken", response?.data?.data?.access_token);
+      const { statusCode, message, data } = response.data;
+
+      if (statusCode === 200 && data) {
+        toast.success(message || "Login successful");
+
+        localStorage.setItem("accessToken", data.access_token);
+        localStorage.setItem("restaurant_id", data.restaurant?._id || "");
+        localStorage.setItem("is_kyc_completed", data.is_kyc_completed || "");
+        localStorage.setItem("vendor_id", data._id || "");
+
+        Cookies.set("authToken", data.access_token);
+
         setShowOTP(false);
-        navigate("/dashboard");
+
+        console.log(data, "Vendor login response");
+
+        if (data.is_kyc_completed) {
+          navigate("/dashboard");
+        } else {
+          navigate("/vendor-kyc");
+        }
+      } else {
+        setError("Invalid OTP or verification failed.");
       }
     } catch (error) {
       console.error("OTP verification error:", error);
@@ -105,6 +125,7 @@ const Register = () => {
       setIsVerifed(false);
     }
   };
+
   const handleCloseModal = () => {
     setShowOTP(false);
     setEnteredOTP("");
