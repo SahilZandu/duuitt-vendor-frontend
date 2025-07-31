@@ -85,10 +85,11 @@ const ViewOrderDetails = () => {
                                         }
                                         alt={item?.food_item_name || "Food Image"}
                                         className="w-full h-36 object-cover rounded"
-                                        onError={(e) => {
-                                            e.currentTarget.onerror = null;
-                                            e.currentTarget.src = "/public/images/default-food-image.png";
-                                        }}
+                                        // onError={(e) => {
+                                        //     e.currentTarget.onerror = null;
+                                        //     e.currentTarget.src = "/public/images/default-food-image.png";
+                                        // }}
+                                         crossOrigin="anonymous"
                                     />
                                 </div>
 

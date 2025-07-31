@@ -21,8 +21,8 @@ type Props = {
 
 const variantClasses: Record<Variant, string> = {
   primary: "bg-purple-600 hover:bg-purple-700 text-white",
-  secondary: "bg-gray-200 hover:bg-gray-300 text-black",
-  danger: "bg-red-600 hover:bg-red-700 text-white",
+  secondary: "bg-orange-400 hover:bg-orange-500 text-white font-medium",
+  danger: "border border-red-600 text-red-700 font-semibold hover:bg-red-100",
   outline: "bg-transparent border border-gray-400 text-gray-700 hover:bg-gray-100",
   success: "bg-green-600 hover:bg-green-700 text-white",
   "soft-success": "bg-green-100 text-green-700",

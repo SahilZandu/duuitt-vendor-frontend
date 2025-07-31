@@ -5,6 +5,7 @@ import GlobalDataTable from "../../../../components/layout/GlobalDataTable";
 import Loader from "../../../../components/loader/Loader";
 import PageTitle from "../../../../components/Ui/PageTitle";
 import { fetchRestaurantPaymentLogs } from "../../../../api/RatingAndPaymentLogsApi";
+import NoDataFound from "../../../../components/Ui/NoDataFound";
 
 interface PaymentLog {
     _id: string;
@@ -135,11 +136,7 @@ const PaymentLogs = () => {
         //     button: true,
         // },
     ];
-    if (loading) {
-        return (
-            <Loader />
-        )
-    }
+
     return (
         <div className="p-6">
             <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
@@ -171,13 +168,18 @@ const PaymentLogs = () => {
                 </div>
             </div>
 
-            {/* Table */}
-            <GlobalDataTable
-                columns={columns}
-                data={orders}
-                pagination
-                selectableRows={false}
-            />
+            {loading ? (
+                <Loader />
+            ) : orders && orders?.length === 0 ? (
+                <NoDataFound message="No payment logs available." />
+            ) : (
+                <GlobalDataTable
+                    columns={columns}
+                    data={orders}
+                    pagination={true}
+                    selectableRows={false}
+                />
+            )}
 
         </div>
     );

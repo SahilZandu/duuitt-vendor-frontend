@@ -8,6 +8,7 @@ import MenuIcon from "../../../../lib/MenuIcon";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../../../components/loader/Loader";
 import PageTitle from "../../../../components/Ui/PageTitle";
+import NoDataFound from "../../../../components/Ui/NoDataFound";
 
 const OrderHistory = () => {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -100,16 +101,12 @@ const OrderHistory = () => {
             button: true,
         },
     ];
-    if (loading) {
-        return (
-            <Loader />
-        )
-    }
+
     return (
         <div className="p-6">
             <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
                 {/* <h1 className="text-2xl font-bold mb-4">Order History</h1> */}
-                <PageTitle title="Order History"/>
+                <PageTitle title="Order History" />
 
                 {/* Filters */}
                 <div className="flex justify-between items-center gap-4 mb-4">
@@ -137,13 +134,20 @@ const OrderHistory = () => {
                 </div>
             </div>
 
-            {/* Table */}
-            <GlobalDataTable
-                columns={columns}
-                data={orders}
-                pagination={true}
-                selectableRows={false}
-            />
+
+            {loading ? (
+                <Loader />
+            ) : orders && orders?.length === 0 ? (
+                <NoDataFound message="No orders available." />
+            ) : (
+                <GlobalDataTable
+                    columns={columns}
+                    data={orders}
+                    pagination={true}
+                    selectableRows={false}
+                />
+            )}
+
         </div>
     );
 };

@@ -14,6 +14,8 @@ import VendorProfile from "../pages/authenticatedPages/Outlet/VendorProfile";
 import Rating from "../pages/authenticatedPages/Outlet/Rating";
 import PaymentLogs from "../pages/authenticatedPages/Outlet/PaymentLogs";
 import KycSubmitted from "../components/kyc/KycSubmitted";
+import Orders from "../pages/authenticatedPages/Orders";
+import ViewOrder from "../pages/authenticatedPages/Orders/ViewOrder";
 
 const AppRoutes = () => {
   return (
@@ -27,7 +29,7 @@ const AppRoutes = () => {
       {/* Protected routes */}
       <Route path="/kyc-submitted" element={<KycSubmitted />} />
       <Route element={<ProtectedRoute />}>
-      <Route path="/vendor-kyc" element={<VendorKycPage />} />
+        <Route path="/vendor-kyc" element={<VendorKycPage />} />
 
         {/* All protected routes use layout */}
         <Route element={<MainLayout />}>
@@ -40,6 +42,10 @@ const AppRoutes = () => {
           <Route path="/outlet/manage-profile" element={<VendorProfile />} />
           <Route path="/outlet/rating" element={<Rating />} />
           <Route path="/outlet/payment-logs" element={<PaymentLogs />} />
+          {/* Orders...... */}
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/orders/view-order/:id" element={<ViewOrder />} />
+          
         </Route>
       </Route>
 
