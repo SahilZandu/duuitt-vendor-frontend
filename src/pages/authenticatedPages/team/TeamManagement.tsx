@@ -27,6 +27,8 @@ const TeamManagement: React.FC = () => {
     const [team, setTeam] = useState<TeamMember[]>([]);
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
+    const [editMember, setEditMember] = useState<TeamMember | null>(null);
+
 
     useEffect(() => {
         fetchTeam();
@@ -71,17 +73,20 @@ const TeamManagement: React.FC = () => {
         },
         {
             name: "Actions",
-            cell: (_row: TeamMember) => (
-              <div className="space-x-2">
-                <button className="text-blue-600 hover:underline">Edit</button>
-                <button className="text-red-600 hover:underline">Delete</button>
-              </div>
+            cell: (row: TeamMember) => (
+                <div className="space-x-2">
+                    <button className="text-blue-600 hover:underline" onClick={() => {
+                        setEditMember(row); // row from DataTable
+                        setShowModal(true);
+                    }}>Edit</button>
+                    <button className="text-red-600 hover:underline">Delete</button>
+                </div>
             ),
             ignoreRowClick: true,
             allowOverflow: true,
             button: true,
-          }
-          
+        }
+
     ];
 
     return (
@@ -96,40 +101,44 @@ const TeamManagement: React.FC = () => {
                 </button>
             </div>
             <DataTable
-                    columns={columns}
-                    data={team}
-                    progressPending={loading}
-                    pagination
-                    highlightOnHover
-                    noDataComponent={<div className="py-4 text-gray-600">No team member found</div>}
-                    paginationRowsPerPageOptions={[10, 25, 50]}
-                    paginationPerPage={25}
-                    paginationComponentOptions={{
-                        rowsPerPageText: 'Rows per page:',
-                        rangeSeparatorText: 'of',
-                    }}
-                    customStyles={{
-                        rows: {
-                            style: {
-                                borderBottom: '1px solid #e5e7eb',
-                                fontSize: 14,
-                            },
+                columns={columns}
+                data={team}
+                progressPending={loading}
+                pagination
+                highlightOnHover
+                noDataComponent={<div className="py-4 text-gray-600">No team member found</div>}
+                paginationRowsPerPageOptions={[10, 25, 50]}
+                paginationPerPage={25}
+                paginationComponentOptions={{
+                    rowsPerPageText: 'Rows per page:',
+                    rangeSeparatorText: 'of',
+                }}
+                customStyles={{
+                    rows: {
+                        style: {
+                            borderBottom: '1px solid #e5e7eb',
+                            fontSize: 14,
                         },
-                        headRow: {
-                            style: {
-                                fontWeight: 500,
-                                fontSize: 16,
-                                color: '#fff',
-                                backgroundColor: '#a855f7',
-                            },
+                    },
+                    headRow: {
+                        style: {
+                            fontWeight: 500,
+                            fontSize: 16,
+                            color: '#fff',
+                            backgroundColor: '#a855f7',
                         },
-                    }}
-                />
+                    },
+                }}
+            />
 
             <AddTeamMemberModal
                 isOpen={showModal}
-                onClose={() => setShowModal(false)}
-                onSuccess={fetchTeam} // refresh table after adding
+                onClose={() => {
+                    setShowModal(false);
+                    setEditMember(null);
+                }}
+                onSuccess={fetchTeam}
+                teamMember={editMember}
             />
         </div>
     );

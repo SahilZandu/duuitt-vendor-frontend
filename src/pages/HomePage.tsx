@@ -7,6 +7,8 @@ import Cookies from "js-cookie";
 import Footer from "../components/layout/Footer";
 import Spinner from "../components/loader/Spinner";
 import logo from "../assets/images/logo.png";
+import { requestNotificationPermissionAndSendToken } from "../utils/firebase";
+import { getOrCreateDeviceId } from "../utils/getOrCreateDeviceId";
 
 
 const HomePage = () => {
@@ -52,8 +54,53 @@ const HomePage = () => {
     }
   };
 
+  // const handleOTPVerify = async () => {
+  //   setError("");
+  //   if (!enteredOTP) {
+  //     setError("Please enter the OTP.");
+  //     return;
+  //   }
+
+  //   setIsVerifed(true);
+
+  //   try {
+  //     const response = await axiosInstance("post", "/vendor/verify-otp", {
+  //       phone: Number(phone),
+  //       otp: Number(enteredOTP),
+  //     });
+
+  //     if (response.data.statusCode === 200) {
+  //       toast.success(response?.data?.message || "Login successful");
+
+  //       localStorage.setItem("accessToken", response?.data?.data?.access_token);
+  //       console.log(response?.data?.data, ' this is the datajfdsajkfsdkjfadjkhdsfjkah')
+  //       localStorage.setItem("restaurant_id", response?.data?.data?.restaurant?._id);
+  //       Cookies.set("authToken", response?.data?.data?.access_token);
+
+
+  //       const vendorProfile = response?.data?.data;
+  //       localStorage.setItem("is_kyc_completed", vendorProfile?.is_kyc_completed);
+  //       localStorage.setItem("vendor_id", vendorProfile?._id);
+  //       const deviceId = getOrCreateDeviceId();
+  //       await requestNotificationPermissionAndSendToken(vendorProfile, deviceId);
+
+  //       console.log(vendorProfile, ' this is the venodr data');
+  //       if (vendorProfile?.is_kyc_completed) {
+  //         navigate("/dashboard");
+  //       } else {
+  //         navigate("/vendor-kyc");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("OTP verification error:", error);
+  //     setError("OTP verification failed. Please try again.");
+  //   } finally {
+  //     setIsVerifed(false);
+  //   }
+  // };
   const handleOTPVerify = async () => {
     setError("");
+
     if (!enteredOTP) {
       setError("Please enter the OTP.");
       return;
@@ -70,18 +117,24 @@ const HomePage = () => {
       if (response.data.statusCode === 200) {
         toast.success(response?.data?.message || "Login successful");
 
-        localStorage.setItem("accessToken", response?.data?.data?.access_token);
-        console.log(response?.data?.data,' this is the datajfdsajkfsdkjfadjkhdsfjkah')
-        localStorage.setItem("restaurant_id", response?.data?.data?.restaurant?._id);
-        Cookies.set("authToken", response?.data?.data?.access_token);
+        const userData = response?.data?.data;
+        const vendorData = userData?.vendor || {};
 
+        // Save tokens and IDs
+        localStorage.setItem("accessToken", userData?.access_token);
+        Cookies.set("authToken", userData?.access_token);
+        localStorage.setItem("restaurant_id", userData?.restaurant?._id || "");
+        localStorage.setItem("vendor_id", vendorData?._id || "");
 
-        const vendorProfile = response?.data?.data;
-        localStorage.setItem("is_kyc_completed", vendorProfile?.is_kyc_completed);
-        localStorage.setItem("vendor_id", vendorProfile?._id);
+        // Save vendor KYC status
+        localStorage.setItem("is_kyc_completed", vendorData?.is_kyc_completed || false);
 
-        console.log(vendorProfile, ' this is the venodr data');
-        if (vendorProfile?.is_kyc_completed) {
+        // Request FCM token
+        const deviceId = getOrCreateDeviceId();
+        await requestNotificationPermissionAndSendToken(userData, deviceId);
+
+        // Navigate based on vendor KYC status
+        if (vendorData?.is_kyc_completed) {
           navigate("/dashboard");
         } else {
           navigate("/vendor-kyc");
@@ -94,6 +147,7 @@ const HomePage = () => {
       setIsVerifed(false);
     }
   };
+
 
 
   const handleCloseModal = () => {
@@ -120,7 +174,7 @@ const HomePage = () => {
           <div className="flex-1 flex flex-col justify-center px-8 lg:px-16">
             {/* Logo */}
             <div className="mb-12">
-                <img src={logo} alt="Logo" className="w-24" />
+              <img src={logo} alt="Logo" className="w-24" />
             </div>
 
             {/* Main Headline */}

@@ -6,6 +6,8 @@ import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/images/logo.png";
+import { getOrCreateDeviceId } from "../utils/getOrCreateDeviceId";
+import { requestNotificationPermissionAndSendToken } from "../utils/firebase";
 
 const Register = () => {
   const [isVerfied, setIsVerifed] = useState(false);
@@ -107,9 +109,10 @@ const Register = () => {
         Cookies.set("authToken", data.access_token);
 
         setShowOTP(false);
-
+        const vendorProfile = response?.data?.data;
         console.log(data, "Vendor login response");
-
+        const deviceId = getOrCreateDeviceId();
+        await requestNotificationPermissionAndSendToken(vendorProfile, deviceId);
         if (data.is_kyc_completed) {
           navigate("/dashboard");
         } else {

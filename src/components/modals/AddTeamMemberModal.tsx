@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "../layout/Modal";
 import axiosInstance from "../../api/apiInstance";
 import { toast } from "react-toastify";
@@ -15,10 +15,21 @@ interface Role {
   active: boolean;
 }
 
+interface TeamMember {
+  _id: string;
+  name: string;
+  phone: number;
+  email: string;
+  roles: Role;
+  permissions: Permission[];
+  is_active: boolean;
+}
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  teamMember?: TeamMember | null;
 }
 
 const defaultPermissions: Permission[] = [
@@ -43,7 +54,7 @@ const roles: Role[] = [
   { id: 4, name: "customer", active: true },
 ];
 
-const AddTeamMemberModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
+const AddTeamMemberModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, teamMember }) => {
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -55,6 +66,32 @@ const AddTeamMemberModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (teamMember) {
+      const updatedPermissions = defaultPermissions.map(p => {
+        const match = teamMember.permissions.find(tp => tp.id === p.id);
+        return { ...p, active: match?.active || false };
+      });
+
+      setForm({
+        name: teamMember.name,
+        phone: String(teamMember.phone),
+        email: teamMember.email,
+        role: roles.find(r => r.id === teamMember.roles.id) || null,
+        permissions: updatedPermissions,
+      });
+    } else {
+      setForm({
+        name: "",
+        phone: "",
+        email: "",
+        role: null,
+        permissions: defaultPermissions,
+      });
+    }
+    setErrors({});
+  }, [teamMember, isOpen]);
+
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!form.name.trim()) newErrors.name = "Name is required";
@@ -63,21 +100,9 @@ const AddTeamMemberModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
     if (!form.email.trim()) newErrors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(form.email)) newErrors.email = "Invalid email format";
     if (!form.role) newErrors.role = "Role is required";
-    const selected = form.permissions.filter(p => p.active);
-    if (selected.length === 0) newErrors.permissions = "Select at least one permission";
-
+    if (!form.permissions.some(p => p.active)) newErrors.permissions = "Select at least one permission";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const isFormValid = () => {
-    return (
-      form.name.trim() &&
-      /^\d{10}$/.test(form.phone) &&
-      /\S+@\S+\.\S+/.test(form.email) &&
-      form.role !== null &&
-      form.permissions.some(p => p.active)
-    );
   };
 
   const handlePermissionToggle = (id: number) => {
@@ -105,7 +130,7 @@ const AddTeamMemberModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
         name: form.role?.name,
         active: true,
       },
-      is_active: false,
+      is_active: teamMember ? teamMember.is_active : false,
       permissions: form.permissions
         .filter(p => p.active)
         .map(p => ({
@@ -116,21 +141,20 @@ const AddTeamMemberModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
     };
 
     try {
-      await axiosInstance("post", "/vendor/add-team-member", payload);
-      toast.success("Team member added successfully");
+      if (teamMember) {
+        // EDIT
+        await axiosInstance("put", `/vendor/update-team-member/${teamMember._id}`, payload);
+        toast.success("Team member updated successfully");
+      } else {
+        // ADD
+        await axiosInstance("post", "/vendor/add-team-member", payload);
+        toast.success("Team member added successfully");
+      }
       onSuccess();
       onClose();
-      setForm({
-        name: "",
-        phone: "",
-        email: "",
-        role: null,
-        permissions: defaultPermissions,
-      });
-      setErrors({});
     } catch (err) {
-      console.error("Failed to add team member", err);
-      toast.error("Failed to add team member");
+      console.error("Error submitting team member", err);
+      toast.error("Operation failed");
     } finally {
       setIsSubmitting(false);
     }
@@ -139,7 +163,7 @@ const AddTeamMemberModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
   if (!isOpen) return null;
 
   return (
-    <Modal title="Add Team Member" onClose={onClose}>
+    <Modal title={`${teamMember ? "Edit" : "Add"} Team Member`} onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-4">
 
         {/* Name */}
@@ -233,13 +257,12 @@ const AddTeamMemberModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
           </button>
           <button
             type="submit"
-            disabled={!isFormValid() || isSubmitting}
-            className={`${!isFormValid() || isSubmitting
-                ? "bg-purple-300 cursor-not-allowed"
-                : "bg-purple-600 hover:bg-purple-700"
-              } text-white px-4 py-2 rounded`}
+            disabled={isSubmitting}
+            className={`${
+              isSubmitting ? "bg-purple-300 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"
+            } text-white px-4 py-2 rounded`}
           >
-            {isSubmitting ? "Saving..." : "Save"}
+            {isSubmitting ? "Saving..." : teamMember ? "Update" : "Save"}
           </button>
         </div>
       </form>
