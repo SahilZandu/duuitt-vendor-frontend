@@ -35,6 +35,11 @@ type OrderStatusPayload = {
     status: "cooking" | "packing_processing" | "ready_to_pickup" | "declined";
     cooking_time?: string; // Optional
 };
+type OrderStatusResponse = {
+    statusCode: number;
+    message: string;
+    success: boolean;
+};
 // fetch order by status
 export const fetchOrdersByStatus = async ({
     restaurant_id,
@@ -94,14 +99,15 @@ export const getOrderStatus = async (
 };
 
 // Mark order as ready for pickup
-export const updateOrderStatus = async (payload: OrderStatusPayload): Promise<boolean> => {
+export const updateOrderStatus = async (
+    payload: OrderStatusPayload
+): Promise<OrderStatusResponse | null> => {
     try {
         const response = await apiRequest("post", "/food-order/update-order-status", payload);
-        console.log({response});
-        
-        return response?.data;
+        console.log({ response });
+        return response?.data || null;
     } catch (error) {
         console.error("Error updating order status:", error);
-        return false;
+        return null;
     }
 };

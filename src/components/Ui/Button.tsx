@@ -44,7 +44,7 @@ const Button = ({
       onClick={onClick}
       disabled={disabled || loading}
       className={clsx(
-        "px-4 py-2 rounded-[10px] font-medium transition duration-200 w-full text-sm flex items-center justify-center gap-2",
+        "px-4 py-2 rounded-[10px] font-medium transition duration-200 text-sm flex items-center justify-center gap-2",
         variantClasses[variant],
         {
           "opacity-50 cursor-not-allowed": disabled || loading,

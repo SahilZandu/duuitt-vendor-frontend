@@ -16,6 +16,7 @@ import PaymentLogs from "../pages/authenticatedPages/Outlet/PaymentLogs";
 import KycSubmitted from "../components/kyc/KycSubmitted";
 import Orders from "../pages/authenticatedPages/Orders";
 import ViewOrder from "../pages/authenticatedPages/Orders/ViewOrder";
+import Timings from "../pages/authenticatedPages/Timings";
 
 const AppRoutes = () => {
   return (
@@ -45,6 +46,8 @@ const AppRoutes = () => {
           {/* Orders...... */}
           <Route path="/orders" element={<Orders />} />
           <Route path="/orders/view-order/:id" element={<ViewOrder />} />
+          {/* Timings */}
+          <Route path="/timings" element={<Timings />}/>
           
         </Route>
       </Route>
