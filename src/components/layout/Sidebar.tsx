@@ -16,6 +16,7 @@ const topMenuItems: MenuItem[] = [
   { label: "Dashboard", to: "/dashboard", icon: "dashboard" },
   { label: "Orders", to: "/orders", icon: "order" },
   { label: "Team Members", to: "/team", icon: "team" },
+  { label: "Food Menu", to: "/food-menu", icon: "food" },
   {
     label: "Outlet Info", to: "/outlet", icon: "outlet", children: [
       { label: "Restaurant Profile", to: "/outlet/restaurant-profile", icon: "restaurant" },

@@ -1,3 +1,4 @@
+import { mdiFood } from "@mdi/js";
 import React from "react";
 import type { JSX } from 'react';
 
@@ -94,6 +95,19 @@ const iconMap: Record<string, (className?: string) => JSX.Element> = {
             <circle cx="16" cy="14" r="1" fill="currentColor" />
         </svg>
     ),
+    food: (className) => (
+        <svg
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+          className={className}
+          fill="currentColor"
+        >
+          <path d={mdiFood} />
+        </svg>
+      ),
+      
+    
 
     outlet: (className) => (
         <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">

@@ -18,6 +18,9 @@ import OfferManagement from "../pages/authenticatedPages/offer/OfferManagement";
 import Orders from "../pages/authenticatedPages/Orders";
 import ViewOrder from "../pages/authenticatedPages/Orders/ViewOrder";
 import Timings from "../pages/authenticatedPages/Timings";
+import FoodItemsList from "../pages/authenticatedPages/Food-Menu/FoodItemsList";
+import FoodItemDetail from "../pages/authenticatedPages/Food-Menu/FoodItemDetail";
+import AddProduct from "../pages/authenticatedPages/Food-Menu/AddProduct";
 
 
 const AppRoutes = () => {
@@ -51,6 +54,9 @@ const AppRoutes = () => {
           <Route path="/orders/view-order/:id" element={<ViewOrder />} />
           {/* Timings */}
           <Route path="/timings" element={<Timings />}/>
+          <Route path="/food-menu" element={<FoodItemsList />}/>
+          <Route path="/food-item/:id" element={<FoodItemDetail />} />
+          <Route path="/add-product" element={<AddProduct />} />
           
         </Route>
       </Route>

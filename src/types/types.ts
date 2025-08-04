@@ -89,3 +89,36 @@ export type OrderType = {
   packing_fee?: number;
   platform_fee?: number;
 };
+
+type VariantGroup = {
+  group: string;
+  variant: {
+      _id: string;
+      name: string;
+  }[];
+};
+
+type AddonGroup = {
+  group: string;
+  max_selection: number;
+  is_price_related: boolean;
+  addon: {
+      _id: string;
+      name: string;
+      price?: number;
+  }[];
+};
+
+
+export type FoodItem = {
+  _id: string;
+  name: string;
+  image?: string;
+  description?: string;
+  selling_price?: number;
+  tag?: string;
+  in_stock:number;
+  veg_nonveg?: "veg" | "nonveg"|"egg";
+  variants?: VariantGroup[];
+  addon?: AddonGroup[];
+};
