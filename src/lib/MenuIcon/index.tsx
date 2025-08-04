@@ -1,25 +1,27 @@
 import React from "react";
+import type { JSX } from 'react';
 
 interface MenuIconProps {
     name: string;
+    className?: string;
 }
-
-const iconMap = {
-    home: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+const iconMap: Record<string, (className?: string) => JSX.Element> = {
+    home: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
             <path d="M3 12L12 3L21 12" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             <path d="M5 10V21H19V10" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     ),
-    profile: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    profile: (className) => (
+        <svg width="20" height="20" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <circle cx="12" cy="7" r="4" strokeWidth="1.5" />
             <path d="M4 21c0-4 4-6 8-6s8 2 8 6" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
     ),
-    settings: (
+    settings: (className) => (
         <svg
             width="20"
+            className={className}
             height="20"
             viewBox="0 0 24 24"
             fill="none"
@@ -32,54 +34,59 @@ const iconMap = {
             <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c0 .7.4 1.3 1 1.51H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
         </svg>
     ),
-    restaurant: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    restaurant: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
             <path d="M4 3h16v2H4V3zm1 4h14l-1.5 13.5H6.5L5 7zm4 2v9m6-9v9" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     ),
-    order: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    order: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
             <path d="M3 6h18M3 12h18M3 18h18" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
     ),
-    manage: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    manage: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
             <circle cx="12" cy="12" r="3" strokeWidth="1.5" />
             <path d="M19.4 15a8 8 0 00-1.4-2.2M4.6 9a8 8 0 011.4-2.2M9 4.6A8 8 0 0112 4a8 8 0 013 .6" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
     ),
-    logout: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    logout: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
             <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     ),
-    rating: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+    rating: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="currentColor" stroke="none">
             <path d="M12 17.27L18.18 21 16.54 13.97 
              22 9.24l-7.19-.61L12 2 9.19 8.63 
              2 9.24l5.46 4.73L5.82 21z" />
         </svg>
     ),
-    payment: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+    noData: (className?: string) => (
+        <svg width="20" height="20" className={className} xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 24 24" fill="currentColor">
+            <path d="m23.707,22.293l-5.963-5.963c1.412-1.725,2.262-3.927,2.262-6.324C20.006,4.492,15.52.006,10.006.006S.006,4.492.006,10.006s4.486,10,10,10c2.398,0,4.6-.85,6.324-2.262l5.963,5.963c.195.195.451.293.707.293s.512-.098.707-.293c.391-.391.391-1.023,0-1.414Zm-13.701-4.287c-4.411,0-8-3.589-8-8S5.595,2.006,10.006,2.006s8,3.589,8,8-3.589,8-8,8Zm3.701-10.299l-2.293,2.293,2.293,2.293c.391.391.391,1.023,0,1.414-.195.195-.451.293-.707.293s-.512-.098-.707-.293l-2.293-2.293-2.293,2.293c-.195.195-.451.293-.707.293s-.512-.098-.707-.293c-.391-.391-.391-1.023,0-1.414l2.293-2.293-2.293-2.293c-.391-.391-.391-1.023,0-1.414s1.023-.391,1.414,0l2.293,2.293,2.293-2.293c.391-.391,1.023-.391,1.414,0s.391,1.023,0,1.414Z" />
+        </svg>
+    ),
+    payment: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="currentColor" stroke="none">
             <path d="M2 4C1.45 4 1 4.45 1 5V19C1 19.55 1.45 20 2 20H22C22.55 20 23 19.55 23 19V5C23 4.45 22.55 4 22 4H2ZM21 8H3V6H21V8ZM3 18V10H21V18H3ZM5 14H7V16H5V14ZM9 14H11V16H9V14Z" />
         </svg>
     ),
 
-    close: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    close: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
             <path d="M18 6L6 18" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             <path d="M6 6l12 12" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     ),
 
-    dropdown: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    dropdown: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
             <path d="M6 9l6 6 6-6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     ),
-    view: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    view: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
             <path
                 d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"
                 strokeWidth="1.5"
@@ -89,17 +96,114 @@ const iconMap = {
             <circle cx="12" cy="12" r="3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     ),
-    "dropdown-up": (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    new: (className) => (
+        <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
+            <path
+                d="M3 4h18M3 10h18M3 16h12"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    ),
+    cooking: (className) => (
+        <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
+            <path
+                d="M4 10h16M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10M9 10V5a3 3 0 016 0v5"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    ),
+    packing: (className) => (
+        <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
+            <path
+                d="M3 7l9-4 9 4v10l-9 4-9-4V7z"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <path
+                d="M3 7l9 5 9-5"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    ),
+    ready: (className) => (
+        <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
+            <path
+                d="M5 13l4 4L19 7"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    ),
+    all: (className) => (
+        <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
+            <path d="M8 12h8M12 8v8" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+    ),
+    "dropdown-up": (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
             <path d="M18 15l-6-6-6 6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     ),
-    default: (
+    veg: (className?: string) => (
+        <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            className={className}
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <rect
+                x="1"
+                y="1"
+                width="14"
+                height="14"
+                rx="2"
+                stroke="#16a34a" // Tailwind green-600
+                strokeWidth="2"
+                fill="none"
+            />
+            <circle cx="8" cy="8" r="3" fill="#16a34a" />
+        </svg>
+    ),
+
+    // ✅ Non-Veg icon as SVG (Red triangle inside square)
+    nonVeg: (className?: string) => (
+        <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            className={className}
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <rect
+                x="1"
+                y="1"
+                width="14"
+                height="14"
+                rx="2"
+                stroke="#dc2626" // Tailwind red-600
+                strokeWidth="2"
+                fill="none"
+            />
+            <polygon points="8,4 12,11 4,11" fill="#dc2626" />
+        </svg>
+    ),
+    default: (className) => (
         <svg
             width="20"
             height="20"
             viewBox="0 0 24 24"
             fill="none"
+            className={className}
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"
@@ -113,8 +217,9 @@ const iconMap = {
 
 };
 
-const MenuIcon: React.FC<MenuIconProps> = ({ name }) => {
-    return iconMap[name as keyof typeof iconMap] || iconMap.default;
+const MenuIcon: React.FC<MenuIconProps> = ({ name, className }) => {
+    const renderIcon = iconMap[name] || iconMap.default;
+    return renderIcon(className);
 };
 
 export default MenuIcon;

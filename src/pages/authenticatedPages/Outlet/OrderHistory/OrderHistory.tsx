@@ -2,12 +2,13 @@
 import { useEffect, useState } from "react";
 import type { TableColumn } from "react-data-table-component";
 import { fetchOrdersByStatus, type Order } from "../../../../api/OrderApi";
+import GlobalDataTable from "../../../../components/layout/GlobalDataTable";
 import FormatDate from "../../../../components/Ui/FormatDate";
 import MenuIcon from "../../../../lib/MenuIcon";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../../../components/loader/Loader";
 import PageTitle from "../../../../components/Ui/PageTitle";
-import DataTable from "react-data-table-component";
+import NoDataFound from "../../../../components/Ui/NoDataFound";
 
 const OrderHistory = () => {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -84,7 +85,6 @@ const OrderHistory = () => {
                 </span>
             ),
             sortable: true,
-            width:"170px"
         },
         {
             name: "Action",
@@ -101,16 +101,12 @@ const OrderHistory = () => {
             button: true,
         },
     ];
-    if (loading) {
-        return (
-            <Loader />
-        )
-    }
+
     return (
         <div className="p-6">
             <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
                 {/* <h1 className="text-2xl font-bold mb-4">Order History</h1> */}
-                <PageTitle title="Order History"/>
+                <PageTitle title="Order History" />
 
                 {/* Filters */}
                 <div className="flex justify-between items-center gap-4 mb-4">
@@ -137,47 +133,20 @@ const OrderHistory = () => {
                     />
                 </div>
             </div>
-            <DataTable
+
+
+            {loading ? (
+                <Loader />
+            ) : orders && orders?.length === 0 ? (
+                <NoDataFound message="No orders available." />
+            ) : (
+                <GlobalDataTable
                     columns={columns}
                     data={orders}
-                    progressPending={loading}
-                    pagination
-                    highlightOnHover
-                    noDataComponent={<div className="py-4 text-gray-600">No order found</div>}
-                    paginationRowsPerPageOptions={[10, 25, 50]}
-                    paginationPerPage={25}
-                    paginationComponentOptions={{
-                        rowsPerPageText: 'Rows per page:',
-                        rangeSeparatorText: 'of',
-                    }}
-                    customStyles={{
-                        rows: {
-                            style: {
-                                borderBottom: '1px solid #e5e7eb',
-                                fontSize: 14,
-                            },
-                        },
-                        headRow: {
-                            style: {
-                                fontWeight: 500,
-                                fontSize: 16,
-                                color: '#fff',
-                                backgroundColor: '#a855f7',
-                            },
-                        },
-                    }}
+                    pagination={true}
+                    selectableRows={false}
                 />
-
-            {/* Table */}
-            {/* <GlobalDataTable
-                columns={columns}
-                data={orders}
-                pagination={true}
-                selectableRows={false}
-            />
-
-            {loading && <Loader />} */}
-
+            )}
 
         </div>
     );

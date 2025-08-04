@@ -118,23 +118,22 @@ const HomePage = () => {
         toast.success(response?.data?.message || "Login successful");
 
         const userData = response?.data?.data;
-        const vendorData = userData?.vendor || {};
 
         // Save tokens and IDs
         localStorage.setItem("accessToken", userData?.access_token);
         Cookies.set("authToken", userData?.access_token);
         localStorage.setItem("restaurant_id", userData?.restaurant?._id || "");
-        localStorage.setItem("vendor_id", vendorData?._id || "");
+        localStorage.setItem("vendor_id", userData?._id || "");
 
         // Save vendor KYC status
-        localStorage.setItem("is_kyc_completed", vendorData?.is_kyc_completed || false);
+        localStorage.setItem("is_kyc_completed", userData?.is_kyc_completed || false);
 
         // Request FCM token
         const deviceId = getOrCreateDeviceId();
         await requestNotificationPermissionAndSendToken(userData, deviceId);
 
         // Navigate based on vendor KYC status
-        if (vendorData?.is_kyc_completed) {
+        if (userData?.is_kyc_completed) {
           navigate("/dashboard");
         } else {
           navigate("/vendor-kyc");

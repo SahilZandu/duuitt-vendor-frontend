@@ -1,6 +1,6 @@
 // components/DataTable.tsx
 import DataTable from 'react-data-table-component';
-import type { TableColumn } from "react-data-table-component"; // 👈 Correct
+import type { TableColumn } from "react-data-table-component"; 
 
 interface DataTableProps<T> {
   columns: TableColumn<T>[];

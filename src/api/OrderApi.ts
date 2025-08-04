@@ -1,10 +1,11 @@
 import apiRequest from "./apiInstance";
+import type  { OrderStatus, OrderType } from "../types/types";
 
 export type Order = {
     order_id: string;
     _id: string;
     invoice_no: string;
-    status: "completed" | "declined" | "pending";
+    status: OrderStatus;
     createdAt: string;
     updatedAt: string;
     total_amount: number;
@@ -20,8 +21,25 @@ export type Order = {
         product_name: string;
         quantity: number;
         price: number;
+        veg_nonveg?: string;
     }>;
     restaurant_id: string;
+
+    // ✅ Add these fields to match `ExtendedOrder`
+    billing_detail: {
+        total_amount: number;
+        payment_status: "captured" | "failed" | string;
+    };
+    instructions?: string;
+    cart_items: {
+        food_item_name: string;
+        quantity: number;
+        food_item_price: number;
+        veg_nonveg: string;
+    }[];
+    restaurant?: {
+        landmark?: string;
+    };
 };
 
 type FetchOrdersParams = {
@@ -30,7 +48,16 @@ type FetchOrdersParams = {
     search?: string;
     limit?: number;
 };
-
+type OrderStatusPayload = {
+    food_order_id: string;
+    status: "cooking" | "packing_processing" | "ready_to_pickup" | "declined";
+    cooking_time?: string; // Optional
+};
+type OrderStatusResponse = {
+    statusCode: number;
+    message: string;
+    success: boolean;
+};
 // fetch order by status
 export const fetchOrdersByStatus = async ({
     restaurant_id,
@@ -53,13 +80,52 @@ export const fetchOrdersByStatus = async ({
 };
 
 // fetch order by id for single order details view
-export const fetchOrderById = async (order_id: string): Promise<Order | null> => {
-  try {
-    const payload = { order_id };
-    const response = await apiRequest("post", "/food-order/get-order-id-wise-details", payload);
-    return response?.data?.data || null;
-  } catch (error) {
-    console.error("Error fetching order by ID:", error);
-    return null;
-  }
+export const fetchOrderById = async (order_id: string): Promise<OrderType | null> => {
+    try {
+        const payload = { order_id };
+        const response = await apiRequest("post", "/food-order/get-order-id-wise-details", payload);
+        return response?.data?.data || null;
+    } catch (error) {
+        console.error("Error fetching order by ID:", error);
+        return null;
+    }
+};
+
+// fetch waiting orders
+export const fetchWaitingOrders = async (restaurant_id: string): Promise<Order[]> => {
+    try {
+        const payload = { restaurant_id };
+        const response = await apiRequest("post", "/food-order/get-waiting-order", payload);
+        console.log("response from waiting orders ----", response);
+        return response?.data?.data || [];
+    } catch (error) {
+        console.error("Error fetching waiting orders:", error);
+        return [];
+    }
+};
+
+export const getOrderStatus = async (
+    params: { restaurant_id: string; status: "all" | "cooking" | "ready_to_pickup" | 'packing_processing' }
+): Promise<Order[]> => {
+    try {
+        const response = await apiRequest("post", "/food-order/get-order-by-status", params);
+        return response?.data?.data || [];
+    } catch (error) {
+        console.error("Error fetching orders by status:", error);
+        return [];
+    }
+};
+
+// Mark order as ready for pickup
+export const updateOrderStatus = async (
+    payload: OrderStatusPayload
+): Promise<OrderStatusResponse | null> => {
+    try {
+        const response = await apiRequest("post", "/food-order/update-order-status", payload);
+        console.log({ response });
+        return response?.data || null;
+    } catch (error) {
+        console.error("Error updating order status:", error);
+        return null;
+    }
 };

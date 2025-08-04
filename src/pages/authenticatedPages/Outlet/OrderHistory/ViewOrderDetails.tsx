@@ -72,20 +72,23 @@ const ViewOrderDetails = () => {
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {order?.cartitems?.length > 0 ? (
                         order.cartitems.map((item: any, idx: number) => (
-                            <li key={idx} className="flex flex-col bg-gray-50 rounded-lg shadow-sm overflow-hidden border border-gray-200">
-                                <img
-                                    src={
-                                        item?.food_item_image
-                                            ? `${import.meta.env.VITE_BACKEND_BASE_URL}${item.food_item_image}`
-                                            : "/public/images/default-food-image.png"
-                                    }
-                                    alt={item?.food_item_name || "Food Image"}
-                                    className="w-full h-48 object-cover"
-                                    onError={(e) => {
-                                        e.currentTarget.onerror = null;
-                                        e.currentTarget.src = "/public/images/default-food-image.png";
-                                    }}
-                                />
+                            <li key={idx} className="p-4 border rounded bg-gray-50 flex">
+                                <div className="w-1/2">
+                                    <img
+                                        src={
+                                            item?.food_item_image
+                                                ? `${import.meta.env.VITE_BACKEND_BASE_URL}${item.food_item_image}`
+                                                : "/public/images/default-food-image.png"
+                                        }
+                                        alt={item?.food_item_name || "Food Image"}
+                                        className="w-full h-36 object-cover rounded"
+                                        // onError={(e) => {
+                                        //     e.currentTarget.onerror = null;
+                                        //     e.currentTarget.src = "/public/images/default-food-image.png";
+                                        // }}
+                                         crossOrigin="anonymous"
+                                    />
+                                </div>
 
                                 <div className="p-4 space-y-2">
                                     <div className="text-lg font-semibold text-gray-800">
