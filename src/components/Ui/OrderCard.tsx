@@ -7,7 +7,13 @@ import Button from "./Button";
 import { useNavigate } from "react-router-dom";
 
 // Define strict union for statuses
-import type { OrderStatus } from "../../types/types";
+type OrderStatus =
+    | "waiting_for_confirmation"
+    | "cooking"
+    | "packing_processing"
+    | "ready_to_pickup"
+    | "declined"
+    | "completed";
 
 type ExtendedOrder = Order & {
     billing_detail: {
@@ -30,10 +36,9 @@ type ExtendedOrder = Order & {
 };
 
 interface Props {
-  order: ExtendedOrder;
-  onStatusChange: (id: string, status: OrderStatus, time?: number) => void;
-  onReject: (orderId: string) => Promise<void>; 
-  activeTab: string;
+    order: ExtendedOrder;
+    onStatusChange: (id: string, status: OrderStatus, time?: number) => void;
+    activeTab: string;
 }
 
 // Helper: badge color based on status

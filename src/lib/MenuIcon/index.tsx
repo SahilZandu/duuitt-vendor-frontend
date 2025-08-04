@@ -44,6 +44,73 @@ const iconMap: Record<string, (className?: string) => JSX.Element> = {
             <path d="M3 6h18M3 12h18M3 18h18" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
     ),
+    time: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="9" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M12 7v5l3 3" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+    ),
+    team: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
+            <path
+                d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <circle cx="9" cy="7" r="4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+                d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    ),
+    dashboard: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
+            <rect x="3" y="3" width="7" height="7" rx="1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <rect x="14" y="3" width="7" height="7" rx="1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <rect x="14" y="14" width="7" height="7" rx="1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <rect x="3" y="14" width="7" height="7" rx="1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    ),
+    allDays: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
+            <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth="1.5" strokeLinejoin="round" />
+            <path d="M3 10h18" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M8 2v4M16 2v4" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M8 17h4l-1.5 1.5M12 17l1.5 1.5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    ),
+
+    specificDays: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
+            <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth="1.5" strokeLinejoin="round" />
+            <path d="M3 10h18" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M8 2v4M16 2v4" strokeWidth="1.5" strokeLinecap="round" />
+            <circle cx="8" cy="14" r="1" fill="currentColor" />
+            <circle cx="12" cy="14" r="1" fill="currentColor" />
+            <circle cx="16" cy="14" r="1" fill="currentColor" />
+        </svg>
+    ),
+
+    outlet: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
+            <path
+                d="M3 9.5L4.5 4h15L21 9.5M3 9.5V20h18V9.5M3 9.5h18"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <path
+                d="M9 20V14h6v6"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    ),
     manage: (className) => (
         <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
             <circle cx="12" cy="12" r="3" strokeWidth="1.5" />

@@ -17,6 +17,7 @@ import KycSubmitted from "../components/kyc/KycSubmitted";
 import OfferManagement from "../pages/authenticatedPages/offer/OfferManagement";
 import Orders from "../pages/authenticatedPages/Orders";
 import ViewOrder from "../pages/authenticatedPages/Orders/ViewOrder";
+import Timings from "../pages/authenticatedPages/Timings";
 
 
 const AppRoutes = () => {
@@ -48,6 +49,8 @@ const AppRoutes = () => {
           {/* Orders...... */}
           <Route path="/orders" element={<Orders />} />
           <Route path="/orders/view-order/:id" element={<ViewOrder />} />
+          {/* Timings */}
+          <Route path="/timings" element={<Timings />}/>
           
         </Route>
       </Route>

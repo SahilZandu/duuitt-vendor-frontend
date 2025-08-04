@@ -56,13 +56,11 @@ const Orders = () => {
         const success = await updateOrderStatus(payload);
         console.log({ success });
         if (success?.statusCode === 404) {
-           toast.error(success?.message|| `This order cannot proceed because no rider is assigned. Please search for and assign a rider to continue.`); 
+            toast.error(success.message || "This order cannot proceed because no rider is assigned.");
         } else {
-            toast.success(`Order Updated!`);
+            toast.success("Order Updated!");
             loadOrders(activeTab);
         }
-      
-
     };
     useEffect(() => {
         loadOrders(activeTab);
@@ -81,7 +79,7 @@ const Orders = () => {
 
     // Tab options based on new order condition
     const tabOptions = [
-        { label: "New Orders", value: "new" , icon: "new"},
+        { label: "New Orders", value: "new", icon: "new" },
         { label: "Preparing", value: "cooking", icon: "cooking" },
         { label: "Packing", value: "packing", icon: "packing" },
         { label: "Ready for Pickup", value: "ready", icon: "ready" },
