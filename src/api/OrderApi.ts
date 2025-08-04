@@ -1,10 +1,11 @@
 import apiRequest from "./apiInstance";
+import type  { OrderStatus, OrderType } from "../types/types";
 
 export type Order = {
     order_id: string;
     _id: string;
     invoice_no: string;
-    status: "completed" | "declined" | "pending";
+    status: OrderStatus;
     createdAt: string;
     updatedAt: string;
     total_amount: number;
@@ -20,8 +21,25 @@ export type Order = {
         product_name: string;
         quantity: number;
         price: number;
+        veg_nonveg?: string;
     }>;
     restaurant_id: string;
+
+    // ✅ Add these fields to match `ExtendedOrder`
+    billing_detail: {
+        total_amount: number;
+        payment_status: "captured" | "failed" | string;
+    };
+    instructions?: string;
+    cart_items: {
+        food_item_name: string;
+        quantity: number;
+        food_item_price: number;
+        veg_nonveg: string;
+    }[];
+    restaurant?: {
+        landmark?: string;
+    };
 };
 
 type FetchOrdersParams = {
@@ -62,7 +80,7 @@ export const fetchOrdersByStatus = async ({
 };
 
 // fetch order by id for single order details view
-export const fetchOrderById = async (order_id: string): Promise<Order | null> => {
+export const fetchOrderById = async (order_id: string): Promise<OrderType | null> => {
     try {
         const payload = { order_id };
         const response = await apiRequest("post", "/food-order/get-order-id-wise-details", payload);

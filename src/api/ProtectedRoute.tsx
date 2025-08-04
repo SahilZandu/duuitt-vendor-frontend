@@ -54,15 +54,15 @@ const ProtectedRoute = () => {
 
   if (loading) return <Loader />;
 
-  // // ✅ If already KYC done, don't allow access to /vendor-kyc again
-  // if (token && is_kyc_completed === "true" && location.pathname === "/vendor-kyc") {
-  //   return <Navigate to="/dashboard" replace />;
-  // }
+  // ✅ If already KYC done, don't allow access to /vendor-kyc again
+  if (token && is_kyc_completed === "true" && location.pathname === "/vendor-kyc") {
+    return <Navigate to="/dashboard" replace />;
+  }
 
-  // // ✅ If vendor not fetched or needs KYC
-  // if (shouldRedirectToKyc) {
-  //   return <Navigate to="/vendor-kyc" replace />;
-  // }
+  // ✅ If vendor not fetched or needs KYC
+  if (shouldRedirectToKyc) {
+    return <Navigate to="/vendor-kyc" replace />;
+  }
 
   return <Outlet context={{ vendor }} />;
 };
