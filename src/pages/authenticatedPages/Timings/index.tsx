@@ -6,82 +6,98 @@ import DeleteModal from "../../../components/modals/DeleteModal";
 import { addRestaurantTimings, deleteRestaurantTiming, updateRestaurantTiming } from "../../../api/timingsApi";
 import { useVendor } from "../../../lib/Context/VendorContext";
 import { toast } from "react-toastify";
+import type {
+    RestaurantTiming,
+    Slot,
+    EditingSlot,
+    RestaurantTimingPayload,
+} from '../../../types/types';
 
-const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-const Timings = () => {
-    const [activeTab, setActiveTab] = useState("all");
-    const [allDaySlots, setAllDaySlots] = useState([]);
-    const [specificDaySlots, setSpecificDaySlots] = useState(
-        daysOfWeek.reduce((acc, day) => {
-            acc[day] = [];
+const Timings: React.FC = () => {
+    const { vendor } = useVendor();
+    const timing = vendor?.restaurant?.timings as RestaurantTiming | undefined;
+
+    const [activeTab, setActiveTab] = useState<'all' | 'specific'>('all');
+    const [allDaySlots, setAllDaySlots] = useState<Slot[]>([]);
+    const [specificDaySlots, setSpecificDaySlots] = useState<Record<string, Slot[]>>(() =>
+        daysOfWeek.reduce((acc, d) => {
+            acc[d] = [];
             return acc;
-        }, {} as Record<string, { id: number; from: string; to: string; is_edit_delete: boolean; isNew?: boolean }[]>)
+        }, {} as Record<string, Slot[]>)
     );
+
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
-    const [editingSlot, setEditingSlot] = useState<null | { slotIndex: number; slotData: any }>(null);
+    const [editingSlot, setEditingSlot] = useState<EditingSlot | null>(null);
     const [isTimeSlotOpen, setIsTimeSlotOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [deletingSlot, setDeletingSlot] = useState<{
-        type: "all" | "specific";
+        type: 'all' | 'specific';
         slotId: number;
         dayOfWeek?: number;
         index?: number;
     } | null>(null);
     const [deleteLoading, setDeleteLoading] = useState(false);
 
-    const { vendor } = useVendor();
-    const timing = vendor?.restaurant?.timings;
-    const vendor_id = localStorage.getItem("vendor_id");
-    const restaurant_id = localStorage.getItem("restaurant_id");
+    const vendor_id = localStorage.getItem('vendor_id');
+    const restaurant_id = localStorage.getItem('restaurant_id');
 
     const formatTime = (time24: string) => {
-        const [hour, minute] = time24.split(":").map(Number);
-        const ampm = hour >= 12 ? "PM" : "AM";
-        const hour12 = hour % 12 || 12;
-        return `${hour12}:${minute.toString().padStart(2, "0")} ${ampm}`;
+        const [h, m] = time24.split(':').map(Number);
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const hr12 = h % 12 || 12;
+        return `${hr12}:${m.toString().padStart(2, '0')} ${ampm}`;
     };
 
     useEffect(() => {
-        if (!timing) return;
+        if (!timing) {
+            setAllDaySlots([]);
+            setSpecificDaySlots(
+                daysOfWeek.reduce((acc, d) => {
+                    acc[d] = [];
+                    return acc;
+                }, {} as Record<string, Slot[]>)
+            );
+            return;
+        }
 
-       if (timing?.is_all_day && timing?.all_days?.timings?.length > 0) {
-            const allSlots = timing?.all_days.timings.map((item: any) => ({
+        if (timing.is_all_day && timing.all_days.timings.length > 0) {
+            const slots: Slot[] = timing.all_days.timings.map((item) => ({
                 id: Date.now() + Math.random(),
                 from: item.open_times,
                 to: item.close_time,
                 is_edit_delete: item.is_edit_delete,
                 timing_id: item._id,
             }));
-            setAllDaySlots(allSlots);
+            setAllDaySlots(slots);
         } else {
-            const newSpecific: Record<string, any[]> = {};
-            daysOfWeek.forEach((day, i) => {
-                const dayTiming = timing.specified[i];
-                newSpecific[day] = dayTiming?.timings?.map((slot: any) => ({
+            const specific: Record<string, Slot[]> = {};
+            timing.specified.forEach((dayTiming, i) => {
+                specific[daysOfWeek[i]] = dayTiming.timings.map((slot) => ({
                     id: Date.now() + Math.random(),
                     from: slot.open_times,
                     to: slot.close_time,
                     is_edit_delete: slot.is_edit_delete,
                     timing_id: slot._id,
-                })) || [];
+                }));
             });
-            setSpecificDaySlots(newSpecific);
+            setSpecificDaySlots(specific);
         }
     }, [timing]);
 
     const deleteSlot = async () => {
         if (!deletingSlot || !restaurant_id) return;
+
         const { type, slotId, dayOfWeek, index } = deletingSlot;
 
-        if (type === "all") {
+        if (type === 'all') {
             const slot = allDaySlots.find((s) => s.id === slotId);
             if (slot?.isNew) {
                 setAllDaySlots((prev) => prev.filter((s) => s.id !== slotId));
                 closeDelete();
                 return;
             }
-
             try {
                 setDeleteLoading(true);
                 await deleteRestaurantTiming({
@@ -90,38 +106,42 @@ const Timings = () => {
                     index: index!,
                     is_all_day: true,
                 });
-                toast.success("Slot deleted.");
+                toast.success('Slot deleted.');
                 setAllDaySlots((prev) => prev.filter((_, i) => i !== index));
                 closeDelete();
             } catch {
-                toast.error("Delete failed.");
+                toast.error('Delete failed.');
                 setDeleteLoading(false);
             }
         } else {
-            const day = daysOfWeek[dayOfWeek!];
-            const slot = specificDaySlots[day].find((s) => s.id === slotId);
+            const dow = dayOfWeek!;
+            const dayName = daysOfWeek[dow];
+            const slot = specificDaySlots[dayName].find((s) => s.id === slotId);
             if (slot?.isNew) {
-                const updated = specificDaySlots[day].filter((s) => s.id !== slotId);
-                setSpecificDaySlots({ ...specificDaySlots, [day]: updated });
+                setSpecificDaySlots((prev) => ({
+                    ...prev,
+                    [dayName]: prev[dayName].filter((s) => s.id !== slotId),
+                }));
                 closeDelete();
                 return;
             }
-
             try {
                 setDeleteLoading(true);
                 await deleteRestaurantTiming({
                     restaurant_id,
-                    day_of_week: dayOfWeek!,
+                    day_of_week: dow,
                     index: index!,
                     is_all_day: false,
                 });
-                toast.success("Slot deleted.");
-                const updated = [...specificDaySlots[day]];
-                updated.splice(index!, 1);
-                setSpecificDaySlots({ ...specificDaySlots, [day]: updated });
+                toast.success('Slot deleted.');
+                setSpecificDaySlots((prev) => {
+                    const arr = [...prev[dayName]];
+                    arr.splice(index!, 1);
+                    return { ...prev, [dayName]: arr };
+                });
                 closeDelete();
             } catch {
-                toast.error("Delete failed.");
+                toast.error('Delete failed.');
                 setDeleteLoading(false);
             }
         }
@@ -134,33 +154,41 @@ const Timings = () => {
     };
 
     const handleSaveAllDaysTimings = async () => {
+        if (!vendor_id || !restaurant_id) {
+            toast.error('Missing vendor or restaurant ID');
+            return;
+        }
         try {
-            const payload = {
+            const payload: RestaurantTimingPayload = {
                 vendor_id,
                 restaurant_id,
                 timings: {
                     is_all_day: true,
                     all_days: {
                         outlet_status: false,
-                        timings: allDaySlots && allDaySlots?.map((slot) => ({
-                            open_times: slot?.from,
-                            close_time: slot?.to,
+                        timings: allDaySlots.map((slot) => ({
+                            open_times: slot.from,
+                            close_time: slot.to,
                             days_of_week: 0,
-                            is_edit_delete: true,
+                            is_edit_delete: slot.is_edit_delete,
                         })),
                     },
                     specified: Array(7).fill({ outlet_status: false, timings: [] }),
                 },
             };
             await addRestaurantTimings(payload);
-            setAllDaySlots(allDaySlots && allDaySlots?.map((slot) => ({ ...slot, isNew: false })));
-            toast.success("All-day timings saved.");
+            setAllDaySlots((prev) => prev.map((s) => ({ ...s, isNew: false })));
+            toast.success('All-day timings saved.');
         } catch {
-            toast.error("Save failed.");
+            toast.error('Save failed.');
         }
     };
 
     const handleSaveSpecificDayTimings = async () => {
+        if (!vendor_id || !restaurant_id) {
+            toast.error('Missing vendor or restaurant ID');
+            return;
+        }
         try {
             const specified = daysOfWeek.map((day, i) => ({
                 outlet_status: false,
@@ -168,10 +196,10 @@ const Timings = () => {
                     open_times: slot.from,
                     close_time: slot.to,
                     days_of_week: i,
-                    is_edit_delete: true,
+                    is_edit_delete: slot.is_edit_delete,
                 })),
             }));
-            const payload = {
+            const payload: RestaurantTimingPayload = {
                 vendor_id,
                 restaurant_id,
                 timings: {
@@ -181,47 +209,56 @@ const Timings = () => {
                 },
             };
             await addRestaurantTimings(payload);
-            const updated = { ...specificDaySlots };
-            daysOfWeek.forEach((day) => {
-                updated[day] = updated[day].map((slot) => ({ ...slot, isNew: false }));
+            setSpecificDaySlots((prev) => {
+                const copy: Record<string, Slot[]> = {};
+                daysOfWeek.forEach((day) => {
+                    copy[day] = prev[day].map((s) => ({ ...s, isNew: false }));
+                });
+                return copy;
             });
-            setSpecificDaySlots(updated);
-            toast.success("Specific timings saved.");
+            toast.success('Specific timings saved.');
         } catch {
-            toast.error("Save failed.");
+            toast.error('Save failed.');
         }
     };
 
-    const onSubmitSlot = async ({ startTime, endTime }) => {
+    const onSubmitSlot = async ({ startTime, endTime }: { startTime: string; endTime: string }) => {
         if (editingSlot) {
             const { slotIndex, slotData } = editingSlot;
-            const payload = {
-                restaurant_id,
-                timing_id: slotData.timing_id,
-                open_times: startTime,
-                close_time: endTime,
-            };
+            if (!slotData.timing_id) {
+                toast.error('Missing timing ID');
+                return;
+            }
             try {
-                await updateRestaurantTiming(payload);
-                toast.success("Slot updated.");
-                if (activeTab === "all") {
-                    const updated = [...allDaySlots];
-                    updated[slotIndex] = { ...slotData, from: startTime, to: endTime };
-                    setAllDaySlots(updated);
+                await updateRestaurantTiming({
+                    restaurant_id: restaurant_id!,
+                    timing_id: slotData.timing_id,
+                    open_times: startTime,
+                    close_time: endTime,
+                });
+                toast.success('Slot updated.');
+                if (activeTab === 'all') {
+                    setAllDaySlots((prev) => {
+                        const arr = [...prev];
+                        arr[slotIndex] = { ...arr[slotIndex], from: startTime, to: endTime };
+                        return arr;
+                    });
                 } else if (selectedDay) {
-                    const updated = [...specificDaySlots[selectedDay]];
-                    updated[slotIndex] = { ...slotData, from: startTime, to: endTime };
-                    setSpecificDaySlots({ ...specificDaySlots, [selectedDay]: updated });
+                    setSpecificDaySlots((prev) => {
+                        const arr = [...prev[selectedDay]];
+                        arr[slotIndex] = { ...arr[slotIndex], from: startTime, to: endTime };
+                        return { ...prev, [selectedDay]: arr };
+                    });
                 }
             } catch {
-                toast.error("Update failed.");
+                toast.error('Update failed.');
             }
             setEditingSlot(null);
             setIsTimeSlotOpen(false);
             return;
         }
 
-        const newSlot = {
+        const newSlot: Slot = {
             id: Date.now(),
             from: startTime,
             to: endTime,
@@ -229,70 +266,83 @@ const Timings = () => {
             isNew: true,
         };
 
-        if (activeTab === "all") {
+        if (activeTab === 'all') {
             setAllDaySlots((prev) => [...prev, newSlot]);
         } else if (selectedDay) {
-            const updated = [...specificDaySlots[selectedDay], newSlot];
-            setSpecificDaySlots({ ...specificDaySlots, [selectedDay]: updated });
+            setSpecificDaySlots((prev) => ({
+                ...prev,
+                [selectedDay]: [...prev[selectedDay], newSlot],
+            }));
         }
 
         setIsTimeSlotOpen(false);
     };
 
     const tabOptions = [
-        { label: "All Days", value: "all", icon: "allDays" },
-        { label: "Specific Days", value: "specific", icon: "specificDays" },
+        { label: 'All Days', value: 'all', icon: 'allDays' },
+        { label: 'Specific Days', value: 'specific', icon: 'specificDays' },
     ];
 
     return (
         <div className="bg-white min-h-screen">
-            <Tabs tabs={tabOptions} activeTab={activeTab} onTabChange={setActiveTab} />
-            {activeTab === "all" && (
-                <>
-                    <div className="p-4 space-y-3">
-                        <div className="flex justify-between">
-                            <h3 className="text-lg font-semibold">All Days</h3>
-                            {allDaySlots.length < 2 && (
-                                <Button onClick={() => setIsTimeSlotOpen(true)} variant="primary" label="Add Timing" />
-                            )}
-                        </div>
-                        {allDaySlots.map((slot, index) => (
-                            <div key={slot.id} className="flex justify-between items-center">
-                                <div className="flex gap-3 items-center">
-                                    <strong>Slot {index + 1}:</strong>
-                                    <span>{formatTime(slot.from)} to {formatTime(slot.to)}</span>
-                                </div>
-                                {slot.is_edit_delete && (
-                                    <div className="flex gap-2">
-                                        {!slot.isNew && (
-                                            <Button
-                                                variant="outline-success"
-                                                label="Edit"
-                                                onClick={() => {
-                                                    setEditingSlot({ slotIndex: index, slotData: slot });
-                                                    setIsTimeSlotOpen(true);
-                                                }}
-                                            />
-                                        )}
+            <Tabs tabs={tabOptions} activeTab={activeTab}
+                onTabChange={(tab: string) => {
+                    // Make sure the value is valid before setting
+                    if (tab === 'all' || tab === 'specific') {
+                        setActiveTab(tab);
+                    } else {
+                        console.warn('Unexpected tab value', tab);
+                    }
+                }}
+            />
+
+            {activeTab === 'all' && (
+                <div className="p-4 space-y-3">
+                    <div className="flex justify-between">
+                        <h3 className="text-lg font-semibold">All Days</h3>
+                        {allDaySlots.length < 2 && (
+                            <Button onClick={() => setIsTimeSlotOpen(true)} variant="primary" label="Add Timing" />
+                        )}
+                    </div>
+
+                    {allDaySlots.map((slot, index) => (
+                        <div key={slot.id} className="flex justify-between items-center">
+                            <div className="flex gap-3 items-center">
+                                <strong>Slot {index + 1}:</strong>
+                                <span>{formatTime(slot.from)} to {formatTime(slot.to)}</span>
+                            </div>
+                            {slot.is_edit_delete && (
+                                <div className="flex gap-2">
+                                    {!slot.isNew && (
                                         <Button
-                                            variant="danger"
-                                            label="Delete"
+                                            variant="outline-success"
+                                            label="Edit"
                                             onClick={() => {
-                                                setDeletingSlot({ type: "all", slotId: slot.id, index });
-                                                setIsDeleteModalOpen(true);
+                                                setEditingSlot({ slotIndex: index, slotData: slot });
+                                                setIsTimeSlotOpen(true);
                                             }}
                                         />
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                        <div className="flex justify-end">
-                            <Button onClick={handleSaveAllDaysTimings} variant="primary" label="Save All Day Timings" />
+                                    )}
+                                    <Button
+                                        variant="danger"
+                                        label="Delete"
+                                        onClick={() => {
+                                            setDeletingSlot({ type: 'all', slotId: slot.id, index });
+                                            setIsDeleteModalOpen(true);
+                                        }}
+                                    />
+                                </div>
+                            )}
                         </div>
+                    ))}
+
+                    <div className="flex justify-end">
+                        <Button onClick={handleSaveAllDaysTimings} variant="primary" label="Save All Day Timings" />
                     </div>
-                </>
+                </div>
             )}
-            {activeTab === "specific" && (
+
+            {activeTab === 'specific' && (
                 <div className="p-4 space-y-4">
                     {daysOfWeek.map((day, i) => (
                         <div key={day} className="border-b pb-2">
@@ -309,6 +359,7 @@ const Timings = () => {
                                     />
                                 )}
                             </div>
+
                             {specificDaySlots[day].map((slot, index) => (
                                 <div key={slot.id} className="flex justify-between items-center mt-2">
                                     <div className="flex gap-2 items-center">
@@ -332,7 +383,7 @@ const Timings = () => {
                                                 variant="danger"
                                                 label="Delete"
                                                 onClick={() => {
-                                                    setDeletingSlot({ type: "specific", slotId: slot.id, dayOfWeek: i, index });
+                                                    setDeletingSlot({ type: 'specific', slotId: slot.id, dayOfWeek: i, index });
                                                     setIsDeleteModalOpen(true);
                                                 }}
                                             />
@@ -347,6 +398,7 @@ const Timings = () => {
                     </div>
                 </div>
             )}
+
             <TimeSlotModal
                 isOpen={isTimeSlotOpen}
                 onClose={() => {
@@ -354,12 +406,19 @@ const Timings = () => {
                     setEditingSlot(null);
                     setSelectedDay(null);
                 }}
-                defaultFrom={editingSlot?.slotData?.from}
-                defaultTo={editingSlot?.slotData?.to}
-                existingSlots={activeTab === "all" ? allDaySlots : selectedDay ? specificDaySlots[selectedDay] : []}
-                actionLabel={editingSlot ? "Update Slot" : "Add Slot"}
+                defaultFrom={editingSlot?.slotData.from}
+                defaultTo={editingSlot?.slotData.to}
+                existingSlots={
+                    activeTab === 'all'
+                        ? allDaySlots
+                        : selectedDay
+                            ? specificDaySlots[selectedDay]
+                            : []
+                }
+                actionLabel={editingSlot ? 'Update Slot' : 'Add Slot'}
                 onSubmit={onSubmitSlot}
             />
+
             <DeleteModal
                 isOpen={isDeleteModalOpen}
                 title="Confirm Delete"

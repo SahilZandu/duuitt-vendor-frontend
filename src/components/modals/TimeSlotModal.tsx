@@ -24,7 +24,7 @@ const TimeSlotModal: React.FC<TimeSlotModalProps> = ({
     actionLoading = false,
     onSubmit,
     onClose,
-    existingSlots,
+    // existingSlots,
     defaultFrom,
     defaultTo
 }) => {
