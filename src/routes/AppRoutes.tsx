@@ -20,7 +20,9 @@ import ViewOrder from "../pages/authenticatedPages/Orders/ViewOrder";
 import Timings from "../pages/authenticatedPages/Timings";
 import FoodItemsList from "../pages/authenticatedPages/Food-Menu/FoodItemsList";
 import FoodItemDetail from "../pages/authenticatedPages/Food-Menu/FoodItemDetail";
-import AddProduct from "../pages/authenticatedPages/Food-Menu/AddProduct";
+
+import FoodItemEdit from "../pages/authenticatedPages/Food-Menu/FoodItemEdit";
+import AddFoodItem from "../pages/authenticatedPages/Food-Menu/AddFoodItem";
 
 
 const AppRoutes = () => {
@@ -56,7 +58,8 @@ const AppRoutes = () => {
           <Route path="/timings" element={<Timings />}/>
           <Route path="/food-menu" element={<FoodItemsList />}/>
           <Route path="/food-item/:id" element={<FoodItemDetail />} />
-          <Route path="/add-product" element={<AddProduct />} />
+          <Route path="/add-product" element={<AddFoodItem />} />
+          <Route path="/food-item/edit" element={<FoodItemEdit />} />
           
         </Route>
       </Route>
