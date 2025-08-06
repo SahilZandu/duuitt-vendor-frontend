@@ -5,9 +5,7 @@ import Loader from "../../../../components/loader/Loader";
 import PageTitle from "../../../../components/Ui/PageTitle";
 import { fetchRestaurantPaymentLogs } from "../../../../api/RatingAndPaymentLogsApi";
 import NoDataFound from "../../../../components/Ui/NoDataFound";
-import GlobalDataTable from "../../../../components/layout/GlobalDataTable";
 import DataTable from "react-data-table-component";
-
 interface PaymentLog {
     _id: string;
     payment_type: "captured" | "refund" | "withdraw";
