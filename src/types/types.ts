@@ -122,3 +122,8 @@ export type FoodItem = {
   variants?: VariantGroup[];
   addon?: AddonGroup[];
 };
+
+export interface EditingSlot {
+    slotIndex: number;
+    slotData: Slot;
+}

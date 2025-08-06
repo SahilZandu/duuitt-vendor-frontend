@@ -46,7 +46,7 @@ export const fetchVendorDetails = async (
     vendor_id: string
 ): Promise<Restaurant | null> => {
     try {
-        alert()
+        // alert()
         const payload = { vendor_id };
         const response = await apiRequest("post", "/vendor/get", payload);
         return response?.data?.data || null;

@@ -69,6 +69,7 @@ export interface DeleteRestaurantTimingPayload {
   day_of_week: number;
   index: number;
   is_all_day: boolean;
+  // outlet_status: boolean;
 }
 
 export interface DeleteRestaurantTimingResponse {
@@ -81,6 +82,27 @@ export const deleteRestaurantTiming = async (
   payload: DeleteRestaurantTimingPayload
 ): Promise<DeleteRestaurantTimingResponse> => {
   const response = await apiRequest("post", "/restaurant/delete-restaurant-timings", payload);
+  console.log({ response });
+  return response?.data;
+};
+
+// ..............update outlet status.............
+interface UpdateOnlineStatusPayload {
+  restaurant_id: string | null;
+  status: boolean;
+  day: number;
+}
+
+interface UpdateOnlineStatusResponse {
+  success: boolean;
+  message?: string;
+  data?: any;
+}
+
+export const updateOnlineStatusOfSpecifiedDay = async (
+  payload: UpdateOnlineStatusPayload
+): Promise<UpdateOnlineStatusResponse> => {
+  const response = await apiRequest("post", "/restaurant/update-online-status-of-specified-day", payload);
   console.log({ response });
   return response?.data;
 };

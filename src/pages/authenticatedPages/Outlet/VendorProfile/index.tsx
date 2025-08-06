@@ -26,6 +26,8 @@ const VendorProfile = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    console.log("inside useeefect-------------");
+    
     const loadVendor = async () => {
       setLoading(true);
       try {
@@ -33,14 +35,13 @@ const VendorProfile = () => {
         if (!vendor_id) return;
 
         const fetchedData = await fetchVendorDetails(vendor_id);
-        if (Array.isArray(fetchedData) && fetchedData.length > 0) {
-          const vendor = fetchedData[0];
-          setFormData({
-            name: vendor.name,
-            phone: vendor.phone,
-            email: vendor.email,
+        console.log("fetchedData------------", fetchedData);
+        setFormData({
+            name: fetchedData?.name || '',
+            phone: fetchedData?.phone || '',
+            email: fetchedData?.email || '',
           });
-        }
+       
       } catch (error) {
         toast.error("Failed to load vendor data");
       } finally {

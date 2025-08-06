@@ -3,7 +3,7 @@ import Tabs from "../../../components/Ui/Tabs";
 import Button from "../../../components/Ui/Button";
 import TimeSlotModal from "../../../components/modals/TimeSlotModal";
 import DeleteModal from "../../../components/modals/DeleteModal";
-import { addRestaurantTimings, deleteRestaurantTiming, updateRestaurantTiming } from "../../../api/timingsApi";
+import { addRestaurantTimings, deleteRestaurantTiming, updateOnlineStatusOfSpecifiedDay, updateRestaurantTiming } from "../../../api/timingsApi";
 import { useVendor } from "../../../lib/Context/VendorContext";
 import { toast } from "react-toastify";
 import type {
@@ -12,22 +12,30 @@ import type {
     EditingSlot,
     RestaurantTimingPayload,
 } from '../../../types/types';
+import Loader from "../../../components/loader/Loader";
+import Switcher from "../../../components/Ui/Switcher";
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const Timings: React.FC = () => {
-    const { vendor } = useVendor();
-    const timing = vendor?.restaurant?.timings as RestaurantTiming | undefined;
+    const { vendor, fetchVendor, loading } = useVendor();
+    const timing = vendor && vendor?.restaurant?.timings as RestaurantTiming | undefined;
 
     const [activeTab, setActiveTab] = useState<'all' | 'specific'>('all');
     const [allDaySlots, setAllDaySlots] = useState<Slot[]>([]);
-    const [specificDaySlots, setSpecificDaySlots] = useState<Record<string, Slot[]>>(() =>
-        daysOfWeek.reduce((acc, d) => {
-            acc[d] = [];
-            return acc;
-        }, {} as Record<string, Slot[]>)
-    );
+    console.log({ allDaySlots });
 
+    const [specificDaySlots, setSpecificDaySlots] = useState<
+        Record<string, { outlet_status: boolean; timings: Slot[] }>
+    >(
+        daysOfWeek.reduce((acc, d) => {
+            acc[d] = { outlet_status: false, timings: [] };
+            return acc;
+        }, {} as Record<string, { outlet_status: boolean; timings: Slot[] }>)
+    );
+    console.log({ specificDaySlots });
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
     const [editingSlot, setEditingSlot] = useState<EditingSlot | null>(null);
     const [isTimeSlotOpen, setIsTimeSlotOpen] = useState(false);
@@ -55,9 +63,9 @@ const Timings: React.FC = () => {
             setAllDaySlots([]);
             setSpecificDaySlots(
                 daysOfWeek.reduce((acc, d) => {
-                    acc[d] = [];
+                    acc[d] = { outlet_status: false, timings: [] };
                     return acc;
-                }, {} as Record<string, Slot[]>)
+                }, {} as Record<string, { outlet_status: boolean; timings: Slot[] }>)
             );
             return;
         }
@@ -72,19 +80,26 @@ const Timings: React.FC = () => {
             }));
             setAllDaySlots(slots);
         } else {
-            const specific: Record<string, Slot[]> = {};
+            const specific: Record<string, { outlet_status: boolean; timings: Slot[] }> = {};
+
             timing.specified.forEach((dayTiming, i) => {
-                specific[daysOfWeek[i]] = dayTiming.timings.map((slot) => ({
-                    id: Date.now() + Math.random(),
-                    from: slot.open_times,
-                    to: slot.close_time,
-                    is_edit_delete: slot.is_edit_delete,
-                    timing_id: slot._id,
-                }));
+                const day = daysOfWeek[i];
+                specific[day] = {
+                    outlet_status: dayTiming?.outlet_status,
+                    timings: dayTiming && dayTiming?.timings?.map((slot) => ({
+                        id: Date.now() + Math.random(),
+                        from: slot.open_times,
+                        to: slot.close_time,
+                        is_edit_delete: slot.is_edit_delete,
+                        timing_id: slot._id,
+                    })),
+                };
             });
+
             setSpecificDaySlots(specific);
         }
     }, [timing]);
+
 
     const deleteSlot = async () => {
         if (!deletingSlot || !restaurant_id) return;
@@ -98,54 +113,82 @@ const Timings: React.FC = () => {
                 closeDelete();
                 return;
             }
+
             try {
                 setDeleteLoading(true);
+
                 await deleteRestaurantTiming({
                     restaurant_id,
                     day_of_week: 0,
-                    index: index!,
+                    index: index!, // Ensure index is not undefined
                     is_all_day: true,
+                    // outlet_status: false,
                 });
+
                 toast.success('Slot deleted.');
+
+                // Remove the deleted slot from UI
                 setAllDaySlots((prev) => prev.filter((_, i) => i !== index));
+
+                // Close the modal or confirmation UI
                 closeDelete();
-            } catch {
+            } catch (error) {
+                console.error('Error deleting slot:', error); // Helpful for debugging
                 toast.error('Delete failed.');
-                setDeleteLoading(false);
+            } finally {
+                setDeleteLoading(false); // Always reset loading state
             }
+
         } else {
             const dow = dayOfWeek!;
             const dayName = daysOfWeek[dow];
-            const slot = specificDaySlots[dayName].find((s) => s.id === slotId);
+            const slot = specificDaySlots[dayName].timings.find((s) => s.id === slotId);
+
             if (slot?.isNew) {
                 setSpecificDaySlots((prev) => ({
                     ...prev,
-                    [dayName]: prev[dayName].filter((s) => s.id !== slotId),
+                    [dayName]: {
+                        ...prev[dayName],
+                        timings: prev[dayName].timings.filter((s) => s.id !== slotId),
+                    },
                 }));
                 closeDelete();
                 return;
             }
+
             try {
                 setDeleteLoading(true);
-                await deleteRestaurantTiming({
+               const response =  await deleteRestaurantTiming({
                     restaurant_id,
-                    day_of_week: dow,
+                    day_of_week: Number(dow) + 1,
                     index: index!,
                     is_all_day: false,
+                    // outlet_status: false,
                 });
-                toast.success('Slot deleted.');
+
+                toast.success(response?.message || 'Record deleted successfully!');
+
                 setSpecificDaySlots((prev) => {
-                    const arr = [...prev[dayName]];
+                    const arr = [...prev[dayName].timings];
                     arr.splice(index!, 1);
-                    return { ...prev, [dayName]: arr };
+                    return {
+                        ...prev,
+                        [dayName]: {
+                            ...prev[dayName],
+                            timings: arr,
+                        },
+                    };
                 });
+
                 closeDelete();
+                fetchVendor();
             } catch {
                 toast.error('Delete failed.');
                 setDeleteLoading(false);
             }
         }
     };
+
 
     const closeDelete = () => {
         setIsDeleteModalOpen(false);
@@ -159,6 +202,7 @@ const Timings: React.FC = () => {
             return;
         }
         try {
+            setIsSubmitting(true);
             const payload: RestaurantTimingPayload = {
                 vendor_id,
                 restaurant_id,
@@ -177,10 +221,14 @@ const Timings: React.FC = () => {
                 },
             };
             await addRestaurantTimings(payload);
-            setAllDaySlots((prev) => prev.map((s) => ({ ...s, isNew: false })));
+            setAllDaySlots((prev) =>
+                (Array.isArray(prev) ? prev : []).map((s) => ({ ...s, isNew: false }))
+            );
             toast.success('All-day timings saved.');
         } catch {
             toast.error('Save failed.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -189,16 +237,31 @@ const Timings: React.FC = () => {
             toast.error('Missing vendor or restaurant ID');
             return;
         }
+
         try {
-            const specified = daysOfWeek.map((day, i) => ({
-                outlet_status: false,
-                timings: specificDaySlots[day].map((slot) => ({
-                    open_times: slot.from,
-                    close_time: slot.to,
-                    days_of_week: i,
-                    is_edit_delete: slot.is_edit_delete,
-                })),
-            }));
+            setIsSubmitting(true);
+
+            const specified = daysOfWeek.map((day, i) => {
+                const dayData = specificDaySlots?.[day] || {
+                    outlet_status: false,
+                    timings: [],
+                };
+
+                const timingsArray = Array.isArray(dayData.timings) ? dayData.timings : [];
+
+                return {
+                    outlet_status: dayData.outlet_status || false,
+                    timings: timingsArray
+                        .filter(slot => slot?.from && slot?.to)
+                        .map((slot) => ({
+                            open_times: slot.from,
+                            close_time: slot.to,
+                            days_of_week: i,
+                            is_edit_delete: slot.is_edit_delete,
+                        })),
+                };
+            });
+
             const payload: RestaurantTimingPayload = {
                 vendor_id,
                 restaurant_id,
@@ -208,23 +271,43 @@ const Timings: React.FC = () => {
                     specified,
                 },
             };
-            await addRestaurantTimings(payload);
+
+            const response = await addRestaurantTimings(payload);
+            toast.success(response?.message || 'Restaurant updated successfully');
+            // Clean up: mark all specific slots as not new
             setSpecificDaySlots((prev) => {
-                const copy: Record<string, Slot[]> = {};
+                const updated: Record<string, { outlet_status: boolean; timings: Slot[] }> = {};
                 daysOfWeek.forEach((day) => {
-                    copy[day] = prev[day].map((s) => ({ ...s, isNew: false }));
+                    const existing = prev[day] || {
+                        outlet_status: false,
+                        timings: [],
+                    };
+
+                    const safeTimings = Array.isArray(existing.timings) ? existing.timings : [];
+
+                    updated[day] = {
+                        outlet_status: existing.outlet_status,
+                        timings: safeTimings.map((slot) => ({
+                            ...slot,
+                            isNew: false,
+                        })),
+                    };
                 });
-                return copy;
+                return updated;
             });
-            toast.success('Specific timings saved.');
+            fetchVendor();
         } catch {
             toast.error('Save failed.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     const onSubmitSlot = async ({ startTime, endTime }: { startTime: string; endTime: string }) => {
         if (editingSlot) {
             const { slotIndex, slotData } = editingSlot;
+            console.log({ slotData });
+
             if (!slotData.timing_id) {
                 toast.error('Missing timing ID');
                 return;
@@ -245,10 +328,17 @@ const Timings: React.FC = () => {
                     });
                 } else if (selectedDay) {
                     setSpecificDaySlots((prev) => {
-                        const arr = [...prev[selectedDay]];
+                        const arr = [...prev[selectedDay].timings];
                         arr[slotIndex] = { ...arr[slotIndex], from: startTime, to: endTime };
-                        return { ...prev, [selectedDay]: arr };
+                        return {
+                            ...prev,
+                            [selectedDay]: {
+                                ...prev[selectedDay],
+                                timings: arr,
+                            },
+                        };
                     });
+
                 }
             } catch {
                 toast.error('Update failed.');
@@ -271,9 +361,13 @@ const Timings: React.FC = () => {
         } else if (selectedDay) {
             setSpecificDaySlots((prev) => ({
                 ...prev,
-                [selectedDay]: [...prev[selectedDay], newSlot],
+                [selectedDay]: {
+                    ...prev[selectedDay],
+                    timings: [...(prev[selectedDay]?.timings || []), newSlot],
+                },
             }));
         }
+
 
         setIsTimeSlotOpen(false);
     };
@@ -286,83 +380,90 @@ const Timings: React.FC = () => {
     return (
         <div className="bg-white min-h-screen">
             <Tabs tabs={tabOptions} activeTab={activeTab}
-                onTabChange={(tab: string) => {
-                    // Make sure the value is valid before setting
-                    if (tab === 'all' || tab === 'specific') {
-                        setActiveTab(tab);
+                onTabChange={async (tab: string) => {
+                    if (tab !== 'all' && tab !== 'specific') return;
+
+                    setActiveTab(tab);
+                    const updatedVendor = await fetchVendor();
+                    const updatedTiming = updatedVendor?.restaurant?.timings;
+
+                    if (!updatedTiming) {
+                        setAllDaySlots([]);
+                        setSpecificDaySlots(
+                            daysOfWeek.reduce((acc, d) => {
+                                acc[d] = {
+                                    outlet_status: false,
+                                    timings: [],
+                                };
+                                return acc;
+                            }, {} as Record<string, { outlet_status: boolean; timings: Slot[] }>),
+                        );
+
+                        return;
+                    }
+
+                    if (updatedTiming.is_all_day && updatedTiming.all_days.timings.length > 0) {
+                        const slots: Slot[] = updatedTiming.all_days.timings.map((item: any) => ({
+                            id: Date.now() + Math.random(),
+                            from: item.open_times,
+                            to: item.close_time,
+                            is_edit_delete: item.is_edit_delete,
+                            timing_id: item._id,
+                        }));
+                        setAllDaySlots(slots);
+                        // clear specific day slots
+                        setSpecificDaySlots(
+                            daysOfWeek.reduce((acc, d) => {
+                                acc[d] = {
+                                    outlet_status: false,
+                                    timings: [],
+                                };
+                                return acc;
+                            }, {} as Record<string, { outlet_status: boolean; timings: Slot[] }>),
+                        );
+
                     } else {
-                        console.warn('Unexpected tab value', tab);
+                        // reset all day slots
+                        setAllDaySlots([]);
+
+                        // ensure all 7 days are defined, even if some have 0 slots
+                        const specific: Record<string, Slot[]> = daysOfWeek.reduce((acc, day, index) => {
+                            const dayTimings = updatedTiming?.specified?.[index]?.timings || [];
+                            acc[day] = dayTimings.map((slot: any) => ({
+                                id: Date.now() + Math.random(),
+                                from: slot.open_times,
+                                to: slot.close_time,
+                                is_edit_delete: slot.is_edit_delete,
+                                timing_id: slot._id,
+                            }));
+                            return acc;
+                        }, {} as Record<string, Slot[]>);
+
+                        const specificWrapped = Object.fromEntries(
+                            Object.entries(specific).map(([day, slots]) => [
+                                day,
+                                { outlet_status: false, timings: slots },
+                            ])
+                        );
+                        setSpecificDaySlots(specificWrapped); // ✅ Correct
+
                     }
                 }}
             />
-
-            {activeTab === 'all' && (
-                <div className="p-4 space-y-3">
-                    <div className="flex justify-between">
-                        <h3 className="text-lg font-semibold">All Days</h3>
-                        {allDaySlots.length < 2 && (
-                            <Button onClick={() => setIsTimeSlotOpen(true)} variant="primary" label="Add Timing" />
-                        )}
-                    </div>
-
-                    {allDaySlots.map((slot, index) => (
-                        <div key={slot.id} className="flex justify-between items-center">
-                            <div className="flex gap-3 items-center">
-                                <strong>Slot {index + 1}:</strong>
-                                <span>{formatTime(slot.from)} to {formatTime(slot.to)}</span>
-                            </div>
-                            {slot.is_edit_delete && (
-                                <div className="flex gap-2">
-                                    {!slot.isNew && (
-                                        <Button
-                                            variant="outline-success"
-                                            label="Edit"
-                                            onClick={() => {
-                                                setEditingSlot({ slotIndex: index, slotData: slot });
-                                                setIsTimeSlotOpen(true);
-                                            }}
-                                        />
-                                    )}
-                                    <Button
-                                        variant="danger"
-                                        label="Delete"
-                                        onClick={() => {
-                                            setDeletingSlot({ type: 'all', slotId: slot.id, index });
-                                            setIsDeleteModalOpen(true);
-                                        }}
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    ))}
-
-                    <div className="flex justify-end">
-                        <Button onClick={handleSaveAllDaysTimings} variant="primary" label="Save All Day Timings" />
-                    </div>
-                </div>
-            )}
-
-            {activeTab === 'specific' && (
-                <div className="p-4 space-y-4">
-                    {daysOfWeek.map((day, i) => (
-                        <div key={day} className="border-b pb-2">
+            {loading ? <Loader /> : (
+                <div>
+                    {activeTab === 'all' && (
+                        <div className="p-4 space-y-3">
                             <div className="flex justify-between">
-                                <h3 className="font-semibold">{day}</h3>
-                                {specificDaySlots[day].length < 2 && (
-                                    <Button
-                                        label="Add Timing"
-                                        variant="primary"
-                                        onClick={() => {
-                                            setSelectedDay(day);
-                                            setIsTimeSlotOpen(true);
-                                        }}
-                                    />
+                                <h3 className="text-lg font-semibold">All Days</h3>
+                                {allDaySlots.length < 2 && (
+                                    <Button onClick={() => setIsTimeSlotOpen(true)} variant="primary" label="Add Timing" />
                                 )}
                             </div>
 
-                            {specificDaySlots[day].map((slot, index) => (
-                                <div key={slot.id} className="flex justify-between items-center mt-2">
-                                    <div className="flex gap-2 items-center">
+                            {allDaySlots.map((slot, index) => (
+                                <div key={slot.id} className="flex justify-between items-center">
+                                    <div className="flex gap-3 items-center">
                                         <strong>Slot {index + 1}:</strong>
                                         <span>{formatTime(slot.from)} to {formatTime(slot.to)}</span>
                                     </div>
@@ -374,7 +475,6 @@ const Timings: React.FC = () => {
                                                     label="Edit"
                                                     onClick={() => {
                                                         setEditingSlot({ slotIndex: index, slotData: slot });
-                                                        setSelectedDay(day);
                                                         setIsTimeSlotOpen(true);
                                                     }}
                                                 />
@@ -383,7 +483,7 @@ const Timings: React.FC = () => {
                                                 variant="danger"
                                                 label="Delete"
                                                 onClick={() => {
-                                                    setDeletingSlot({ type: 'specific', slotId: slot.id, dayOfWeek: i, index });
+                                                    setDeletingSlot({ type: 'all', slotId: slot.id, index });
                                                     setIsDeleteModalOpen(true);
                                                 }}
                                             />
@@ -391,11 +491,109 @@ const Timings: React.FC = () => {
                                     )}
                                 </div>
                             ))}
+                            {allDaySlots?.length > 0 && (
+                                <div className="flex justify-end">
+                                    <Button onClick={handleSaveAllDaysTimings}
+                                        disabled={isSubmitting}
+                                        loading={isSubmitting}
+                                        variant="primary" label="Save All Day Timings" />
+                                </div>
+                            )}
+
                         </div>
-                    ))}
-                    <div className="flex justify-end">
-                        <Button onClick={handleSaveSpecificDayTimings} variant="primary" label="Save Specific Day Timings" />
-                    </div>
+                    )}
+
+                    {activeTab === 'specific' && (
+                        <div className="p-4 space-y-4">
+                            {daysOfWeek.map((day, i) => (
+                                <div key={day} className="border-b pb-2">
+                                    <div className="flex justify-between">
+                                        <div className="flex justify-between gap-2">
+                                            <h3 className="font-semibold">{day}</h3>
+                                            {specificDaySlots?.[day]?.timings?.length > 0 && specificDaySlots?.[day]?.outlet_status === true && (
+                                                <Switcher
+                                                    initial={specificDaySlots?.[day]?.outlet_status || false}
+                                                    onClick={async (newStatus: boolean) => {
+                                                        console.log(`Outlet status for ${day} changed to:`, newStatus);
+                                                        try {
+                                                            const response = await updateOnlineStatusOfSpecifiedDay({
+                                                                restaurant_id: restaurant_id, // Ensure this is defined in scope
+                                                                status: newStatus,
+                                                                day: i + 1, // Make sure `index` corresponds to this day (e.g., 0 = Sunday)
+                                                            });
+                                                            console.log({ response });
+                                                            toast.success(response?.message || "Day online status updated!")
+                                                            // Update local UI state
+                                                            setSpecificDaySlots((prev) => ({
+                                                                ...prev,
+                                                                [day]: {
+                                                                    ...prev[day],
+                                                                    status: newStatus,
+                                                                },
+                                                            }));
+                                                        } catch (error) {
+                                                            console.error("Failed to update outlet status:", error);
+                                                        }
+                                                    }}
+                                                />
+                                            )}
+
+                                        </div>
+                                        {(specificDaySlots[day]?.timings || []).length < 2 && (
+                                            <Button
+                                                label="Add Timing"
+                                                variant="primary"
+                                                onClick={() => {
+                                                    setSelectedDay(day);
+                                                    setIsTimeSlotOpen(true);
+                                                }}
+                                            />
+                                        )}
+
+                                    </div>
+
+                                    {specificDaySlots && specificDaySlots[day]?.timings?.map((slot, index) => (
+                                        <div key={slot.id} className="flex justify-between items-center mt-2">
+                                            <div className="flex gap-2 items-center">
+                                                <strong>Slot {index + 1}:</strong>
+                                                <span>{formatTime(slot.from)} to {formatTime(slot.to)}</span>
+                                            </div>
+                                            {slot.is_edit_delete && (
+                                                <div className="flex gap-2">
+                                                    {!slot.isNew && (
+                                                        <Button
+                                                            variant="outline-success"
+                                                            label="Edit"
+                                                            onClick={() => {
+                                                                setEditingSlot({ slotIndex: index, slotData: slot });
+                                                                setSelectedDay(day);
+                                                                setIsTimeSlotOpen(true);
+                                                            }}
+                                                        />
+                                                    )}
+                                                    <Button
+                                                        variant="danger"
+                                                        label="Delete"
+                                                        onClick={() => {
+                                                            setDeletingSlot({ type: 'specific', slotId: slot.id, dayOfWeek: i, index });
+                                                            setIsDeleteModalOpen(true);
+                                                        }}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            ))}
+                            <div className="flex justify-end">
+                                <Button
+                                    onClick={handleSaveSpecificDayTimings}
+                                    variant="primary" label="Save Specific Day Timings"
+                                    disabled={isSubmitting}
+                                    loading={isSubmitting} />
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -406,13 +604,14 @@ const Timings: React.FC = () => {
                     setEditingSlot(null);
                     setSelectedDay(null);
                 }}
+                editingSlot={editingSlot}
                 defaultFrom={editingSlot?.slotData.from}
                 defaultTo={editingSlot?.slotData.to}
                 existingSlots={
                     activeTab === 'all'
-                        ? allDaySlots
+                        ? allDaySlots.map(s => ({ ...s, id: String(s.id) }))
                         : selectedDay
-                            ? specificDaySlots[selectedDay]
+                            ? (specificDaySlots[selectedDay]?.timings ?? []).map(s => ({ ...s, id: String(s.id) }))
                             : []
                 }
                 actionLabel={editingSlot ? 'Update Slot' : 'Add Slot'}

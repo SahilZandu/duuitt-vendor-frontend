@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import MenuIcon from "../../lib/MenuIcon";
 import Button from "../Ui/Button";
 import Input from "../Ui/Input";
+import type { EditingSlot } from "../../types/types";
 
 interface TimeSlotModalProps {
     isOpen: boolean;
@@ -9,12 +10,12 @@ interface TimeSlotModalProps {
     actionLoading?: boolean;
     onSubmit: (data: { startTime: string; endTime: string }) => void;
     onClose: () => void;
-    existingSlots?: { from: string; to: string }[]; // ← new prop
-
+    existingSlots: { id: string; from: string; to: string }[]
     defaultFrom?: string;
     defaultTo?: string;
     isEditing?: boolean;
     actionLabel?: string;
+    editingSlot?: EditingSlot | null;
 }
 
 
@@ -24,12 +25,15 @@ const TimeSlotModal: React.FC<TimeSlotModalProps> = ({
     actionLoading = false,
     onSubmit,
     onClose,
-    // existingSlots,
+    existingSlots,
     defaultFrom,
-    defaultTo
+    defaultTo,
+    editingSlot
 }) => {
     const [startTime, setStartTime] = useState(defaultFrom || "");
     const [endTime, setEndTime] = useState(defaultTo || "");
+    const [submitting, setSubmitting] = useState(false);
+
     useEffect(() => {
         setStartTime(defaultFrom || "");
         setEndTime(defaultTo || "");
@@ -42,28 +46,56 @@ const TimeSlotModal: React.FC<TimeSlotModalProps> = ({
     const [errors, setErrors] = useState<{ from?: string; to?: string }>({});
 
     if (!isOpen) return null;
+    const toMinutes = (time: string) => {
+        const [hours, minutes] = time.split(":").map(Number);
+        return hours * 60 + minutes;
+    };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const newErrors: typeof errors = {};
 
         if (!startTime) newErrors.from = "Please select a start time.";
         if (!endTime) newErrors.to = "Please select an end time.";
 
-        // if (startTime && endTime && startTime >= endTime) {
-        //     newErrors.from = "'From' time must be earlier than 'To' time.";
-        // }
-      
+        if (startTime && endTime && startTime >= endTime) {
+            newErrors.from = "'From' time must be earlier than 'To' time.";
+        }
+
+        if (startTime && endTime && (existingSlots?.length ?? 0) > 0) {
+            const currentSlotId = editingSlot?.slotData?.id;
+
+            const hasOverlap = existingSlots?.some(({ from, to, id }) => {
+                if (Number(id) === currentSlotId) return false;
+                const [s1, e1] = [toMinutes(startTime), toMinutes(endTime)];
+                const [s2, e2] = [toMinutes(from), toMinutes(to)];
+
+                return s1 < e2 && s2 < e1;
+            });
+
+            if (hasOverlap) {
+                newErrors.from = "This time overlaps with another scheduled slot. Please adjust it.";
+            }
+        }
+
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             return;
         }
+        try {
+            setSubmitting(true);
+            await onSubmit({ startTime, endTime });
+            setStartTime("");
+            setEndTime("");
+            setErrors({});
+        } catch (err) {
+            console.error("Submit failed:", err);
+        } finally {
+            setSubmitting(false);
+        }
 
-        // All good – submit
-        onSubmit({ startTime, endTime });
-        setStartTime("");
-        setEndTime("");
-        setErrors({});
     };
+
+
     const handleClose = () => {
         setStartTime("");
         setEndTime("");
@@ -127,6 +159,7 @@ const TimeSlotModal: React.FC<TimeSlotModalProps> = ({
                     <Button
                         onClick={handleSubmit}
                         disabled={actionLoading}
+                        loading={submitting}
                         label={actionLabel}
                     />
                 </div>
