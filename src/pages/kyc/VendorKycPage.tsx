@@ -63,7 +63,7 @@ const VendorKycPage = () => {
 
             try {
                 const response = await axiosInstance("post", "/vendor/get", { vendor_id });
-                const fetchedVendor = response?.data?.data?.[0] || null;
+                const fetchedVendor = response?.data?.data || null;
 
                 if (!fetchedVendor) {
                     toast.error("Vendor data not found.");
@@ -211,7 +211,7 @@ const VendorKycPage = () => {
             const allSubmitted = requiredSteps.every(step => newSubmittedSteps.includes(step));
 
             if (allSubmitted) {
-                window.location.href = "/kyc-submitted";
+                navigate("/kyc-submitted");
             } else {
                 setCurrentStep((prev) => Math.min(prev + 1, documentSteps.length - 1));
             }
