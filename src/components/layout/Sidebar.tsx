@@ -94,13 +94,13 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-64 bg-[#8E3CF7] text-white min-h-screen flex flex-col justify-between py-6 px-4">
-      <nav className="space-y-2">
+    <aside className="w-64 bg-[#8E3CF7] text-white h-screen flex flex-col py-6 px-4">
+      <nav className="space-y-2 overflow-y-auto">
         <Link to="/" className="mb-8 cursor-pointer flex justify-center items-center">
           <img
             src={logo}
             alt="Logo"
-            className="max-w-[160px] h-auto object-contain"
+            className="max-w-[100px] h-auto object-contain"
           />
         </Link>
 
