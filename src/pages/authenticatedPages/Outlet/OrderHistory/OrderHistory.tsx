@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import Loader from "../../../../components/loader/Loader";
 import PageTitle from "../../../../components/Ui/PageTitle";
 import NoDataFound from "../../../../components/Ui/NoDataFound";
+import DataTable from "react-data-table-component";
 
 const OrderHistory = () => {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -137,14 +138,36 @@ const OrderHistory = () => {
 
             {loading ? (
                 <Loader />
-            ) : orders && orders?.length === 0 ? (
-                <NoDataFound message="No orders available." />
             ) : (
-                <GlobalDataTable
+                <DataTable
                     columns={columns}
                     data={orders}
-                    pagination={true}
-                    selectableRows={false}
+                    progressPending={loading}
+                    pagination
+                    highlightOnHover
+                    noDataComponent={<NoDataFound/>}
+                    paginationRowsPerPageOptions={[10, 25, 50]}
+                    paginationPerPage={25}
+                    paginationComponentOptions={{
+                        rowsPerPageText: 'Rows per page:',
+                        rangeSeparatorText: 'of',
+                    }}
+                    customStyles={{
+                        rows: {
+                            style: {
+                                borderBottom: '1px solid #e5e7eb',
+                                fontSize: 14,
+                            },
+                        },
+                        headRow: {
+                            style: {
+                                fontWeight: 500,
+                                fontSize: 16,
+                                color: '#fff',
+                                backgroundColor: '#a855f7',
+                            },
+                        },
+                    }}
                 />
             )}
 

@@ -6,6 +6,7 @@ import PageTitle from "../../../../components/Ui/PageTitle";
 import { fetchRestaurantPaymentLogs } from "../../../../api/RatingAndPaymentLogsApi";
 import NoDataFound from "../../../../components/Ui/NoDataFound";
 import GlobalDataTable from "../../../../components/layout/GlobalDataTable";
+import DataTable from "react-data-table-component";
 
 interface PaymentLog {
     _id: string;
@@ -167,13 +168,16 @@ const PaymentLogs = () => {
                     />
                 </div>
             </div>
-            {/* <DataTable
+            {loading ? (
+                <Loader />
+            ) : (
+                <DataTable
                     columns={columns}
                     data={orders}
                     progressPending={loading}
-                    pagination
+                    pagination={true}
                     highlightOnHover
-                    noDataComponent={<div className="py-4 text-gray-600">No payment found</div>}
+                    noDataComponent={<NoDataFound />}
                     paginationRowsPerPageOptions={[10, 25, 50]}
                     paginationPerPage={25}
                     paginationComponentOptions={{
@@ -196,22 +200,9 @@ const PaymentLogs = () => {
                             },
                         },
                     }}
-                /> */}
-
-            {loading ? (
-                <Loader />
-            ) : orders && orders?.length === 0 ? (
-                <NoDataFound message="No payment logs available." />
-            ) : (
-                <GlobalDataTable
-                    columns={columns}
-                    data={orders}
-                    pagination={true}
-                    selectableRows={false}
                 />
             )}
 
-            {/* {loading && <Loader />}  */}
         </div>
     );
 };

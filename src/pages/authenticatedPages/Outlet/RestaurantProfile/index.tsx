@@ -22,6 +22,9 @@ type FormDataType = {
     veg_non_veg: string;
     minimum_order_value: string;
     minimum_order_preparation_time: string;
+    restaurant_charge: string;
+    admin_commission: string;
+    gst_percentage: string;
 };
 
 const RestaurantProfile = () => {
@@ -37,6 +40,9 @@ const RestaurantProfile = () => {
         veg_non_veg: "",
         minimum_order_value: "",
         minimum_order_preparation_time: "",
+        restaurant_charge: "",
+        admin_commission: '',
+        gst_percentage: '',
     });
     console.log({ formData });
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -64,10 +70,6 @@ const RestaurantProfile = () => {
                     setFormData({
                         banner: fetchedData[0]?.banner,
                         files: fetchedData[0]?.assets,
-                        // banner: fetchedData[0].banner ? `${baseURL}${fetchedData.banner}` : "",
-                        // assets: fetchedData[0].assets
-                        //     ? fetchedData.assets.map((asset: string) => `${baseURL}${asset}`)
-                        //     : [],
                         name: fetchedData[0]?.vendor?.name,
                         about: fetchedData[0]?.about,
                         address: fetchedData[0]?.address,
@@ -77,6 +79,9 @@ const RestaurantProfile = () => {
                         veg_non_veg: fetchedData[0]?.veg_non_veg,
                         minimum_order_value: fetchedData[0]?.minimum_order_value,
                         minimum_order_preparation_time: fetchedData[0]?.minimum_order_preparation_time,
+                        restaurant_charge: fetchedData[0]?.restaurant_charge,
+                        admin_commission: fetchedData[0]?.admin_commission,
+                        gst_percentage: fetchedData[0]?.gst_percentage,
                     });
                 } else {
                     console.warn("No restaurant data returned.");
@@ -179,7 +184,9 @@ const RestaurantProfile = () => {
         formDataToSend.append("veg_non_veg", data.veg_non_veg);
         formDataToSend.append("minimum_order_value", data.minimum_order_value);
         formDataToSend.append("minimum_order_preparation_time", data.minimum_order_preparation_time);
-
+        formDataToSend.append("restaurant_charge", data.restaurant_charge);
+        formDataToSend.append("admin_commission", data.admin_commission);
+        formDataToSend.append("gst_percentage", data.gst_percentage);
         return formDataToSend;
     };
 
@@ -202,7 +209,7 @@ const RestaurantProfile = () => {
         setIsSubmitting(true);
         try {
             const formDataToSend = convertToFormData(formData, restaurant_id);
-             await updateRestaurantProfile(formDataToSend);
+            await updateRestaurantProfile(formDataToSend);
             toast.success("Profile Updated Successfully");
         } catch (err) {
             toast.error("Failed to update profile");
@@ -307,7 +314,7 @@ const RestaurantProfile = () => {
                                         type="button"
                                     >
                                         {/* ✕ */}
-                                        <MenuIcon name="close"/>
+                                        <MenuIcon name="close" />
                                     </button>
                                 </div>
                             ))}
@@ -414,33 +421,66 @@ const RestaurantProfile = () => {
 
                     />
                 </div>
-                <div>
-                    <Input
-                        type="number"
-                        label="Minimum Order Value"
-                        name="minimum_order_value"
-                        value={formData?.minimum_order_value}
-                        onChange={handleChange}
-                        className="input"
-                        placeholder="Enter minimum order value"
-                        error={errors?.minimum_order_value}
-                        required
-                    />
-                </div>
 
-                <div>
-                    <Input
-                        type="number"
-                        label="Minimum Order Preparation Time (in minutes)"
-                        name="minimum_order_preparation_time"
-                        value={formData?.minimum_order_preparation_time}
-                        onChange={handleChange}
-                        className="input"
-                        placeholder="Enter preparation time"
-                        error={errors?.minimum_order_preparation_time}
-                        required
-                    />
-                </div>
+                <Input
+                    type="number"
+                    label="Minimum Order Value"
+                    name="minimum_order_value"
+                    value={formData?.minimum_order_value}
+                    onChange={handleChange}
+                    className="input"
+                    placeholder="Enter minimum order value"
+                    error={errors?.minimum_order_value}
+                    required
+                />
+
+                <Input
+                    type="number"
+                    label="Minimum Order Preparation Time (in minutes)"
+                    name="minimum_order_preparation_time"
+                    value={formData?.minimum_order_preparation_time}
+                    onChange={handleChange}
+                    className="input"
+                    placeholder="Enter preparation time"
+                    error={errors?.minimum_order_preparation_time}
+                    required
+                />
+                <Input
+                    type="number"
+                    disabled={true}
+                    label="Restaurant Charge"
+                    name="restaurant_charge"
+                    value={formData?.restaurant_charge}
+                    onChange={handleChange}
+                    className="input"
+                    placeholder="Enter preparation time"
+                    error={errors?.restaurant_charge}
+                    required
+                />
+                <Input
+                    type="number"
+                    disabled={true}
+                    label="Admin Commission"
+                    name="admin_commission"
+                    value={formData?.admin_commission}
+                    onChange={handleChange}
+                    className="input"
+                    placeholder="Enter preparation time"
+                    error={errors?.admin_commission}
+                    required
+                />
+                <Input
+                    type="number"
+                    disabled={true}
+                    label="Gst Percentage"
+                    name="gst_percentage"
+                    value={formData?.gst_percentage}
+                    onChange={handleChange}
+                    className="input"
+                    placeholder="Enter preparation time"
+                    error={errors?.gst_percentage}
+                    required
+                />
             </div>
 
             <div className="mt-6 flex justify-end">
