@@ -22,7 +22,10 @@ const PageTitle: React.FC<PageTitleProps> = ({
 }) => {
   return (
     <div className={clsx("mb-6", alignmentMap[align], className)}>
-      <h1 className="text-2xl md:text-3xl font-semibold text-gray-800">{title}</h1>
+      {title && (
+         <h1 className="text-2xl md:text-3xl font-semibold text-gray-800">{title}</h1>
+      )}
+     
       {subtitle && (
         <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
       )}

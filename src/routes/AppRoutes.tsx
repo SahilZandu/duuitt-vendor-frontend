@@ -45,7 +45,6 @@ const AppRoutes = () => {
           <Route path="/outlet/order-history/view/:id" element={<ViewOrderDetails />} />
           <Route path="/team" element={<TeamManagement />} />
           <Route path="/outlet/restaurant-profile" element={<RestaurantProfile />} />
-          <Route path="/outlet/manage-profile" element={<VendorProfile />} />
           <Route path="/outlet/rating" element={<Rating />} />
           <Route path="/outlet/payment-logs" element={<PaymentLogs />} />
           <Route path="/offers" element={<OfferManagement />} />
@@ -53,11 +52,13 @@ const AppRoutes = () => {
           <Route path="/orders" element={<Orders />} />
           <Route path="/orders/view-order/:id" element={<ViewOrder />} />
           {/* Timings */}
-          <Route path="/timings" element={<Timings />}/>
-          <Route path="/food-menu" element={<FoodItemsList />}/>
+          <Route path="/timings" element={<Timings />} />
+          <Route path="/food-menu" element={<FoodItemsList />} />
           <Route path="/food-item/:id" element={<FoodItemDetail />} />
           <Route path="/add-product" element={<AddProduct />} />
-          
+          {/* ....Setting.... */}
+          <Route path="/setting/manage-profile" element={<VendorProfile />} />
+
         </Route>
       </Route>
 

@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import type { OrderStatus } from "../../types/types";
 
 type ExtendedOrder = Order & {
+    payment_status?: "captured" | "failed" | string;
     billing_detail: {
         total_amount: number;
         payment_status: "captured" | "failed" | string;
@@ -20,6 +21,7 @@ type ExtendedOrder = Order & {
         quantity: number;
         food_item_price: number;
         veg_nonveg: string;
+        varient_name?: string;
     }[];
     status: OrderStatus;
     restaurant?: {
@@ -30,10 +32,10 @@ type ExtendedOrder = Order & {
 };
 
 interface Props {
-  order: ExtendedOrder;
-  onStatusChange: (id: string, status: OrderStatus, time?: number) => void;
-  onReject: (orderId: string) => Promise<void>; 
-  activeTab: string;
+    order: ExtendedOrder;
+    onStatusChange: (id: string, status: OrderStatus, time?: number) => void;
+    onReject: (orderId: string) => Promise<void>;
+    activeTab: string;
 }
 
 // Helper: badge color based on status
@@ -42,10 +44,12 @@ const getStatusColor = (status: OrderStatus) => {
         case "cooking":
             return "bg-orange-500";
         case "ready_to_pickup":
-        case "packing_processing":
+        case "packing_processing": case "completed":
             return "bg-green-500";
         case "waiting_for_confirmation":
             return "bg-blue-500";
+        case "declined":
+            return "bg-red-500";
         default:
             return "bg-gray-400";
     }
@@ -76,13 +80,13 @@ const OrderCard: React.FC<Props> = ({ order, onStatusChange, activeTab }) => {
     const navigate = useNavigate();
 
     return (
-        <div className="bg-white rounded-xl shadow-md p-4 w-full max-w-md">
+        <div className="bg-white rounded-xl shadow-md p-4 w-full cursor-pointer">
             <div className="flex justify-between">
-                <div className="text-sm text-gray-500">#{order._id}</div>
+                <div className="text-sm text-gray-500">#{order?.order_id}</div>
                 <div
                     className={`px-2 py-1 rounded-[20px] text-white text-sm font-medium ${getStatusColor(order.status)}`}
                 >
-                    {getStatusLabel(order.status)}
+                    {getStatusLabel(order?.status)}
                 </div>
             </div>
 
@@ -107,19 +111,21 @@ const OrderCard: React.FC<Props> = ({ order, onStatusChange, activeTab }) => {
                 <span className="flex items-center gap-2">
                     Total bill:
                     <span
-                        className={`px-2 py-1 rounded text-xs font-semibold ${order.billing_detail.payment_status === "captured"
+                        className={`px-2 py-1 rounded text-xs font-semibold ${(order?.billing_detail?.payment_status === "captured" || order?.payment_status === "captured")
                             ? "bg-green-100 text-green-700"
-                            : order.billing_detail.payment_status === "failed"
+                            : (order?.billing_detail?.payment_status === "failed" || order?.payment_status === "failed")
                                 ? "bg-red-100 text-red-700"
                                 : "bg-gray-100 text-gray-700"
                             }`}
                     >
-                        {order.billing_detail.payment_status === "captured"
-                            ? "Paid"
-                            : order.billing_detail.payment_status || "Unknown"}
+                        {
+                            (order?.billing_detail?.payment_status === "captured" || order?.payment_status === "captured")
+                                ? "Paid"
+                                : (order?.billing_detail?.payment_status || order?.payment_status || "Pending")
+                        }
                     </span>
                 </span>
-                <span>₹{Number(order.billing_detail.total_amount).toFixed(2)}</span>
+                <span>₹{Number(order?.billing_detail?.total_amount || order?.total_amount || 0).toFixed(2)}</span>
             </div>
 
             {activeTab === "new" && (

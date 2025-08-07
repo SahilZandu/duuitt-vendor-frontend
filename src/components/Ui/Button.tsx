@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import React from "react";
 
 type Variant =
   | "primary"
@@ -17,6 +18,8 @@ type Props = {
   className?: string;
   variant?: Variant;
   type?: "button" | "submit" | "reset";
+  iconLeft?: React.ReactNode;
+  iconRight?: React.ReactNode;
 };
 
 const variantClasses: Record<Variant, string> = {
@@ -37,6 +40,8 @@ const Button = ({
   className = "",
   variant = "primary",
   type = "button",
+  iconLeft,
+  iconRight,
 }: Props) => {
   return (
     <button
@@ -75,7 +80,10 @@ const Button = ({
           ></path>
         </svg>
       )}
-      {label}
+
+      {iconLeft && <span className="mr-1">{iconLeft}</span>}
+      <span>{label}</span>
+      {iconRight && <span className="ml-1">{iconRight}</span>}
     </button>
   );
 };

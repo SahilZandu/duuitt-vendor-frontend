@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import axiosInstance from "../../../api/apiInstance";
 import AddTeamMemberModal from "../../../components/modals/AddTeamMemberModal";
+import PageTitle from "../../../components/Ui/PageTitle";
+import Button from "../../../components/Ui/Button";
+import MenuIcon from "../../../lib/MenuIcon";
 
 interface TeamMember {
     _id: string;
@@ -92,13 +95,15 @@ const TeamManagement: React.FC = () => {
     return (
         <div className="p-6">
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Team Management</h2>
-                <button
+                <PageTitle title="Team Management"/>
+                <Button
                     onClick={() => setShowModal(true)}
+                    label="Add Team Member"
+                    iconLeft={<MenuIcon name="add"/>}
+                    variant="primary"
                     className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-                >
-                    + Add Team Member
-                </button>
+                />
+              
             </div>
             <DataTable
                 columns={columns}

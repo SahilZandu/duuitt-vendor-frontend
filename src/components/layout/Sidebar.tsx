@@ -19,22 +19,21 @@ const topMenuItems: MenuItem[] = [
   { label: "Food Menu", to: "/food-menu", icon: "food" },
   {
     label: "Outlet Info", to: "/outlet", icon: "outlet", children: [
-      { label: "Restaurant Profile", to: "/outlet/restaurant-profile", icon: "restaurant" },
-      { label: "Order History", to: "/outlet/order-history", icon: "order" },
-      { label: "Manage Profile", to: "/outlet/manage-profile", icon: "manage" },
+      { label: "Restaurant Profile", to: "/outlet/restaurant-profile", icon: "restaurant-profile" },
+      { label: "Order History", to: "/outlet/order-history", icon: "order-history" },
       { label: "Rating", to: "/outlet/rating", icon: "rating" },
       { label: "Payment Logs", to: "/outlet/payment-logs", icon: "payment" },
     ],
   },
   { label: "Messages", to: "/messages", icon: "message" },
-  { label: "Offers", to: "/offers", icon: "offer" },
+  { label: "Offers", to: "/offers", icon: "offers" },
   { label: "Timing", to: "/timings", icon: "time" },
   // { label: "KYC Documents", to: "/kyc", icon: "kyc" },
   // { label: "Reports", to: "/reports", icon: "report" },
 ];
 
 const bottomMenuItems: MenuItem[] = [
-  { label: "Settings", icon: "settings", to: "/setting" },
+  { label: "Settings", to: "/setting/manage-profile", icon: "settings" },
   // { label: "Get Help", to: "/help", icon: "help" },
   { label: "Sign out", to: "/logout", icon: "logout" },
 ];

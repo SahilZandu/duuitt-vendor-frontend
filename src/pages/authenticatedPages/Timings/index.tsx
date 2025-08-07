@@ -14,6 +14,7 @@ import type {
 } from '../../../types/types';
 import Loader from "../../../components/loader/Loader";
 import Switcher from "../../../components/Ui/Switcher";
+import MenuIcon from "../../../lib/MenuIcon";
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -457,7 +458,7 @@ const Timings: React.FC = () => {
                             <div className="flex justify-between">
                                 <h3 className="text-lg font-semibold">All Days</h3>
                                 {allDaySlots.length < 2 && (
-                                    <Button onClick={() => setIsTimeSlotOpen(true)} variant="primary" label="Add Timing" />
+                                    <Button onClick={() => setIsTimeSlotOpen(true)} variant="primary" label="Add Timing" iconLeft={<MenuIcon name="add" />}/>
                                 )}
                             </div>
 
@@ -473,6 +474,7 @@ const Timings: React.FC = () => {
                                                 <Button
                                                     variant="outline-success"
                                                     label="Edit"
+                                                    iconLeft={<MenuIcon name="edit" />}
                                                     onClick={() => {
                                                         setEditingSlot({ slotIndex: index, slotData: slot });
                                                         setIsTimeSlotOpen(true);
@@ -482,6 +484,7 @@ const Timings: React.FC = () => {
                                             <Button
                                                 variant="danger"
                                                 label="Delete"
+                                                 iconLeft={<MenuIcon name="delete" />}
                                                 onClick={() => {
                                                     setDeletingSlot({ type: 'all', slotId: slot.id, index });
                                                     setIsDeleteModalOpen(true);
@@ -543,6 +546,7 @@ const Timings: React.FC = () => {
                                             <Button
                                                 label="Add Timing"
                                                 variant="primary"
+                                                  iconLeft={<MenuIcon name="add" />}
                                                 onClick={() => {
                                                     setSelectedDay(day);
                                                     setIsTimeSlotOpen(true);
@@ -564,6 +568,7 @@ const Timings: React.FC = () => {
                                                         <Button
                                                             variant="outline-success"
                                                             label="Edit"
+                                                              iconLeft={<MenuIcon name="edit" />}
                                                             onClick={() => {
                                                                 setEditingSlot({ slotIndex: index, slotData: slot });
                                                                 setSelectedDay(day);
@@ -574,6 +579,7 @@ const Timings: React.FC = () => {
                                                     <Button
                                                         variant="danger"
                                                         label="Delete"
+                                                          iconLeft={<MenuIcon name="delete" />}
                                                         onClick={() => {
                                                             setDeletingSlot({ type: 'specific', slotId: slot.id, dayOfWeek: i, index });
                                                             setIsDeleteModalOpen(true);

@@ -11,6 +11,7 @@ interface RadioGroupProps {
   options: Option[];
   selected: string;
   onChange: (value: string) => void;
+  disabled:boolean;
 }
 
 const RadioButton: React.FC<RadioGroupProps> = ({
@@ -19,6 +20,7 @@ const RadioButton: React.FC<RadioGroupProps> = ({
   options,
   selected,
   onChange,
+  disabled,
 }) => {
   return (
     <div>
@@ -37,6 +39,7 @@ const RadioButton: React.FC<RadioGroupProps> = ({
                 name={name}
                 value={option.value}
                 checked={isSelected}
+                disabled={disabled}
                 onChange={() => onChange(option.value)}
                 className="sr-only"
               />

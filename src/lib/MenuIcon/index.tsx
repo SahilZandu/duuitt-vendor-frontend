@@ -19,6 +19,58 @@ const iconMap: Record<string, (className?: string) => JSX.Element> = {
             <path d="M4 21c0-4 4-6 8-6s8 2 8 6" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
     ),
+    "order-history": (className) => (
+        <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            className={className}
+            fill="none"
+            stroke="currentColor"
+        >
+            <path
+                d="M8 3H16C16.5523 3 17 3.44772 17 4V20L14.5 18.5L12 20L9.5 18.5L7 20V4C7 3.44772 7.44772 3 8 3Z"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <circle
+                cx="12"
+                cy="10"
+                r="3"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <path
+                d="M12 9V11L13 12"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    ),
+    rs: (className) => (
+        <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            className={className}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            {/* Horizontal lines */}
+            <path d="M6 4H18" />
+            <path d="M6 8H18" />
+
+            {/* Vertical curve for ₹ */}
+            <path d="M6 4C11 4 14 6 14 10C14 13.3137 11.3137 16 8 16H6L17 20" />
+        </svg>
+    ),
+
     settings: (className) => (
         <svg
             width="20"
@@ -35,6 +87,50 @@ const iconMap: Record<string, (className?: string) => JSX.Element> = {
             <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c0 .7.4 1.3 1 1.51H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
         </svg>
     ),
+    "restaurant-profile": (className) => (
+        <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            className={className}
+            fill="none"
+            stroke="currentColor"
+        >
+            {/* Map pin outline */}
+            <path
+                d="M12 21C12 21 5 14.5 5 9.5C5 6.46243 7.46243 4 10.5 4C13.5376 4 16 6.46243 16 9.5C16 14.5 12 21 12 21Z"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+
+            {/* Fork */}
+            <path
+                d="M10 7V10"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+            />
+            <path
+                d="M9.5 7V10"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+            />
+            <path
+                d="M10.5 7V10"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+            />
+
+            {/* Knife */}
+            <path
+                d="M13 7V10C13 10.5523 12.5523 11 12 11"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+            />
+        </svg>
+    ),
+
+
     restaurant: (className) => (
         <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
             <path d="M4 3h16v2H4V3zm1 4h14l-1.5 13.5H6.5L5 7zm4 2v9m6-9v9" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -68,6 +164,77 @@ const iconMap: Record<string, (className?: string) => JSX.Element> = {
             />
         </svg>
     ),
+    add: (className) => (
+        <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            className={className}
+            fill="none"
+            stroke="currentColor"
+        >
+            <line x1="12" y1="5" x2="12" y2="19" strokeWidth="1.5" strokeLinecap="round" />
+            <line x1="5" y1="12" x2="19" y2="12" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+    ),
+    edit: (className) => (
+        <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            className={className}
+            fill="none"
+            stroke="currentColor"
+        >
+            <path
+                d="M12.3 6.09998L17.9 11.7L8.59998 21H3V15.4L12.3 6.09998Z"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <path
+                d="M14.8 3.59998C15.2 3.19998 15.8 3.19998 16.2 3.59998L18.4 5.79998C18.8 6.19998 18.8 6.79998 18.4 7.19998L16.7 8.89998L14.1 6.29998L14.8 3.59998Z"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    ),
+    delete: (className) => (
+        <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            className={className}
+            fill="none"
+            stroke="currentColor"
+        >
+            <path
+                d="M3 6H5H21"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <path
+                d="M8 6V4C8 3.44772 8.44772 3 9 3H15C15.5523 3 16 3.44772 16 4V6M19 6V20C19 20.5523 18.5523 21 18 21H6C5.44772 21 5 20.5523 5 20V6H19Z"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <line x1="10" y1="11" x2="10" y2="17" strokeWidth="1.5" strokeLinecap="round" />
+            <line x1="14" y1="11" x2="14" y2="17" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+    ),
+    offers: (className) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
+            <path d="M4 7V5C4 3.89543 4.89543 3 6 3H8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M21 13L13 21L3 11V3H11L21 13Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <line x1="8" y1="16" x2="16" y2="8" strokeWidth="1.5" strokeLinecap="round" />
+            <circle cx="9" cy="9" r="1" fill="currentColor" />
+            <circle cx="15" cy="15" r="1" fill="currentColor" />
+        </svg>
+    ),
+
     dashboard: (className) => (
         <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
             <rect x="3" y="3" width="7" height="7" rx="1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -97,17 +264,17 @@ const iconMap: Record<string, (className?: string) => JSX.Element> = {
     ),
     food: (className) => (
         <svg
-          viewBox="0 0 24 24"
-          width="18"
-          height="18"
-          className={className}
-          fill="currentColor"
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            className={className}
+            fill="currentColor"
         >
-          <path d={mdiFood} />
+            <path d={mdiFood} />
         </svg>
-      ),
-      
-    
+    ),
+
+
 
     outlet: (className) => (
         <svg width="20" height="20" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor">
