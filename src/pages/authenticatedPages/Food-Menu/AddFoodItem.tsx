@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Icon from "@mdi/react";
-import { mdiDelete, mdiPlus } from "@mdi/js";
+import { mdiArrowLeft, mdiDelete, mdiPlus } from "@mdi/js";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance from "../../../api/apiInstance";
@@ -47,7 +47,7 @@ interface ProductData {
     default_quantity?: number;
 }
 
-const AddProduct = () => {
+const AddFoodItem = () => {
     const [dishCategories, setDishCategories] = useState<any[]>([]);
     const [productData, setProductData] = useState<ProductData>({
         name: "",
@@ -62,8 +62,8 @@ const AddProduct = () => {
         in_stock: true,
         recomended: false,
         image: null,
-        vendor_id: "",
-        restaurant_id: "",
+        // vendor_id: "",
+        // restaurant_id: "",
         title: "",
         product_timing: "full_time",
         default_quantity: 1,
@@ -92,6 +92,7 @@ const AddProduct = () => {
     const [maxSelectionLimit, setMaxSelectionLimit] = useState(1);
     const [isPriceRelated, setIsPriceRelated] = useState("");
     const [addonItems, setAddonItems] = useState<AddonItem[]>([]);
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const navigate = useNavigate();
 
@@ -194,8 +195,34 @@ const AddProduct = () => {
         updated[index].price = value;
         setCombinations(updated);
     };
+    const validateForm = (): boolean => {
+        const { name, description, selling_price, base_price, product_type, dish_category_id } = productData;
+        const newErrors: { [key: string]: string } = {};
+
+        if (!name.trim()) newErrors.name = "Product name is required.";
+        if (!description.trim()) newErrors.description = "Description is required.";
+        if (!dish_category_id) newErrors.dish_category_id = "Dish category is required.";
+
+        if (!base_price || isNaN(Number(base_price)) || Number(base_price) < 0) {
+            newErrors.base_price = "Enter a valid base price.";
+        }
+
+        if (!selling_price || isNaN(Number(selling_price)) || Number(selling_price) < 0) {
+            newErrors.selling_price = "Enter a valid selling price.";
+        }
+
+        if (product_type === "variable" && variantGroups.length < 2) {
+            newErrors.variantGroups = "At least two variant groups required for variable products.";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+
 
     const handleSubmit = async () => {
+        if (!validateForm()) return;
         try {
             // Create FormData for file upload
             const formData = new FormData();
@@ -273,6 +300,16 @@ const AddProduct = () => {
     return (
         <div className="p-6 max-w-5xl mx-auto">
             <h2 className="text-2xl font-bold mb-6">Add Product</h2>
+            <div className="flex items-center justify-between mb-6">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
+                >
+                    <Icon path={mdiArrowLeft} size={0.8} className="mr-2" />
+                    <span className="text-sm font-medium">Back</span>
+                </button>
+            </div>
+
 
             {/* Basic Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -287,6 +324,7 @@ const AddProduct = () => {
                         className="w-full px-3 py-2 border rounded"
                         required
                     />
+                    {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                 </div>
 
                 <div>
@@ -298,6 +336,8 @@ const AddProduct = () => {
                         className="w-full border rounded p-2"
                         rows={3}
                     />
+                    {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
+
                 </div>
 
                 {/* Product Type */}
@@ -331,6 +371,8 @@ const AddProduct = () => {
                             </option>
                         ))}
                     </select>
+                    {errors.dish_category_id && <p className="text-red-500 text-sm">{errors.dish_category_id}</p>}
+
                 </div>
 
                 {/* Prices */}
@@ -343,6 +385,8 @@ const AddProduct = () => {
                         onChange={handleInputChange}
                         className="w-full border rounded p-2"
                     />
+                    {errors.base_price && <p className="text-red-500 text-sm">{errors.base_price}</p>}
+
                 </div>
 
                 <div>
@@ -355,6 +399,8 @@ const AddProduct = () => {
                         className="w-full border rounded p-2"
                         required
                     />
+                    {errors.selling_price && <p className="text-red-500 text-sm">{errors.selling_price}</p>}
+
                 </div>
 
                 {/* Tag */}
@@ -381,27 +427,6 @@ const AddProduct = () => {
                     />
                 </div>
 
-                <div>
-                    <label className="block font-medium mb-1">Vendor ID</label>
-                    <input
-                        type="text"
-                        name="vendor_id"
-                        value={productData.vendor_id}
-                        onChange={handleInputChange}
-                        className="w-full border rounded p-2"
-                    />
-                </div>
-
-                <div>
-                    <label className="block font-medium mb-1">Restaurant ID</label>
-                    <input
-                        type="text"
-                        name="restaurant_id"
-                        value={productData.restaurant_id}
-                        onChange={handleInputChange}
-                        className="w-full border rounded p-2"
-                    />
-                </div>
 
                 <div>
                     <label className="block font-medium mb-1">Product Timing</label>
@@ -457,6 +482,7 @@ const AddProduct = () => {
                         <img
                             src={imagePreview}
                             alt="Preview"
+                             crossOrigin="anonymous"
                             className="w-32 h-32 mt-2 object-cover border rounded"
                         />
                     )}
@@ -573,6 +599,8 @@ const AddProduct = () => {
                             Generate Combinations
                         </button>
                     )}
+                    {errors.variantGroups && <p className="text-red-500 text-sm">{errors.variantGroups}</p>}
+
 
                     {combinations.length > 0 && (
                         <div className="mt-6">
@@ -740,4 +768,4 @@ const AddProduct = () => {
     );
 };
 
-export default AddProduct;
+export default AddFoodItem;

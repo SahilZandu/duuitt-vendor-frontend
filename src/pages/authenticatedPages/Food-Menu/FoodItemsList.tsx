@@ -3,6 +3,8 @@ import axiosInstance from "../../../api/apiInstance";
 import CommonCard from "../../../components/Ui/CommonCard";
 import type { FoodItem } from "../../../types/types";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import DeleteConfirmationModal from "../../../components/modals/DeleteConfirmationModal";
 
 const FoodList = () => {
     const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
@@ -12,25 +14,31 @@ const FoodList = () => {
     const [search, setSearch] = useState("");
     const [vegFilter, setVegFilter] = useState("All");
     const [tagFilter, setTagFilter] = useState("All");
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const navigate = useNavigate();
+    const [deleting, setDeleting] = useState(false);
+    console.log(deleting,'deleting')
 
     const IMAGE_BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL;
 
-    useEffect(() => {
-        const fetchFoodItems = async () => {
-            try {
-                const restaurant_id = localStorage.getItem("restaurant_id");
-                const response = await axiosInstance("post", "/food-item/all", { restaurant_id });
-                const data = response.data.data || [];
-                setFoodItems(data);
-                setFilteredItems(data);
-            } catch (error) {
-                console.error("Error fetching food items:", error);
-            }
-        };
+    const fetchFoodItems = async () => {
+        try {
+            const restaurant_id = localStorage.getItem("restaurant_id");
+            const response = await axiosInstance("post", "/food-item/all", { restaurant_id });
+            const data = response.data.data || [];
+            setFoodItems(data);
+            setFilteredItems(data);
+        } catch (error) {
+            console.error("Error fetching food items:", error);
+        }
+    };
 
+    useEffect(() => {
         fetchFoodItems();
     }, []);
+
 
     useEffect(() => {
         filterItems();
@@ -65,6 +73,39 @@ const FoodList = () => {
             setLoadingMore(false);
         }, 800); // Simulated delay
     };
+    const handleDeleteClick = (id: string) => {
+        setSelectedItemId(id);
+        setShowDeleteModal(true);
+    };
+    const confirmDelete = async () => {
+        if (!selectedItemId) return;
+    
+        setDeleting(true); // Start loader
+    
+        try {
+            const response = await axiosInstance("post", "/food-item/delete", {
+                restaurant_id: localStorage.getItem("restaurant_id"),
+                dish_item_id: selectedItemId,
+            });
+    
+            if (response?.data) {
+                toast.success("Item deleted successfully.");
+                await fetchFoodItems(); // Refresh list
+            } else {
+                toast.error("Unexpected response from server.");
+            }
+        } catch (error) {
+            toast.error("Failed to delete item.");
+            console.error("Delete Error:", error);
+        } finally {
+            setDeleting(false); // Stop loader
+            setShowDeleteModal(false);
+            setSelectedItemId(null);
+        }
+    };
+    
+
+
 
     return (
         <div className="p-4 h-[100vh] flex flex-col">
@@ -129,8 +170,12 @@ const FoodList = () => {
                                 vegNonVeg={item.veg_nonveg}
                                 tag={item.tag}
                                 onViewDetails={() => navigate(`/food-item/${item._id}`)}
-                                onEdit={() => console.log("Edit:", item._id)}
-                                onDelete={() => console.log("Delete:", item._id)}
+                                onEdit={() =>
+                                    navigate('/food-item/edit', {
+                                        state: { itemId: item._id, item }, // pass anything you want
+                                    })
+                                }
+                                onDelete={() => handleDeleteClick(item._id)}
                             />
                         </div>
                     ))}
@@ -154,6 +199,12 @@ const FoodList = () => {
                     <p className="text-center text-gray-500 mt-10">No food items found.</p>
                 )}
             </div>
+            <DeleteConfirmationModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={confirmDelete}
+                loading={deleting}
+            />
         </div>
     );
 };
