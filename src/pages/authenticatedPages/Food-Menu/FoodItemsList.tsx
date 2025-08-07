@@ -19,7 +19,7 @@ const FoodList = () => {
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const navigate = useNavigate();
     const [deleting, setDeleting] = useState(false);
-    console.log(deleting,'deleting')
+    console.log(deleting,'defdsafsdadleting')
 
     const IMAGE_BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL;
 
