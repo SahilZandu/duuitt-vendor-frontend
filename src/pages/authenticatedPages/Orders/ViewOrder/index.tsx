@@ -124,7 +124,7 @@ const ViewOrder = () => {
         ))}
       </ul>
 
-      <div className="mt-4 border-t pt-4 space-y-2 text-sm">
+      <div className="mt-4 pt-4 space-y-2 text-sm">
         <div className="flex justify-between">
           <span>Item total</span>
           <span>₹{order?.total_amount}</span>

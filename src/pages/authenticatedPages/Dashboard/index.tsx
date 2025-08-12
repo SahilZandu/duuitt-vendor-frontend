@@ -49,10 +49,10 @@ const Dashboard: React.FC = () => {
   const getStatusColor = (status: OrderStatus) => {
     switch (status) {
       case "cooking":
-        return "bg-orange-500";
+        return "bg-green-500";
       case "ready_to_pickup":
       case "packing_processing": case "completed":
-        return "bg-green-500";
+        return "bg-orange-500";
       case "waiting_for_confirmation":
         return "bg-blue-500";
       case "declined":
@@ -61,6 +61,24 @@ const Dashboard: React.FC = () => {
         return "bg-gray-400";
     }
   };
+  const getStatusLabel = (status: OrderStatus) => {
+    switch (status) {
+        case "cooking":
+            return "Preparing";
+        case "ready_to_pickup":
+            return "Ready to Pickup";
+        case "waiting_for_confirmation":
+            return "New";
+        case "packing_processing":
+            return "Packing";
+        case "completed":
+            return "Completed";
+        case "declined":
+            return "Declined";
+        default:
+            return "Unknown";
+    }
+};
   if (loading) {
     return (
       <Loader />
@@ -157,7 +175,7 @@ const Dashboard: React.FC = () => {
                   onReject={async (orderId: string) => {
                     console.log("Rejected order:", orderId);
                   }}
-                  activeTab={"new"} />
+                  activeTab={"cooking"} />
               </div>
             ))}
           </div>
@@ -171,7 +189,7 @@ const Dashboard: React.FC = () => {
                 <div><strong>Invoice No:</strong> {selectedOrder?.invoice_no}</div>
                 <div><strong>Order ID:</strong> {selectedOrder?.order_id}</div>
                 <div><strong>Transaction ID:</strong> {selectedOrder?.transaction_id}</div>
-                <div><strong>Status:</strong> <span className={`capitalize px-2 py-1 rounded-[20px] text-white ${getStatusColor(selectedOrder.status)}`}>{selectedOrder?.status}</span></div>
+                <div><strong>Status:</strong> <span className={`capitalize px-2 py-1 rounded-[20px] text-white ${getStatusColor(selectedOrder.status)}`}>{getStatusLabel(selectedOrder?.status)}</span></div>
                 <div><strong>Verification Code:</strong> {selectedOrder?.verification_code}</div>
                 <div><strong>Cooking Time:</strong> {selectedOrder?.cooking_time}</div>
                 <div><strong>Distance (km):</strong> {selectedOrder?.distance_from_customer}</div>
