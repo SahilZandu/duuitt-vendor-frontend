@@ -14,6 +14,7 @@ interface CheckboxGroupProps {
   disabled?: boolean;
   required?: boolean;
   error?: string;
+  className?: string;
 }
 
 const CheckBox: React.FC<CheckboxGroupProps> = ({
@@ -24,6 +25,7 @@ const CheckBox: React.FC<CheckboxGroupProps> = ({
   onChange,
   disabled = false,
   required = false,
+  className,
   error,
 }) => {
   const toggleValue = (value: string) => {
@@ -45,8 +47,8 @@ const CheckBox: React.FC<CheckboxGroupProps> = ({
         </label>
       )}
 
-      <div className="flex flex-wrap gap-6 mt-2">
-        {options.map((option) => {
+      <div className={`flex flex-wrap gap-6 mt-2 ${className}`}>
+        {options && options.map((option) => {
           const isSelected = selected && selected?.includes(option.value);
 
           return (
@@ -83,7 +85,7 @@ const CheckBox: React.FC<CheckboxGroupProps> = ({
                   </svg>
                 )}
               </span>
-              <span className={isSelected ? "text-green-700 font-medium" : "text-gray-700"}>
+              <span className={"text-black-700 font-semibold"}>
                 {option.label}
               </span>
             </label>

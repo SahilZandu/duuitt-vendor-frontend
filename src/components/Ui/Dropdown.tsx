@@ -61,7 +61,7 @@ const Dropdown: React.FC<Props> = ({
         className={baseClass}
         required={required}
       >
-        <option value="" disabled>
+        <option value="" disabled className="text-gray-800">
           {placeholder}
         </option>
         {options && options?.length > 0 && options?.map(({ label, value }) => (

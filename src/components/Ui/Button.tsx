@@ -8,6 +8,7 @@ type Variant =
   | "outline"
   | "success"
   | "soft-success"
+  | "primary-outline"
   | "outline-success";
 
 type Props = {
@@ -30,6 +31,7 @@ const variantClasses: Record<Variant, string> = {
   success: "bg-green-600 hover:bg-green-700 text-white",
   "soft-success": "bg-green-100 text-green-700",
   "outline-success": "border border-green-500 text-green-600 bg-white hover:bg-green-50",
+  "primary-outline": "border border-purple-500 text-purple-600 font-bold bg-white hover:bg-purple-50",
 };
 
 const Button = ({

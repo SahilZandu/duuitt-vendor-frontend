@@ -22,6 +22,7 @@ import FoodItemDetail from "../pages/authenticatedPages/Food-Menu/FoodItemDetail
 import FoodItemEdit from "../pages/authenticatedPages/Food-Menu/FoodItemEdit";
 import AddFoodItem from "../pages/authenticatedPages/Food-Menu/AddFoodItem";
 import FoodMenu from "../pages/authenticatedPages/Food-Menu";
+import AddTeamMember from "../pages/authenticatedPages/team/AddTeamMember";
 
 
 const AppRoutes = () => {
@@ -45,6 +46,8 @@ const AppRoutes = () => {
           <Route path="/outlet/order-history" element={<OrderHistory />} />
           <Route path="/outlet/order-history/view/:id" element={<ViewOrderDetails />} />
           <Route path="/team" element={<TeamManagement />} />
+          <Route path="/team/add-team-member" element={<AddTeamMember />} />
+          
           <Route path="/outlet/restaurant-profile" element={<RestaurantProfile />} />
           <Route path="/outlet/rating" element={<Rating />} />
           <Route path="/outlet/payment-logs" element={<PaymentLogs />} />
@@ -61,7 +64,7 @@ const AppRoutes = () => {
 
           <Route path="/add-product" element={<AddFoodItem />} />
           <Route path="/food-item/edit" element={<FoodItemEdit />} />
-          
+
         </Route>
       </Route>
 

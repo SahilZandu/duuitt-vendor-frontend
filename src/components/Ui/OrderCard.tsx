@@ -42,10 +42,11 @@ interface Props {
 const getStatusColor = (status: OrderStatus) => {
     switch (status) {
         case "cooking":
-            return "bg-orange-500";
-        case "ready_to_pickup":
-        case "packing_processing": case "completed":
             return "bg-green-500";
+        case "ready_to_pickup":
+            return "bg-orange-500";
+        case "packing_processing": case "completed":
+            return "bg-orange-500";
         case "waiting_for_confirmation":
             return "bg-blue-500";
         case "declined":
@@ -65,7 +66,7 @@ const getStatusLabel = (status: OrderStatus) => {
         case "waiting_for_confirmation":
             return "New";
         case "packing_processing":
-            return "Packing Processing";
+            return "Packing";
         case "completed":
             return "Completed";
         case "declined":
@@ -107,12 +108,12 @@ const OrderCard: React.FC<Props> = ({ order, onStatusChange, activeTab }) => {
                 ))}
             </ul>
 
-            <div className="mt-2 border-t pt-2 text-sm font-medium flex justify-between">
+            <div className="mt-2 border-t-2 border-dashed border-gray-300 pt-2 text-sm font-medium flex justify-between">
                 <span className="flex items-center gap-2">
                     Total bill:
                     <span
                         className={`px-2 py-1 rounded text-xs font-semibold ${(order?.billing_detail?.payment_status === "captured" || order?.payment_status === "captured")
-                            ? "bg-green-100 text-green-700"
+                            ? "bg-gray-100 text-gray-700"
                             : (order?.billing_detail?.payment_status === "failed" || order?.payment_status === "failed")
                                 ? "bg-red-100 text-red-700"
                                 : "bg-gray-100 text-gray-700"
@@ -144,10 +145,12 @@ const OrderCard: React.FC<Props> = ({ order, onStatusChange, activeTab }) => {
                     </div>
                 </div>
             )}
+            {order?.instructions && (
+                <div className="mt-2 bg-gray-100 p-2 text-xs text-gray-700 rounded">
+                    <strong>Instructions:</strong> {order?.instructions || "No Instructions given!"}
+                </div>
+            )}
 
-            <div className="mt-2 bg-gray-100 p-2 text-xs text-gray-700 rounded">
-                <strong>Instructions:</strong> {order.instructions || "No Instructions given!"}
-            </div>
 
             <div className="mt-3">
                 {activeTab === "new" ? (
@@ -206,7 +209,7 @@ const OrderCard: React.FC<Props> = ({ order, onStatusChange, activeTab }) => {
                     <div className="flex flex-col gap-3">
                         <Button
                             label={order.cart_items.length > 2 ? "View More" : "View Details"}
-                            variant="outline-success"
+                            variant="primary-outline"
                             onClick={() => navigate(`/orders/view-order/${order?.order_id}`)}
                         />
                     </div>

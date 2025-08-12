@@ -6,7 +6,9 @@ export const vendorProfileSchema = Yup.object().shape({
     .max(100, "Name cannot exceed 100 characters"),
   phone: Yup.string()
     .required("Phone number is required")
-    .matches(/^[0-9]{10}$/, "Phone must be 10 digits"),
+    .test("only-numbers", "Only numbers are allowed", (value) =>
+      value ? /^[0-9]+$/.test(value) : true
+    ),
   email: Yup.string()
     .email("Invalid email")
     .required("Email is required"),

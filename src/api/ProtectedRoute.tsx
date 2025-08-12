@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import axiosInstance from "../api/apiInstance";
+import Loader from "../components/loader/Loader";
 
 const ProtectedRoute = () => {
   const token = localStorage.getItem("accessToken");
@@ -52,7 +53,7 @@ const ProtectedRoute = () => {
     fetchVendor();
   }, [token, vendor_id, location.pathname]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loader />;
 
   // ✅ If already KYC done, don't allow access to /vendor-kyc again
   if (token && is_kyc_completed === "true" && location.pathname === "/vendor-kyc") {

@@ -5,12 +5,27 @@ import Tabs from "../../../components/Ui/Tabs";
 import NoDataFound from "../../../components/Ui/NoDataFound";
 import Loader from "../../../components/loader/Loader";
 import { toast } from "react-toastify";
+interface OrderCounts {
+    all: number;
+    new: number;
+    cooking: number;
+    packing: number;
+    ready: number;
+}
+
 
 const Orders = () => {
     const restaurantId = localStorage.getItem("restaurant_id") || "";
 
     const [orders, setOrders] = useState<Order[]>([]);
     console.log({ orders });
+    const [orderCounts, setOrderCounts] = useState<OrderCounts>({
+        all: 0,
+        new: 0,
+        cooking: 0,
+        packing: 0,
+        ready: 0,
+    });
 
     const [activeTab, setActiveTab] = useState<string>("all");
     console.log({ activeTab });
@@ -42,6 +57,25 @@ const Orders = () => {
             setLoading(false);
         }
     };
+    const loadOrderCounts = async () => {
+        try {
+            const all = await getOrderStatus({ restaurant_id: restaurantId, status: "all" });
+            const newOrders = await fetchWaitingOrders(restaurantId);
+            const cooking = await getOrderStatus({ restaurant_id: restaurantId, status: "cooking" });
+            const packing = await getOrderStatus({ restaurant_id: restaurantId, status: "packing_processing" });
+            const ready = await getOrderStatus({ restaurant_id: restaurantId, status: "ready_to_pickup" });
+
+            setOrderCounts({
+                all: all.length,
+                new: newOrders.length,
+                cooking: cooking.length,
+                packing: packing.length,
+                ready: ready.length,
+            });
+        } catch (error) {
+            console.error("Error loading order counts:", error);
+        }
+    };
 
     const handleStatusChange = async (orderId: string, status: string, time?: number) => {
         const payload: any = {
@@ -64,6 +98,7 @@ const Orders = () => {
     };
     useEffect(() => {
         loadOrders(activeTab);
+        loadOrderCounts()
     }, [activeTab]);
 
     const handleRejectOrder = async (orderId: string) => {
@@ -79,12 +114,13 @@ const Orders = () => {
 
     // Tab options based on new order condition
     const tabOptions = [
-        { label: "All", value: "all", icon: "all" },
-        { label: "New Orders", value: "new", icon: "new" },
-        { label: "Preparing", value: "cooking", icon: "cooking" },
-        { label: "Packing", value: "packing", icon: "packing" },
-        { label: "Ready for Pickup", value: "ready", icon: "ready" },
+        { label: `All Orders (${orderCounts?.all})`, value: "all", icon: "all" },
+        { label: `New Orders (${orderCounts?.new})`, value: "new", icon: "new" },
+        { label: `Preparing (${orderCounts.cooking})`, value: "cooking", icon: "cooking" },
+        { label: `Packed (${orderCounts.packing})`, value: "packing", icon: "packing" },
+        { label: `Ready (${orderCounts.ready})`, value: "ready", icon: "ready" },
     ];
+
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
