@@ -82,7 +82,7 @@ const Button = ({
       )}
 
       {iconLeft && <span className="mr-1">{iconLeft}</span>}
-      <span>{label}</span>
+      {label && <span>{label}</span>}
       {iconRight && <span className="ml-1">{iconRight}</span>}
     </button>
   );

@@ -175,7 +175,7 @@ const PaymentLogs = () => {
                     progressPending={loading}
                     pagination={true}
                     highlightOnHover
-                    noDataComponent={<NoDataFound />}
+                    noDataComponent={<NoDataFound  message="No Payment Logs Found"/>}
                     paginationRowsPerPageOptions={[10, 25, 50]}
                     paginationPerPage={25}
                     paginationComponentOptions={{

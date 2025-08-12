@@ -4,6 +4,7 @@ import MenuIcon from "../../../lib/MenuIcon";
 import Loader from "../../../components/loader/Loader";
 import OrderCard from "../../../components/Ui/OrderCard";
 import type { OrderStatus } from "../../../types/types";
+import NoDataFound from "../../../components/Ui/NoDataFound";
 interface DashboardData {
   orders: {
     total: number;
@@ -236,7 +237,7 @@ const Dashboard: React.FC = () => {
             </div>
 
           ) : (
-            <p className="text-sm text-gray-500">Click on an order to view its details.</p>
+            <NoDataFound message="Click on an order to view its details."/>
           )}
         </div>
       </div>

@@ -7,6 +7,9 @@ import type { TableColumn } from 'react-data-table-component';
 import axiosInstance from "../../../api/apiInstance";
 import DataTable from 'react-data-table-component';
 import PageTitle from '../../../components/Ui/PageTitle';
+import { toast } from 'react-toastify';
+import NoDataFound from '../../../components/Ui/NoDataFound';
+import Loader from '../../../components/loader/Loader';
 
 interface Offer {
     _id?: string;
@@ -19,9 +22,11 @@ interface Offer {
         first_order_of_day?: boolean;
         new_users_only?: boolean;
         time_window_end?: string;
+        valid_from?: string;
+        valid_until?: string;
     };
     createdAt?: string;
-    status?: boolean | string;
+    is_vendor_accepted?: boolean | string;
 }
 
 // Replace this with your actual date formatting function
@@ -36,7 +41,23 @@ const OfferManagement = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // const navigate = useNavigate();
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [searchText, setSearchText] = useState("");
+
+    // Filter logic
+    const filteredOffers = offers.filter((offer) => {
+        const matchesStatus =
+            statusFilter === "all" ||
+            (statusFilter === "active" && offer.is_vendor_accepted === true) ||
+            (statusFilter === "inactive" && offer.is_vendor_accepted !== true);
+
+        const matchesSearch =
+            offer.title?.toLowerCase().includes(searchText.toLowerCase()) ||
+            offer.referral_code?.toLowerCase().includes(searchText.toLowerCase());
+
+        return matchesStatus && matchesSearch;
+    });
+
 
     const fetchOffers = async () => {
         setLoading(true);
@@ -58,23 +79,27 @@ const OfferManagement = () => {
         fetchOffers();
     }, []);
 
-    // const handleEdit = (offer: Offer) => {
-    //     if (offer._id) {
-    //         navigate(`/offers/edit/${offer._id}`);
-    //     }
-    // };
+    const handleToggleOfferStatus = async (offer: Offer) => {
+        const updatedStatus = !(offer.is_vendor_accepted === true);
 
-    // const handleDelete = async (offer: Offer) => {
-    //     if (!offer._id) return;
-    //     try {
-    //         await axiosInstance("delete", `/offers/delete/${offer._id}`);
-    //         toast.success('Offer deleted successfully');
-    //         fetchOffers();
-    //     } catch (err) {
-    //         console.error('Delete error:', err);
-    //         toast.error('Failed to delete offer');
-    //     }
-    // };
+        try {
+            const response = await axiosInstance("post", "/offers/vendor-offer-status", {
+                offer_id: offer._id,
+                is_vendor_accepted: updatedStatus,
+            });
+            console.log("response", response);
+
+            toast.success(response?.data?.message || "")
+            // Update the local state optimistically
+            setOffers(prev =>
+                prev.map(o => o._id === offer._id ? { ...o, is_vendor_accepted: updatedStatus } : o)
+            );
+        } catch (error) {
+            console.error("Failed to update offer status", error);
+            alert("Failed to update offer status. Please try again.");
+        }
+    };
+
 
     const columns: TableColumn<Offer>[] = [
         {
@@ -116,96 +141,101 @@ const OfferManagement = () => {
             width: '140px',
         },
         {
-            name: 'Expiry Date',
-            selector: (row: Offer) =>
-                row.usage_conditions?.time_window_end
-                    ? formatDate(row.usage_conditions.time_window_end)
-                    : 'N/A',
-            width: '170px',
-        },
-        {
-            name: 'Created',
-            selector: (row: Offer) => formatDate(row.createdAt),
+            name: 'Valid From',
+            selector: (row: Offer) => formatDate(row?.usage_conditions?.valid_from),
             sortable: true,
             width: '160px',
         },
         {
-            name: 'Status',
-            cell: (row: Offer) => (
-                <span
-                    className={`px-2 py-1 rounded text-white text-xs ${row.status === true || row.status === 'true'
-                            ? 'bg-green-500'
-                            : 'bg-red-500'
-                        }`}
-                >
-                    {row.status === true || row.status === 'true' ? 'Active' : 'Inactive'}
-                </span>
-            ),
-            sortable: true,
-            width: '100px',
+            name: 'Valid Till',
+            selector: (row: Offer) => formatDate(row?.usage_conditions?.valid_until),
+            width: '170px',
         },
-        // {
-        //     name: 'Actions',
-        //     cell: (row: Offer) => (
-        //         <div className="flex gap-2">
-        //             <div
-        //                 onClick={() => handleEdit(row)}
-        //                 className="cursor-pointer p-1"
-        //                 title="Edit Coupon"
-        //             >
-        //                 <Icon path={mdiPencil} size={0.8} color="green" />
-        //             </div>
-        //             <div
-        //                 onClick={() => handleDelete(row)}
-        //                 className="cursor-pointer p-1"
-        //                 title="Delete Coupon"
-        //             >
-        //                 <Icon path={mdiTrashCan} size={0.8} color="red" />
-        //             </div>
-        //         </div>
-        //     ),
-        //     width: '150px',
-        // },
+        {
+            name: 'Active/Inactive Offer',
+            cell: (row: Offer) => (
+                <label className="inline-flex items-center cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={row.is_vendor_accepted === true}
+                        onChange={() => handleToggleOfferStatus(row)}
+                        className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500 rounded-full peer dark:bg-gray-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600 relative"></div>
+                </label>
+            ),
+            width: '140px',
+        }
+
     ];
 
     return (
         <div className="page">
-            <PageTitle title="Offer List"/>
 
-            {error && <p className="text-red-500 mb-4">{error}</p>}
+            <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
+                <PageTitle title="Offer List" />
 
-            <div className="bg-white shadow-md rounded-lg overflow-hidden">
-                <DataTable
-                    columns={columns}
-                    data={offers}
-                    progressPending={loading}
-                    pagination
-                    highlightOnHover
-                    noDataComponent={<div className="py-4 text-gray-600">No offers found</div>}
-                    paginationRowsPerPageOptions={[10, 25, 50]}
-                    paginationPerPage={25}
-                    paginationComponentOptions={{
-                        rowsPerPageText: 'Rows per page:',
-                        rangeSeparatorText: 'of',
-                    }}
-                    customStyles={{
-                        rows: {
-                            style: {
-                                borderBottom: '1px solid #e5e7eb',
-                                fontSize: 14,
-                            },
-                        },
-                        headRow: {
-                            style: {
-                                fontWeight: 500,
-                                fontSize: 16,
-                                color: '#fff',
-                                backgroundColor: '#a855f7',
-                            },
-                        },
-                    }}
-                />
+                {/* Filters */}
+                <div className="flex justify-between items-center gap-4 mb-4">
+                    <div className="flex items-center gap-2">
+                        <select
+                            id="statusFilter"
+                            className="border px-3 py-2 rounded-md"
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                        >
+                            <option value="all">All</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <input
+                        type="text"
+                        placeholder="Search by title or code..."
+                        className="border px-3 py-2 rounded-md w-full max-w-xs"
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                    />
+                </div>
             </div>
+            {error && <p className="text-red-500 mb-4">{error}</p>}
+            {loading ? (
+                <Loader />
+            ) : (
+                <div className="bg-white shadow-md rounded-lg overflow-hidden">
+                    <DataTable
+                        columns={columns}
+                        data={filteredOffers}
+                        progressPending={loading}
+                        pagination
+                        noDataComponent={<NoDataFound message="No Offers Found" />}
+                        highlightOnHover
+                        paginationRowsPerPageOptions={[10, 25, 50]}
+                        paginationPerPage={25}
+                        paginationComponentOptions={{
+                            rowsPerPageText: 'Rows per page:',
+                            rangeSeparatorText: 'of',
+                        }}
+                        customStyles={{
+                            rows: {
+                                style: {
+                                    borderBottom: '1px solid #e5e7eb',
+                                    fontSize: 14,
+                                },
+                            },
+                            headRow: {
+                                style: {
+                                    fontWeight: 500,
+                                    fontSize: 16,
+                                    color: '#fff',
+                                    backgroundColor: '#a855f7',
+                                },
+                            },
+                        }}
+                    />
+                </div>
+            )}
         </div>
     );
 };
