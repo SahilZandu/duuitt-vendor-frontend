@@ -18,11 +18,10 @@ import OfferManagement from "../pages/authenticatedPages/offer/OfferManagement";
 import Orders from "../pages/authenticatedPages/Orders";
 import ViewOrder from "../pages/authenticatedPages/Orders/ViewOrder";
 import Timings from "../pages/authenticatedPages/Timings";
-import FoodItemsList from "../pages/authenticatedPages/Food-Menu/FoodItemsList";
 import FoodItemDetail from "../pages/authenticatedPages/Food-Menu/FoodItemDetail";
-
 import FoodItemEdit from "../pages/authenticatedPages/Food-Menu/FoodItemEdit";
 import AddFoodItem from "../pages/authenticatedPages/Food-Menu/AddFoodItem";
+import FoodMenu from "../pages/authenticatedPages/Food-Menu";
 
 
 const AppRoutes = () => {
@@ -55,7 +54,7 @@ const AppRoutes = () => {
           <Route path="/orders/view-order/:id" element={<ViewOrder />} />
           {/* Timings */}
           <Route path="/timings" element={<Timings />} />
-          <Route path="/food-menu" element={<FoodItemsList />} />
+          <Route path="/food-menu" element={<FoodMenu />} />
           <Route path="/food-item/:id" element={<FoodItemDetail />} />
           {/* ....Setting.... */}
           <Route path="/setting/manage-profile" element={<VendorProfile />} />

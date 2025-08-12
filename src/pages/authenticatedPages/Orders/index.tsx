@@ -12,7 +12,7 @@ const Orders = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     console.log({ orders });
 
-    const [activeTab, setActiveTab] = useState<string>("new");
+    const [activeTab, setActiveTab] = useState<string>("all");
     console.log({ activeTab });
 
     const [loading, setLoading] = useState<boolean>(false);
@@ -79,11 +79,11 @@ const Orders = () => {
 
     // Tab options based on new order condition
     const tabOptions = [
+        { label: "All", value: "all", icon: "all" },
         { label: "New Orders", value: "new", icon: "new" },
         { label: "Preparing", value: "cooking", icon: "cooking" },
         { label: "Packing", value: "packing", icon: "packing" },
         { label: "Ready for Pickup", value: "ready", icon: "ready" },
-        { label: "All", value: "all", icon: "all" },
     ];
 
     const handleTabChange = (tab: string) => {

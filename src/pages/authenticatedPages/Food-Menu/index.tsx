@@ -4,9 +4,9 @@ import CommonCard from "../../../components/Ui/CommonCard";
 import type { FoodItem } from "../../../types/types";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import DeleteConfirmationModal from "../../../components/modals/DeleteConfirmationModal";
+import DeleteModal from "../../../components/modals/DeleteModal";
 
-const FoodList = () => {
+const FoodMenu = () => {
     const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
     const [filteredItems, setFilteredItems] = useState<FoodItem[]>([]);
     const [visibleCount, setVisibleCount] = useState(9);
@@ -14,12 +14,11 @@ const FoodList = () => {
     const [search, setSearch] = useState("");
     const [vegFilter, setVegFilter] = useState("All");
     const [tagFilter, setTagFilter] = useState("All");
-
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const navigate = useNavigate();
     const [deleting, setDeleting] = useState(false);
-    console.log(deleting,'deleting')
+    console.log(deleting, 'deleting')
 
     const IMAGE_BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL;
 
@@ -79,15 +78,15 @@ const FoodList = () => {
     };
     const confirmDelete = async () => {
         if (!selectedItemId) return;
-    
+
         setDeleting(true); // Start loader
-    
+
         try {
             const response = await axiosInstance("post", "/food-item/delete", {
                 restaurant_id: localStorage.getItem("restaurant_id"),
                 dish_item_id: selectedItemId,
             });
-    
+
             if (response?.data) {
                 toast.success("Item deleted successfully.");
                 await fetchFoodItems(); // Refresh list
@@ -103,14 +102,11 @@ const FoodList = () => {
             setSelectedItemId(null);
         }
     };
-    
-
-
 
     return (
         <div className="p-4 h-[100vh] flex flex-col">
             {/* Sticky Filters */}
-            <div className="bg-white z-10 sticky top-0 py-4 flex flex-wrap gap-4 items-center justify-between border-b">
+            <div className="bg-white z-10 sticky top-0 p-4 flex flex-wrap gap-4 items-center justify-between border-b">
                 <div className="flex flex-wrap gap-4 w-full sm:w-auto">
                     <input
                         type="text"
@@ -199,14 +195,18 @@ const FoodList = () => {
                     <p className="text-center text-gray-500 mt-10">No food items found.</p>
                 )}
             </div>
-            <DeleteConfirmationModal
+    
+            <DeleteModal
                 isOpen={showDeleteModal}
-                onClose={() => setShowDeleteModal(false)}
-                onConfirm={confirmDelete}
-                loading={deleting}
+                title="Delete Restaurant Image"
+                onClose={() => {
+                    setShowDeleteModal(false);
+                }}
+                onDelete={confirmDelete}
             />
+
         </div>
     );
 };
 
-export default FoodList;
+export default FoodMenu;

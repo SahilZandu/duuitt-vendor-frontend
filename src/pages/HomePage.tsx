@@ -22,7 +22,7 @@ const HomePage = () => {
 
   const navigate = useNavigate();
 
-  const isValidPhone = (phone: string) => /^[6-9]\d{9}$/.test(phone);
+  // const isValidPhone = (phone: string) => /^[6-9]\d{9}$/.test(phone);
 
   const handleLogin = async () => {
     setError("");
@@ -31,10 +31,10 @@ const HomePage = () => {
       setError("Phone number is required.");
       return;
     }
-    if (!isValidPhone(phone)) {
-      setError("Please enter a valid 10-digit mobile number.");
-      return;
-    }
+    // if (!isValidPhone(phone)) {
+    //   setError("Please enter a valid 10-digit mobile number.");
+    //   return;
+    // }
     setIsLoggingIn(true);
     try {
       const response = await axiosInstance("post", "/vendor", {

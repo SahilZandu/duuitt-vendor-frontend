@@ -1,38 +1,35 @@
 import React from "react";
 import clsx from "clsx";
 
+interface Option {
+  label: string;
+  value: string;
+}
+
 interface Props {
   label?: string;
-  placeholder?: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  type?: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   name?: string;
   error?: string;
   disabled?: boolean;
   className?: string;
-  multiline?: boolean;
-  rows?: number;
+  options: Option[];
   required?: boolean;
-  min?: number;  // added
-  max?: number;  // added
+  placeholder?: string; // for default disabled option
 }
 
-const Input: React.FC<Props> = ({
+const Dropdown: React.FC<Props> = ({
   label,
-  placeholder,
   value,
   onChange,
-  type = "text",
   name,
   error,
   disabled = false,
   className = "",
-  multiline = false,
-  rows = 4,
+  options,
   required = false,
-  min,   // added
-  max,   // added
+  placeholder = "Select an option",
 }) => {
   const baseClass = clsx(
     "w-full px-4 py-2 border rounded-md text-sm transition duration-200",
@@ -45,7 +42,7 @@ const Input: React.FC<Props> = ({
   );
 
   return (
-    <div className="mb-4 w-full">
+    <div className="mb-4">
       {label && (
         <label
           htmlFor={name}
@@ -55,35 +52,28 @@ const Input: React.FC<Props> = ({
         </label>
       )}
 
-      {multiline ? (
-        <textarea
-          id={name}
-          name={name}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          disabled={disabled}
-          rows={rows}
-          className={baseClass}
-        />
-      ) : (
-        <input
-          id={name}
-          name={name}
-          type={type}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          disabled={disabled}
-          className={baseClass}
-          min={min}     
-          max={max}     
-        />
-      )}
+      <select
+        id={name}
+        name={name}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        className={baseClass}
+        required={required}
+      >
+        <option value="" disabled>
+          {placeholder}
+        </option>
+        {options && options?.length > 0 && options?.map(({ label, value }) => (
+          <option key={value} value={value}>
+            {label}
+          </option>
+        ))}
+      </select>
 
       {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
     </div>
   );
 };
 
-export default Input;
+export default Dropdown;

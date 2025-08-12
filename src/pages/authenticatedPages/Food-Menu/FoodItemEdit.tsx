@@ -595,7 +595,7 @@ const FoodItemEdit = () => {
             </div>
 
             {/* Variants Section */}
-            {productData.product_type === "variable" && (
+            {productData?.product_type === "variable" && (
                 <>
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-lg font-semibold">Product Variants</h3>
@@ -837,3 +837,5 @@ const FoodItemEdit = () => {
 };
 
 export default FoodItemEdit;
+
+

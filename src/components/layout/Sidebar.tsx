@@ -25,7 +25,7 @@ const topMenuItems: MenuItem[] = [
       { label: "Payment Logs", to: "/outlet/payment-logs", icon: "payment" },
     ],
   },
-  { label: "Messages", to: "/messages", icon: "message" },
+  // { label: "Messages", to: "/messages", icon: "message" },
   { label: "Offers", to: "/offers", icon: "offers" },
   { label: "Timing", to: "/timings", icon: "time" },
   // { label: "KYC Documents", to: "/kyc", icon: "kyc" },

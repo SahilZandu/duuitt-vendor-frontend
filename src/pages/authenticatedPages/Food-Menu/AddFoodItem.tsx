@@ -1,771 +1,374 @@
-import { useEffect, useState } from "react";
-import Icon from "@mdi/react";
-import { mdiArrowLeft, mdiDelete, mdiPlus } from "@mdi/js";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import axiosInstance from "../../../api/apiInstance";
+// import { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import axiosInstance from "../../../api/apiInstance";
+// import PageTitle from "../../../components/Ui/PageTitle";
+// import Input from "../../../components/Ui/Input";
+// import Dropdown from "../../../components/Ui/Dropdown";
+// import RadioButton from "../../../components/Ui/RadioButton";
+// import CheckBox from "../../../components/Ui/CheckBox";
+// import Button from "../../../components/Ui/Button";
+// import VariantsSection from "./VariantsSection";
+// import AddonsSection from "./AddonsSection";
+// import MenuIcon from "../../../lib/MenuIcon";
+// import { toast } from "react-toastify";
+// import { validateFormData } from "../../../utils/validateForm";
+// import { foodMenuSchema } from "../../../validations/foodMenuSchema";
 
-interface Variant {
-    name: string;
-    id: number;
-}
+// interface AddonValue {
+//     id: number;
+//     name: string;
+//     price?: string;
+// }
 
-interface VariantGroup {
-    group: string;
-    variant: Variant[];
-}
+// interface AddonGroup {
+//     id: number;
+//     groupName: string;
+//     priceable: boolean;
+//     maxSelectionLimit: string;
+//     values: AddonValue[];
+// }
+// interface VariantValue {
+//     id: number;
+//     value: string;
+// }
 
-interface Combination {
-    first_gp: string;
-    second_gp: string;
-    price: string;
-}
+// interface Variant {
+//     id: number;
+//     group: string;
+//     variant: VariantValue[];
+// }
 
-interface AddonItem {
-    name: string;
-    price: string;
-    id: number;
-}
+// interface ProductData {
+//     product_name: string;
+//     description: string;
+//     selling_price: string;
+//     dish_category_id?: string;
+//     base_price?: string;
+//     veg_nonveg?: string;
+//     status?: boolean;
+//     in_stock?: boolean;
+//     recomended?: boolean;
+//     image?: File | null;
+//     vendor_id?: string;
+//     restaurant_id?: string;
+//     title?: string;
+//     product_timing?: 'full_time' | 'partial_time';
+//     default_quantity?: number;
+//     tag?: string;
+// }
 
-interface ProductData {
-    name: string;
-    description: string;
-    selling_price: string;
-    product_type: "simple" | "variable";
-    dish_category_id?: string;
-    base_price?: string;
-    tag?: string;
-    veg_nonveg?: string;
-    status?: boolean;
-    in_stock?: boolean;
-    recomended?: boolean;
-    image?: File | null;
-    vendor_id?: string;
-    restaurant_id?: string;
-    title?: string;
-    product_timing?: 'full_time' | 'partial_time';
-    default_quantity?: number;
-}
+// const AddFoodItem = () => {
+//     const [dishCategories, setDishCategories] = useState<any[]>([]);
+//     const dishOptions = dishCategories && dishCategories?.length > 0 && dishCategories?.map((option) => ({
+//         label: option?.name,
+//         value: option?.name,
+//     }));
+//     const [variants, setVariants] = useState<Variant[]>([]);
+//     console.log("variants-----", variants);
+
+//     const [addons, setAddons] = useState<AddonGroup[]>([]);
+//     console.log("addons-----", addons);
+//     const isAddonSectionOpen = addons?.length > 0;
+
+//     const [generatedCombinations, setGeneratedCombinations] = useState<any[]>([]);
+//     console.log("generatedCombinations in parent----", generatedCombinations);
+
+//     const [productData, setProductData] = useState<ProductData>({
+//         dish_category_id: "",
+//         name: "",
+//         selling_price: "",
+//         description: "",
+//         veg_nonveg: "",
+//         recomended: [] as string[],
+//         tag: "",
+//         image: null,
+//     });
+
+//     console.log("productData----------", productData);
+
+//     useEffect(() => {
+//         const fetchCategories = async () => {
+//             try {
+//                 const response = await axiosInstance("get", "/dish-category/all");
+//                 setDishCategories(response.data.data || []);
+//             } catch (error) {
+//                 console.error("Error fetching dish categories:", error);
+//             }
+//         };
+
+//         fetchCategories();
+//     }, []);
+
+
+//     const navigate = useNavigate();
+
+//     const handleCombinationsChange = (combinations: any[]) => {
+//         setGeneratedCombinations(combinations);
+//     };
+//     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+//         const { name, value, type, checked } = e.target;
+//         setProductData(prev => ({
+//             ...prev,
+//             [name]: type === "checkbox" ? checked : value
+//         }));
+//         setErrors((prev) => ({ ...prev, [name]: "" }));
+//     };
+//     const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+//     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//         const file = e.target.files?.[0];
+//         if (file) {
+//             setProductData(prev => ({ ...prev, image: file }));
+//             setImagePreview(URL.createObjectURL(file));
+//             setErrors(prev => ({ ...prev, image: "" }));
+//         }
+//     };
+//     const handleRecommendedChange = (selected: string[]) => {
+//         setProductData(prev => ({
+//             ...prev,
+//             recomended: selected.length === 1 && selected[0] === "recomended"
+//                 ? true
+//                 : selected.length > 1
+//                     ? selected
+//                     : false
+//         }));
+//     };
+//     const restaurant_id = localStorage.getItem("restaurant_id");
+//     const [errors, setErrors] = useState("");
+//     console.log({ errors });
+
+//     const handleSubmit = async (e: React.FormEvent) => {
+//         e.preventDefault();
+//         const { valid, errors } = await validateFormData(foodMenuSchema, productData);
+
+//         if (!valid) {
+//             setErrors(errors);
+//             return;
+//         }
+
+//         setErrors({});
+//         try {
+//             const formData = new FormData();
+
+//             // Append basic product data
+//             Object.entries(productData).forEach(([key, value]) => {
+//                 if (value !== null && value !== undefined) {
+//                     if (Array.isArray(value)) {
+//                         formData.append(key, JSON.stringify(value));
+//                     } else {
+//                         formData.append(key, value as any);
+//                     }
+//                 }
+//             });
+//             formData.append("restaurant_id", restaurant_id);
+//             // Append variants
+//             formData.append("variants", JSON.stringify(variants));
+//             const productType = variants?.length > 0 ? "variable" : "simple";
+//             formData.append("product_type", productType);
+//             formData.append("base_price", productData?.selling_price);
+//             // Append addons
+//             formData.append("addon", JSON.stringify(addons));
+//             formData.append("status", "true");
+//             formData.append("in_stock", "true");
+//             formData.append("product_timing", "full_time");
+//             formData.append("combinations", JSON.stringify(generatedCombinations));
+//             for (const [key, value] of formData.entries()) {
+//                 console.log(key, value);
+//             }
+//             // API call
+//             const response = await axiosInstance("post", "/food-item", formData, {
+//                 headers: {
+//                     "Content-Type": "multipart/form-data"
+//                 }
+//             });
+
+//             // toast.success("Product added successfully");
+//             // navigate("/food-menu");
+//         } catch (error) {
+//             console.error("Error saving product:", error);
+//             toast.error("Failed to add product");
+//         }
+//     };
+
+//     return (
+//         <div className="bg-white px-4 py-6 md:px-8">
+//             <button
+//                 onClick={() => navigate('/food-menu')}
+//                 className="cursor-pointer inline-flex items-center text-base px-3 py-1 bg-gray-200 rounded-lg mb-2"
+//             >
+//                 <span className="icon mr-2 text-lg">←</span>
+//                 Back
+//             </button>
+//             <form onSubmit={handleSubmit}>
+//                 <PageTitle title="Add Product" align="left" />
+//                 {/* Basic Info */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+//                     <div className="col-span-1 md:col-span-2">
+//                         <label className="block mb-2 font-medium">Product Image</label>
+
+//                         <div className="relative w-40 h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden">
+//                             {/* Image preview */}
+//                             {imagePreview ? (
+//                                 <>
+//                                     <img
+//                                         src={imagePreview}
+//                                         alt="Preview"
+//                                         className="w-full h-full object-cover"
+//                                     />
+//                                     {/* Edit button */}
+//                                     <label className="absolute bottom-0 right-0 bg-blue-500 p-1 rounded-full shadow cursor-pointer">
+//                                         <MenuIcon name="edit" />
+//                                         <input
+//                                             type="file"
+//                                             accept="image/*"
+//                                             onChange={handleImageChange}
+//                                             className="hidden"
+//                                         />
+//                                     </label>
+//                                 </>
+//                             ) : (
+//                                 // Add photo placeholder
+//                                 <label className="flex flex-col items-center cursor-pointer text-gray-500">
+//                                     <MenuIcon name="camera" className="text-3xl mb-1" />
+//                                     <span className="text-sm">Add Photo</span>
+//                                     <input
+//                                         type="file"
+//                                         accept="image/*"
+//                                         onChange={handleImageChange}
+//                                         className="hidden"
+//                                     />
+//                                 </label>
+//                             )}
+//                         </div>
+//                         {errors && <p className="text-sm text-red-500 mt-1">{errors?.image}</p>}
+
+//                     </div>
+
+//                     <Dropdown
+//                         label="Select Dish Type"
+//                         options={dishOptions}
+//                         required
+//                         value={productData?.dish_category_id}
+//                         onChange={(e) => setProductData(prev => ({ ...prev, dish_category_id: e.target.value }))}
+//                         error={errors?.dish_category_id}
+//                     />
+//                     <div>
+//                         <Input
+//                             type="text"
+//                             name="name"
+//                             placeholder="Product Name"
+//                             label="Product Name"
+//                             value={productData.name}
+//                             required={true}
+//                             onChange={handleChange}
+//                             error={errors?.name}
+//                         />
+//                     </div>
+//                     <Input
+//                         type="number"
+//                         name="selling_price"
+//                         placeholder="Selling Price"
+//                         label="Selling Price"
+//                         value={productData.selling_price}
+//                         required
+//                         onChange={handleChange}
+//                         error={errors?.selling_price}
+//                     />
+//                     <Input
+//                         type="text"
+//                         name="description"
+//                         label="Description"
+//                         value={productData.description}
+//                         multiline={true}
+//                         placeholder="Description"
+//                         onChange={handleChange}
+//                         required
+//                          error={errors?.description}
+//                     />
+//                     <div className="col-span-3 md:col-span-2 flex justify-between items-center gap-6">
+//                         <RadioButton
+//                             label="Item Type"
+//                             name="veg_nonveg"
+//                             required
+//                             options={[
+//                                 { label: "Veg", value: "veg" },
+//                                 { label: "Non Veg", value: "Non Veg" },
+//                                 { label: "Egg", value: "egg" },
+//                             ]}
+//                             selected={productData.veg_nonveg}
+//                             onChange={(value) => {
+//                                 setProductData(prev => ({ ...prev, veg_nonveg: value }));
+//                                 setErrors(prev => ({ ...prev, veg_nonveg: "" }));
+//                             }}
+//                             error={errors?.veg_nonveg}
+//                         />
+
+//                         <RadioButton
+//                             label="Select Tags"
+//                             name="tag"
+//                             options={[
+//                                 { label: "Mostly Order", value: "mostly" },
+//                                 { label: "Chef's Special", value: "chef" },
+//                                 { label: "Best Selling", value: "best_selling" },
+//                             ]}
+//                             selected={productData.tag}
+//                             // onChange={(value) => setProductData(prev => ({ ...prev, tag: value }))}
+//                             onChange={(value) => {
+//                                 setProductData(prev => ({ ...prev, tag: value }));
+//                                 setErrors(prev => ({ ...prev, tag: "" }));
+//                             }}
+//                         />
+
+//                         <CheckBox
+//                             label="Recommended"
+//                             name="recomended"
+//                             options={[
+//                                 { label: "Recommended", value: "recomended" },
+//                             ]}
+//                             selected={
+//                                 typeof productData.recomended === "boolean"
+//                                     ? productData.recomended
+//                                         ? ["recomended"]
+//                                         : []
+//                                     : (productData.recomended as string[])
+//                             }
+//                             onChange={handleRecommendedChange}
+//                         />
+//                     </div>
+
+
+//                 </div>
+//                 <VariantsSection
+//                     variants={variants}
+//                     setVariants={setVariants}
+//                     generatedCombinations={generatedCombinations}
+//                     setGeneratedCombinations={setGeneratedCombinations}
+//                     onCombinationsChange={handleCombinationsChange}
+//                 />
+//                 <AddonsSection
+//                     addons={addons}
+//                     setAddons={setAddons}
+//                     required={isAddonSectionOpen}
+//                 />
+
+//                 <div className="mt-8 flex gap-4">
+//                     <Button
+//                         label="Save Product"
+//                         variant="primary"
+//                         type="submit"
+//                     />
+//                 </div>
+//             </form>
+//         </div>
+//     );
+// };
+
+// export default AddFoodItem;
 
 const AddFoodItem = () => {
-    const [dishCategories, setDishCategories] = useState<any[]>([]);
-    const [productData, setProductData] = useState<ProductData>({
-        name: "",
-        description: "",
-        selling_price: "",
-        product_type: "simple",
-        dish_category_id: "",
-        base_price: "",
-        tag: "",
-        veg_nonveg: "",
-        status: true,
-        in_stock: true,
-        recomended: false,
-        image: null,
-        // vendor_id: "",
-        // restaurant_id: "",
-        title: "",
-        product_timing: "full_time",
-        default_quantity: 1,
-    });
-
-    const [imagePreview, setImagePreview] = useState<string>("");
-
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await axiosInstance("get", "/dish-category/all");
-                setDishCategories(response.data.data || []);
-            } catch (error) {
-                console.error("Error fetching dish categories:", error);
-            }
-        };
-
-        fetchCategories();
-    }, []);
-
-    const [variantGroups, setVariantGroups] = useState<VariantGroup[]>([]);
-    const [combinations, setCombinations] = useState<Combination[]>([]);
-
-    const [addonType, setAddonType] = useState<"AddonAdd" | "">("");
-    const [addonGroupName, setAddonGroupName] = useState("");
-    const [maxSelectionLimit, setMaxSelectionLimit] = useState(1);
-    const [isPriceRelated, setIsPriceRelated] = useState("");
-    const [addonItems, setAddonItems] = useState<AddonItem[]>([]);
-    const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
-    const navigate = useNavigate();
-
-    // Handle input changes for basic product data
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value, type } = e.target;
-
-        if (type === "checkbox") {
-            const checked = (e.target as HTMLInputElement).checked;
-            setProductData(prev => ({
-                ...prev,
-                [name]: checked
-            }));
-        } else {
-            setProductData(prev => ({
-                ...prev,
-                [name]: value
-            }));
-        }
-    };
-
-    // Handle image upload
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setProductData(prev => ({
-                ...prev,
-                image: file
-            }));
-
-            // Create preview
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const addVariantGroup = () => {
-        setVariantGroups([...variantGroups, { group: "", variant: [] }]);
-    };
-
-    const updateVariantGroup = (index: number, field: keyof VariantGroup, value: any) => {
-        const updatedGroups = [...variantGroups];
-        if (field === "group") {
-            updatedGroups[index][field] = value as string;
-        }
-        setVariantGroups(updatedGroups);
-    };
-
-    const removeVariantGroup = (index: number) => {
-        const updatedGroups = [...variantGroups];
-        updatedGroups.splice(index, 1);
-        setVariantGroups(updatedGroups);
-    };
-
-    const addVariantToGroup = (groupIndex: number) => {
-        const updatedGroups = [...variantGroups];
-        updatedGroups[groupIndex].variant.push({ name: "", id: Date.now() });
-        setVariantGroups(updatedGroups);
-    };
-
-    const updateVariant = (groupIndex: number, variantIndex: number, field: keyof Variant, value: string | number) => {
-        const updatedGroups = [...variantGroups];
-        updatedGroups[groupIndex].variant[variantIndex] = {
-            ...updatedGroups[groupIndex].variant[variantIndex],
-            [field]: value
-        };
-        setVariantGroups(updatedGroups);
-    };
-
-    const removeVariant = (groupIndex: number, variantIndex: number) => {
-        const updatedGroups = [...variantGroups];
-        updatedGroups[groupIndex].variant.splice(variantIndex, 1);
-        setVariantGroups(updatedGroups);
-    };
-
-    const generateCombinations = () => {
-        if (variantGroups.length < 2) return;
-        const firstGroup = variantGroups[0].variant;
-        const secondGroup = variantGroups[1].variant;
-        const combos: Combination[] = [];
-
-        firstGroup.forEach((f) => {
-            secondGroup.forEach((s) => {
-                combos.push({
-                    first_gp: f.name,
-                    second_gp: s.name,
-                    price: "",
-                });
-            });
-        });
-
-        setCombinations(combos);
-    };
-
-    const updateCombinationPrice = (index: number, value: string) => {
-        const updated = [...combinations];
-        updated[index].price = value;
-        setCombinations(updated);
-    };
-    const validateForm = (): boolean => {
-        const { name, description, selling_price, base_price, product_type, dish_category_id } = productData;
-        const newErrors: { [key: string]: string } = {};
-
-        if (!name.trim()) newErrors.name = "Product name is required.";
-        if (!description.trim()) newErrors.description = "Description is required.";
-        if (!dish_category_id) newErrors.dish_category_id = "Dish category is required.";
-
-        if (!base_price || isNaN(Number(base_price)) || Number(base_price) < 0) {
-            newErrors.base_price = "Enter a valid base price.";
-        }
-
-        if (!selling_price || isNaN(Number(selling_price)) || Number(selling_price) < 0) {
-            newErrors.selling_price = "Enter a valid selling price.";
-        }
-
-        if (product_type === "variable" && variantGroups.length < 2) {
-            newErrors.variantGroups = "At least two variant groups required for variable products.";
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-
-
-    const handleSubmit = async () => {
-        if (!validateForm()) return;
-        try {
-            // Create FormData for file upload
-            const formData = new FormData();
-            const restaurant_id = localStorage.getItem("restaurant_id");
-            if (restaurant_id) {
-                formData.append("restaurant_id", restaurant_id);
-            }
-
-            // Append basic product data according to DTO
-            formData.append('name', productData.name);
-            formData.append('description', productData.description);
-            formData.append('base_price', productData.base_price || '0');
-            formData.append('selling_price', productData.selling_price);
-            formData.append('status', String(productData.status || true));
-
-            // Optional fields
-            if (productData.dish_category_id) {
-                formData.append('dish_category_id', productData.dish_category_id);
-            }
-            if (productData.veg_nonveg) {
-                formData.append('veg_nonveg', productData.veg_nonveg);
-            }
-            if (productData.product_type) {
-                formData.append('product_type', productData.product_type);
-            }
-            if (productData.tag) {
-                formData.append('tag', productData.tag);
-            }
-            if (productData.recomended !== undefined) {
-                formData.append('recomended', String(productData.recomended));
-            }
-            if (productData.in_stock !== undefined) {
-                formData.append('in_stock', String(productData.in_stock));
-            }
-            if (productData.image) {
-                formData.append('image', productData.image);
-            }
-
-            // Handle variants according to DTO
-            if (variantGroups.length > 0) {
-                formData.append('variants', JSON.stringify(variantGroups));
-            }
-
-            // Handle combinations according to DTO
-            if (combinations.length > 0) {
-                formData.append('combinations', JSON.stringify(combinations));
-            }
-
-            // Handle addon according to DTO
-            if (addonType === "AddonAdd" && addonGroupName && addonItems.length > 0) {
-                const addonData = {
-                    groupName: addonGroupName,
-                    maxSelectionLimit: maxSelectionLimit,
-                    isPriceRelated: isPriceRelated,
-                    items: addonItems
-                };
-                formData.append('addon', JSON.stringify(addonData));
-            }
-
-            const selectedAddons: number[] = [];
-
-            selectedAddons.forEach((id) => {
-                formData.append('selected_add_on[]', String(id));
-            });
-
-            await axiosInstance("post", "/food-item", formData);
-            toast.success("Product added successfully");
-            navigate("/food-menu");
-        } catch (error) {
-            toast.error("Failed to add product");
-            console.error(error);
-        }
-    };
-
-    return (
-        <div className="p-6 max-w-5xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Add Product</h2>
-            <div className="flex items-center justify-between mb-6">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="flex items-center border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
-                >
-                    <Icon path={mdiArrowLeft} size={0.8} className="mr-2" />
-                    <span className="text-sm font-medium">Back</span>
-                </button>
-            </div>
-
-
-            {/* Basic Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                    <label className="block font-medium mb-1">Product Name</label>
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="Product Name"
-                        value={productData.name}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border rounded"
-                        required
-                    />
-                    {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-                </div>
-
-                <div>
-                    <label className="block font-medium mb-1">Description</label>
-                    <textarea
-                        name="description"
-                        value={productData.description}
-                        onChange={handleInputChange}
-                        className="w-full border rounded p-2"
-                        rows={3}
-                    />
-                    {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
-
-                </div>
-
-                {/* Product Type */}
-                <div>
-                    <label className="block font-medium mb-1">Product Type</label>
-                    <select
-                        name="product_type"
-                        value={productData.product_type}
-                        onChange={handleInputChange}
-                        className="w-full border rounded p-2"
-                    >
-                        <option value="simple">Simple</option>
-                        <option value="variable">Variable</option>
-                    </select>
-                </div>
-
-                {/* Category */}
-                <div>
-                    <label className="block font-medium mb-1">Dish Category</label>
-                    <select
-                        name="dish_category_id"
-                        value={productData.dish_category_id}
-                        onChange={handleInputChange}
-                        className="w-full border rounded p-2"
-                        required
-                    >
-                        <option value="">Select Category</option>
-                        {dishCategories.map((cat) => (
-                            <option key={cat._id} value={cat._id}>
-                                {cat.name}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.dish_category_id && <p className="text-red-500 text-sm">{errors.dish_category_id}</p>}
-
-                </div>
-
-                {/* Prices */}
-                <div>
-                    <label className="block font-medium mb-1">Base Price</label>
-                    <input
-                        type="number"
-                        name="base_price"
-                        value={productData.base_price}
-                        onChange={handleInputChange}
-                        className="w-full border rounded p-2"
-                    />
-                    {errors.base_price && <p className="text-red-500 text-sm">{errors.base_price}</p>}
-
-                </div>
-
-                <div>
-                    <label className="block font-medium mb-1">Selling Price</label>
-                    <input
-                        type="number"
-                        name="selling_price"
-                        value={productData.selling_price}
-                        onChange={handleInputChange}
-                        className="w-full border rounded p-2"
-                        required
-                    />
-                    {errors.selling_price && <p className="text-red-500 text-sm">{errors.selling_price}</p>}
-
-                </div>
-
-                {/* Tag */}
-                <div>
-                    <label className="block font-medium mb-1">Tag</label>
-                    <input
-                        type="text"
-                        name="tag"
-                        value={productData.tag}
-                        onChange={handleInputChange}
-                        className="w-full border rounded p-2"
-                    />
-                </div>
-
-                {/* Additional DTO Fields */}
-                <div>
-                    <label className="block font-medium mb-1">Title</label>
-                    <input
-                        type="text"
-                        name="title"
-                        value={productData.title}
-                        onChange={handleInputChange}
-                        className="w-full border rounded p-2"
-                    />
-                </div>
-
-
-                <div>
-                    <label className="block font-medium mb-1">Product Timing</label>
-                    <select
-                        name="product_timing"
-                        value={productData.product_timing}
-                        onChange={handleInputChange}
-                        className="w-full border rounded p-2"
-                    >
-                        <option value="full_time">Full Time</option>
-                        <option value="partial_time">Partial Time</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label className="block font-medium mb-1">Default Quantity</label>
-                    <input
-                        type="number"
-                        name="default_quantity"
-                        value={productData.default_quantity}
-                        onChange={handleInputChange}
-                        className="w-full border rounded p-2"
-                        min="1"
-                    />
-                </div>
-
-                {/* Veg/Non-Veg */}
-                <div>
-                    <label className="block font-medium mb-1">Veg / Non-Veg</label>
-                    <select
-                        name="veg_nonveg"
-                        value={productData.veg_nonveg}
-                        onChange={handleInputChange}
-                        className="w-full border rounded p-2"
-                    >
-                        <option value="">Select Food Type</option>
-                        <option value="veg">Veg</option>
-                        <option value="non_veg">Non-Veg</option>
-                        <option value="egg">Egg</option>
-                    </select>
-                </div>
-
-                {/* Image Upload */}
-                <div className="col-span-1 md:col-span-2">
-                    <label className="block font-medium mb-1">Image</label>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="w-full border rounded p-2"
-                    />
-                    {imagePreview && (
-                        <img
-                            src={imagePreview}
-                            alt="Preview"
-                             crossOrigin="anonymous"
-                            className="w-32 h-32 mt-2 object-cover border rounded"
-                        />
-                    )}
-                </div>
-
-                {/* Checkboxes */}
-                <div className="col-span-1 md:col-span-2">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <label className="flex items-center gap-2">
-                            <input
-                                type="checkbox"
-                                name="status"
-                                checked={productData.status || false}
-                                onChange={handleInputChange}
-                            />
-                            Status
-                        </label>
-
-                        <label className="flex items-center gap-2">
-                            <input
-                                type="checkbox"
-                                name="in_stock"
-                                checked={productData.in_stock || false}
-                                onChange={handleInputChange}
-                            />
-                            In Stock
-                        </label>
-
-                        <label className="flex items-center gap-2">
-                            <input
-                                type="checkbox"
-                                name="recomended"
-                                checked={productData.recomended || false}
-                                onChange={handleInputChange}
-                            />
-                            Recommended
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            {/* Variants Section */}
-            {productData.product_type === "variable" && (
-                <>
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold">Product Variants</h3>
-                        <button
-                            onClick={addVariantGroup}
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2"
-                        >
-                            <Icon path={mdiPlus} size={0.8} />
-                            Add Variant Group
-                        </button>
-                    </div>
-
-                    {variantGroups.map((group, groupIndex) => (
-                        <div key={groupIndex} className="border p-4 rounded-md mb-4">
-                            <div className="flex justify-between items-center mb-3 gap-2">
-                                <input
-                                    type="text"
-                                    placeholder="Group Name (e.g., Size, Color)"
-                                    value={group.group}
-                                    onChange={(e) => updateVariantGroup(groupIndex, "group", e.target.value)}
-                                    className="px-3 py-2 border rounded flex-1"
-                                />
-                                <button
-                                    onClick={() => removeVariantGroup(groupIndex)}
-                                    className="text-red-500 hover:text-red-700 p-1"
-                                >
-                                    <Icon path={mdiDelete} size={1} />
-                                </button>
-                            </div>
-
-                            {group.variant.map((variant, variantIndex) => (
-                                <div key={variantIndex} className="flex gap-2 mb-2">
-                                    <input
-                                        type="text"
-                                        placeholder="Variant Name (e.g., Small, Red)"
-                                        value={variant.name}
-                                        onChange={(e) => updateVariant(groupIndex, variantIndex, "name", e.target.value)}
-                                        className="flex-1 px-3 py-2 border rounded"
-                                    />
-                                    <input
-                                        type="number"
-                                        placeholder="ID"
-                                        value={variant.id}
-                                        onChange={(e) => updateVariant(groupIndex, variantIndex, "id", parseInt(e.target.value) || 0)}
-                                        className="w-20 px-3 py-2 border rounded"
-                                    />
-                                    <button
-                                        onClick={() => removeVariant(groupIndex, variantIndex)}
-                                        className="text-red-500 hover:text-red-700 p-1"
-                                    >
-                                        <Icon path={mdiDelete} size={0.8} />
-                                    </button>
-                                </div>
-                            ))}
-
-                            <button
-                                onClick={() => addVariantToGroup(groupIndex)}
-                                className="mt-2 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm flex items-center gap-1"
-                            >
-                                <Icon path={mdiPlus} size={0.6} />
-                                Add Variant
-                            </button>
-                        </div>
-                    ))}
-
-                    {variantGroups.length >= 2 && (
-                        <button
-                            onClick={generateCombinations}
-                            className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 mt-4"
-                        >
-                            Generate Combinations
-                        </button>
-                    )}
-                    {errors.variantGroups && <p className="text-red-500 text-sm">{errors.variantGroups}</p>}
-
-
-                    {combinations.length > 0 && (
-                        <div className="mt-6">
-                            <h4 className="text-md font-semibold mb-3">Price Combinations</h4>
-                            <div className="grid gap-2">
-                                {combinations.map((combo, index) => (
-                                    <div key={index} className="flex gap-2 items-center p-2 border rounded">
-                                        <span className="flex-1 font-medium">
-                                            {combo.first_gp} + {combo.second_gp}
-                                        </span>
-                                        <input
-                                            type="number"
-                                            placeholder="Price"
-                                            value={combo.price}
-                                            onChange={(e) => updateCombinationPrice(index, e.target.value)}
-                                            className="w-24 px-3 py-2 border border-gray-300 rounded-md"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </>
-            )}
-
-            {/* Addon Section */}
-            <div className="mt-10">
-                <h3 className="text-lg font-semibold mb-4">Addons</h3>
-                {addonType !== "AddonAdd" && (
-                    <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-4"
-                        onClick={() => setAddonType("AddonAdd")}
-                    >
-                        Add Addon Group
-                    </button>
-                )}
-
-                {addonType === "AddonAdd" && (
-                    <>
-                        <div className="grid md:grid-cols-3 grid-cols-1 gap-4 mb-4">
-                            <div>
-                                <label className="block font-medium mb-1">Addon Group Name</label>
-                                <input
-                                    type="text"
-                                    placeholder="e.g., Extra Toppings"
-                                    value={addonGroupName}
-                                    onChange={(e) => setAddonGroupName(e.target.value)}
-                                    className="w-full border px-3 py-2 rounded"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block font-medium mb-1">Max Selection Limit</label>
-                                <input
-                                    type="number"
-                                    min={1}
-                                    value={maxSelectionLimit}
-                                    onChange={(e) => {
-                                        const val = parseInt(e.target.value) || 1;
-                                        setMaxSelectionLimit(val);
-                                        if (addonItems.length > val) {
-                                            setAddonItems(addonItems.slice(0, val));
-                                        }
-                                    }}
-                                    className="w-full border px-3 py-2 rounded"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block font-medium mb-1">Price Type</label>
-                                <select
-                                    value={isPriceRelated}
-                                    onChange={(e) => setIsPriceRelated(e.target.value)}
-                                    className="w-full border px-3 py-2 rounded"
-                                >
-                                    <option value="">Select</option>
-                                    <option value="pricable">Pricable</option>
-                                    <option value="nonpricable">Non Pricable</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="mb-4">
-                            <h4 className="font-medium mb-2">Addon Items</h4>
-                            {addonItems.map((item, index) => (
-                                <div key={index} className="flex gap-2 mb-2">
-                                    <input
-                                        type="text"
-                                        placeholder="Addon Name"
-                                        value={item.name}
-                                        onChange={(e) => {
-                                            const updated = [...addonItems];
-                                            updated[index].name = e.target.value;
-                                            setAddonItems(updated);
-                                        }}
-                                        className="flex-1 px-3 py-2 border rounded"
-                                    />
-                                    {isPriceRelated === "pricable" && (
-                                        <input
-                                            type="number"
-                                            placeholder="Price"
-                                            value={item.price}
-                                            onChange={(e) => {
-                                                const updated = [...addonItems];
-                                                updated[index].price = e.target.value;
-                                                setAddonItems(updated);
-                                            }}
-                                            className="w-24 px-3 py-2 border rounded"
-                                        />
-                                    )}
-                                    <button
-                                        onClick={() => setAddonItems(addonItems.filter((_, i) => i !== index))}
-                                        className="text-red-500 hover:text-red-700 p-1"
-                                    >
-                                        <Icon path={mdiDelete} size={0.8} />
-                                    </button>
-                                </div>
-                            ))}
-                            {addonItems.length < maxSelectionLimit && (
-                                <button
-                                    onClick={() =>
-                                        setAddonItems([...addonItems, { name: "", price: "", id: Date.now() }])
-                                    }
-                                    className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2"
-                                >
-                                    <Icon path={mdiPlus} size={0.8} />
-                                    Add Item
-                                </button>
-                            )}
-                        </div>
-
-                        <button
-                            onClick={() => {
-                                setAddonType("");
-                                // Reset addon form
-                                setAddonGroupName("");
-                                setMaxSelectionLimit(1);
-                                setIsPriceRelated("");
-                                setAddonItems([]);
-                            }}
-                            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                        >
-                            Cancel Addon
-                        </button>
-                    </>
-                )}
-            </div>
-
-            {/* Submit */}
-            <div className="mt-8 flex gap-4">
-                <button
-                    onClick={handleSubmit}
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded font-medium"
-                >
-                    Save Product
-                </button>
-                <button
-                    onClick={() => navigate("/products")}
-                    className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded font-medium"
-                >
-                    Cancel
-                </button>
-            </div>
-        </div>
-    );
+    return(
+        <h1>Coming Soon</h1>
+    )
 };
 
 export default AddFoodItem;
