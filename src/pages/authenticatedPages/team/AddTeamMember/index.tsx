@@ -136,8 +136,13 @@ const AddTeamMember = () => {
         try {
             const response = await axiosInstance("post", apiUrl, finalPayload);
             console.log("response----------", response);
-            navigate("/team")
-            toast.success("Team member added successfully");
+
+            if (response?.data?.statusCode === 400) {
+                toast.error(response?.data?.message);
+            } else {
+                navigate("/team")
+                toast.success("Team member added successfully");
+            }
         } catch (err) {
             console.error("Error submitting team member", err);
             toast.error("Operation failed");
@@ -247,6 +252,7 @@ const AddTeamMember = () => {
             <form onSubmit={handleSubmit} className="px-4 py-6 md:px-8 bg-white">
                 <button
                     onClick={() => navigate('/team')}
+                    type="button"
                     className="cursor-pointer mb-2 inline-flex items-center text-base px-3 py-1 bg-gray-200 rounded-lg"
                 >
                     <span className="icon mr-2 text-lg">←</span>

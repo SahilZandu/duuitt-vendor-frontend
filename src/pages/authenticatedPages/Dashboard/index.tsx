@@ -5,6 +5,8 @@ import Loader from "../../../components/loader/Loader";
 import OrderCard from "../../../components/Ui/OrderCard";
 import type { OrderStatus } from "../../../types/types";
 import NoDataFound from "../../../components/Ui/NoDataFound";
+import { useVendor } from "../../../lib/Context/VendorContext";
+import PageTitle from "../../../components/Ui/PageTitle";
 interface DashboardData {
   orders: {
     total: number;
@@ -18,6 +20,7 @@ interface DashboardData {
     gst_collection: number;
     restaurant_charge_total: number;
   };
+
   orderDetails: any[]; // replace `any` with actual order item type if you have
 }
 
@@ -25,7 +28,9 @@ const Dashboard: React.FC = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
-
+ const { vendor } = useVendor();
+ console.log("vendor", vendor);
+ 
   const restaurantId = localStorage.getItem("restaurant_id") || "";
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -64,6 +69,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="p-6  min-h-screen">
       {/* Top Stats */}
+      <PageTitle title={vendor?.restaurant?.name || ""}/>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         {[
           {

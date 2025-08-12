@@ -25,7 +25,7 @@ type ExtendedOrder = Order & {
     }[];
     status: OrderStatus;
     restaurant?: {
-        landmark?: string;
+        name?: string;
     };
     createdAt?: string;
     _id: string;
@@ -91,7 +91,7 @@ const OrderCard: React.FC<Props> = ({ order, onStatusChange, activeTab }) => {
                 </div>
             </div>
 
-            <div className="text-md font-semibold">{order.restaurant?.landmark}</div>
+            <div className="text-md font-semibold">{order.restaurant?.name}</div>
             <div className="text-xs text-gray-400">
                 <FormatDate isoDate={order.createdAt} />
             </div>

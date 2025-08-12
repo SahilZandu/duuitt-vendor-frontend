@@ -32,6 +32,7 @@ export interface RestaurantTimings {
 // Structure of the nested restaurant object
 interface Restaurant {
     timings: RestaurantTimings;
+     name: string;
     // Add any other restaurant fields here if needed
 }
 

@@ -227,7 +227,7 @@ const TeamManagement: React.FC = () => {
             <DeleteModal
                 isOpen={showDeleteModal}
                 actionLoading={deleting}
-                title="Delete Restaurant Image"
+                title="Delete Team Member"
                 onClose={() => {
                     setShowDeleteModal(false);
                 }}

@@ -191,7 +191,7 @@ const HomePage = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name
+                  Phone Number
                 </label>
                 <input
                   type="tel"

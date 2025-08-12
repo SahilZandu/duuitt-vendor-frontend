@@ -469,7 +469,7 @@ const RestaurantProfile = () => {
                     <Input
                         type="number"
                         disabled={isPending}
-                        label="Restaurant Charge"
+                        label="Restaurant Charge(%)"
                         name="restaurant_charge"
                         value={formData?.restaurant_charge}
                         onChange={handleChange}
@@ -481,7 +481,7 @@ const RestaurantProfile = () => {
                     <Input
                         type="number"
                         disabled={true}
-                        label="Admin Commission"
+                        label="Admin Commission(%)"
                         name="admin_commission"
                         value={formData?.admin_commission}
                         onChange={handleChange}
