@@ -19,6 +19,59 @@ const iconMap: Record<string, (className?: string) => JSX.Element> = {
             <path d="M4 21c0-4 4-6 8-6s8 2 8 6" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
     ),
+    tick: (className) => (
+        <svg
+            width="20"
+            height="20"
+            className={className}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+        >
+            <path
+                d="M5 13l4 4L19 7"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    ),
+    bulb: (className) => (
+        <svg
+            width="20"
+            height="20"
+            className={className}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+        >
+            <path
+                d="M9 18h6M10 21h4M12 2a7 7 0 0 0-7 7c0 2.4 1.2 4.5 3 5.7V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.3c1.8-1.2 3-3.3 3-5.7a7 7 0 0 0-7-7z"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    ),
+
+    sideArrow: (className) => (
+        <svg
+            width="20"
+            height="20"
+            className={className}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+        >
+            <path
+                d="M9 5l7 7-7 7"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    ),
+
     camera: (className) => (
         <svg
             width="20"

@@ -198,7 +198,7 @@ const FoodMenu = () => {
     
             <DeleteModal
                 isOpen={showDeleteModal}
-                title="Delete Restaurant Image"
+                title="Delete Food Item"
                 onClose={() => {
                     setShowDeleteModal(false);
                 }}

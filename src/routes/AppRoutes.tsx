@@ -22,7 +22,8 @@ import FoodItemEdit from "../pages/authenticatedPages/Food-Menu/FoodItemEdit";
 import AddFoodItem from "../pages/authenticatedPages/Food-Menu/AddFoodItem";
 import FoodMenu from "../pages/authenticatedPages/Food-Menu";
 import AddTeamMember from "../pages/authenticatedPages/team/AddTeamMember";
-
+import KycDocuments from "../pages/authenticatedPages/KycDocuments";
+import KycDetail from "../pages/authenticatedPages/KycDocuments/KycDetail";
 
 const AppRoutes = () => {
   return (
@@ -64,6 +65,9 @@ const AppRoutes = () => {
           <Route path="/setting/manage-profile" element={<VendorProfile />} />
 
           <Route path="/food-item/edit" element={<FoodItemEdit />} />
+
+          <Route path="/kyc-documents" element={<KycDocuments />} />
+          <Route path="/kyc-detail" element={<KycDetail />} />
 
         </Route>
       </Route>

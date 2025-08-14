@@ -30,7 +30,7 @@ const topMenuItems: MenuItem[] = [
   // { label: "Messages", to: "/messages", icon: "message" },
   { label: "Offers", to: "/offers", icon: "offers" },
   { label: "Timing", to: "/timings", icon: "time" },
-  // { label: "KYC Documents", to: "/kyc", icon: "kyc" },
+  { label: "KYC Documents", to: "/kyc-documents", icon: "kyc" },
   // { label: "Reports", to: "/reports", icon: "report" },
 ];
 
@@ -110,7 +110,6 @@ const Sidebar: React.FC = () => {
       toast.success(response?.data?.message || "")
     } catch (error) {
       console.error("Failed to update offer status", error);
-      alert("Failed to update offer status. Please try again.");
     }
   };
   return (

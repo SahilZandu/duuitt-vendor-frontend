@@ -3,13 +3,17 @@
 // import Button from "../../../components/Ui/Button";
 // import MenuIcon from "../../../lib/MenuIcon";
 
-
 // interface VariantsSectionProps {
+//     variants: Variant[];
+//     setVariants: React.Dispatch<React.SetStateAction<Variant[]>>;
+//     generatedCombinations: any[];
+//     setGeneratedCombinations: React.Dispatch<React.SetStateAction<any[]>>;
 //     onCombinationsChange: (combinations: any[]) => void;
+//     errors: { [key: string]: string };
+//     setErrors: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
 // }
-
-// export default function VariantsSection({ variants, setVariants, generatedCombinations, setGeneratedCombinations, onCombinationsChange }: VariantsSectionProps) {
-// console.log("generatedCombinations--------------", generatedCombinations);
+// export default function VariantsSection({ variants, setVariants, generatedCombinations, setGeneratedCombinations, onCombinationsChange, errors, setErrors }: VariantsSectionProps) {
+//     console.log("generatedCombinations--------------", generatedCombinations);
 
 //     const generateId = () => Math.floor(Math.random() * 100000);
 
@@ -31,7 +35,7 @@
 //         setVariants(prev => prev.map(v =>
 //             v.id === variantId ? { ...v, variant: [...v.variant, { id: generateId(), name: "" }] } : v
 //         ));
-//         setGeneratedCombinations([]); 
+//         setGeneratedCombinations([]);
 //     };
 
 //     const updateValue = (variantId: number, valueId: number, name: string) => {
@@ -48,10 +52,29 @@
 //         ));
 //         setGeneratedCombinations([]);
 //     };
+//     const validateVariants = (): boolean => {
+//         const newErrors: { [key: string]: string } = {};
+//         let hasError = false;
 
+//         variants.forEach(v => {
+//             if (!v.group.trim()) {
+//                 newErrors[`group-${v.id}`] = "Variant group is required";
+//                 hasError = true;
+//             }
+//             v.variant.forEach(val => {
+//                 if (!val.name.trim()) {
+//                     newErrors[`value-${val.id}`] = "Variant value is required";
+//                     hasError = true;
+//                 }
+//             });
+//         });
+
+//         setErrors(newErrors);
+//         return !hasError;
+//     };
 //     const generateCombinations = () => {
 //         if (!variants.length) return;
-
+//         if (!validateVariants()) return;
 //         const variantValues = variants.map(v => v.variant.map(val => val.name).filter(Boolean));
 //         if (variantValues.some(arr => arr.length === 0)) return;
 
@@ -96,7 +119,7 @@
 //                         <Button variant="danger" label="Delete" iconLeft={<MenuIcon name="delete" />} onClick={() => removeVariant(variant.id)} />
 //                     </div>
 
-//                     <Input placeholder="Enter variant group" value={variant.group} onChange={e => updateGroup(variant.id, e.target.value)} />
+//                     <Input placeholder="Enter variant group" value={variant.group} onChange={e => updateGroup(variant.id, e.target.value)} error={errors[`group-${variant.id}`]} />
 
 //                     <div className="flex justify-between mt-3">
 //                         <label>Values</label>
@@ -105,7 +128,7 @@
 
 //                     {variant.variant.map((val, idx) => (
 //                         <div key={val.id} className="flex items-center gap-2 my-2">
-//                             <Input value={val.name} onChange={e => updateValue(variant.id, val.id, e.target.value)} placeholder="Variant value" />
+//                             <Input value={val.name} onChange={e => updateValue(variant.id, val.id, e.target.value)} placeholder="Variant value" error={errors[`value-${val.id}`]}/>
 //                             {idx !== 0 && (
 //                                 <Button variant="danger" label="Delete" iconLeft={<MenuIcon name="delete" />} onClick={() => removeValue(variant.id, val.id)} />
 //                             )}

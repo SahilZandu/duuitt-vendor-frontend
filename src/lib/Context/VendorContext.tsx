@@ -32,15 +32,41 @@ export interface RestaurantTimings {
 // Structure of the nested restaurant object
 interface Restaurant {
     timings: RestaurantTimings;
-     name: string;
+    name: string;
     // Add any other restaurant fields here if needed
 }
+interface BankDetail {
+    bank_name: string;
+    account_number: string;
+    ifsc_code: string;
+    status: string;
+}
 
+interface FssaiDetail {
+    fssai_number: string;
+    expiry_date: string;
+    status: string;
+}
+
+interface GstnDetail {
+    gstn_number: string;
+    expiration_date: string;
+    status: string;
+}
+
+interface PanDetail {
+    pan_number: string;
+    status: string;
+}
 // Vendor type with nested restaurant
 interface Vendor {
     restaurant_id: string;
     restaurant_name: string;
     restaurant?: Restaurant;
+    bank_detail?: BankDetail;
+    fssai_detail?: FssaiDetail;
+    gstn_detail?: GstnDetail;
+    pan_detail?: PanDetail;
 }
 
 // Context type
@@ -48,7 +74,7 @@ interface VendorContextType {
     vendor: Vendor | null;
     loading: boolean;
     setVendor: (vendor: Vendor) => void;
-   fetchVendor: () => Promise<Vendor | undefined>;
+    fetchVendor: () => Promise<Vendor | undefined>;
 }
 
 // Create context
@@ -68,7 +94,7 @@ export const VendorProvider = ({ children }: { children: ReactNode }) => {
     const [vendor, setVendor] = useState<Vendor | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const fetchVendor = async (): Promise<Vendor  | undefined> => {
+    const fetchVendor = async (): Promise<Vendor | undefined> => {
         setLoading(true);
         try {
             const vendor_id = localStorage.getItem("vendor_id");

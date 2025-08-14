@@ -37,9 +37,7 @@ const TeamManagement: React.FC = () => {
     const [editMember, setEditMember] = useState<TeamMember | null>(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleting, setDeleting] = useState(false);
-    useEffect(() => {
-        fetchTeam();
-    }, []);
+  
 
     const fetchTeam = async () => {
         setLoading(true);
@@ -54,6 +52,9 @@ const TeamManagement: React.FC = () => {
             setLoading(false);
         }
     };
+      useEffect(() => {
+        fetchTeam();
+    }, []);
     const [currentMemberId, setCurrentMemberId] = useState("");
     const handleDeleteTeamMember = (row: any) => {
         console.log("row-------------", row);

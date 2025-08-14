@@ -1,4 +1,4 @@
-// import { useEffect, useState } from "react";
+// import { useEffect, useRef, useState } from "react";
 // import { useNavigate } from "react-router-dom";
 // import axiosInstance from "../../../api/apiInstance";
 // import PageTitle from "../../../components/Ui/PageTitle";
@@ -65,6 +65,7 @@
 //     }));
 //     const [variants, setVariants] = useState<Variant[]>([]);
 //     console.log("variants-----", variants);
+//     const variantsSectionRef = useRef<any>(null);
 
 //     const [addons, setAddons] = useState<AddonGroup[]>([]);
 //     console.log("addons-----", addons);
@@ -139,10 +140,15 @@
 
 //     const handleSubmit = async (e: React.FormEvent) => {
 //         e.preventDefault();
-//         const { valid, errors } = await validateFormData(foodMenuSchema, productData);
+//         const { valid, errors: mainErrors } = await validateFormData(foodMenuSchema, productData);
 
-//         if (!valid) {
-//             setErrors(errors);
+//         let validVariants = true;
+//         if (variantsSectionRef.current) {
+//             validVariants = variantsSectionRef.current.validateVariants();
+//         }
+
+//         if (!valid || !validVariants) {
+//             setErrors(mainErrors);
 //             return;
 //         }
 
@@ -167,20 +173,17 @@
 //             formData.append("product_type", productType);
 //             formData.append("base_price", productData?.selling_price);
 //             // Append addons
-//             formData.append("addon", JSON.stringify(addons));
+//             formData.append("addon", JSON.stringify(addons))
 //             formData.append("status", "true");
 //             formData.append("in_stock", "true");
+//             //  formData.append("tag", "Spicy");
 //             formData.append("product_timing", "full_time");
-//             formData.append("combinations", JSON.stringify(generatedCombinations));
+//             formData.append("combinations", JSON.stringify(generatedCombinations))
 //             for (const [key, value] of formData.entries()) {
 //                 console.log(key, value);
 //             }
 //             // API call
-//             const response = await axiosInstance("post", "/food-item", formData, {
-//                 headers: {
-//                     "Content-Type": "multipart/form-data"
-//                 }
-//             });
+//             const response = await axiosInstance("post", "/food-item", formData);
 
 //             // toast.success("Product added successfully");
 //             // navigate("/food-menu");
@@ -283,7 +286,7 @@
 //                         placeholder="Description"
 //                         onChange={handleChange}
 //                         required
-//                          error={errors?.description}
+//                         error={errors?.description}
 //                     />
 //                     <div className="col-span-3 md:col-span-2 flex justify-between items-center gap-6">
 //                         <RadioButton
@@ -307,9 +310,9 @@
 //                             label="Select Tags"
 //                             name="tag"
 //                             options={[
-//                                 { label: "Mostly Order", value: "mostly" },
-//                                 { label: "Chef's Special", value: "chef" },
-//                                 { label: "Best Selling", value: "best_selling" },
+//                                 { label: "Mostly Order", value: "Mostly Order" },
+//                                 { label: "Chef's Special", value: "Chef's Special" },
+//                                 { label: "Best Selling", value: "Best Selling" },
 //                             ]}
 //                             selected={productData.tag}
 //                             // onChange={(value) => setProductData(prev => ({ ...prev, tag: value }))}
@@ -340,6 +343,7 @@
 //                 </div>
 //                 <VariantsSection
 //                     variants={variants}
+//                     ref={variantsSectionRef}
 //                     setVariants={setVariants}
 //                     generatedCombinations={generatedCombinations}
 //                     setGeneratedCombinations={setGeneratedCombinations}

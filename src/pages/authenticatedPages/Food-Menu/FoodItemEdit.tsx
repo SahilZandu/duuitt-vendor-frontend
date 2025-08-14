@@ -178,6 +178,7 @@ const FoodItemEdit = () => {
         product_timing: "full_time",
         default_quantity: 1,
     });
+console.log("productData----------------", productData);
 
     const [imagePreview, setImagePreview] = useState<string>("");
 
@@ -374,7 +375,7 @@ const FoodItemEdit = () => {
 
             await axiosInstance("post", "/food-item/update", formData);
             toast.success("Product updated successfully");
-            navigate("/food-menu");
+            // navigate("/food-menu");
         } catch (error) {
             toast.error("Failed to update product");
             console.error(error);
