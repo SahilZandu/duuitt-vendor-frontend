@@ -7,7 +7,6 @@ import ProtectedRoute from "../api/ProtectedRoute";
 import PublicRoute from "../api/PublicRoute";
 import VendorKycPage from "../pages/kyc/VendorKycPage";
 import OrderHistory from "../pages/authenticatedPages/Outlet/OrderHistory/OrderHistory";
-import ViewOrderDetails from "../pages/authenticatedPages/Outlet/OrderHistory/ViewOrderDetails";
 import RestaurantProfile from "../pages/authenticatedPages/Outlet/RestaurantProfile";
 import TeamManagement from "../pages/authenticatedPages/team/TeamManagement";
 import VendorProfile from "../pages/authenticatedPages/Outlet/VendorProfile";
@@ -44,10 +43,10 @@ const AppRoutes = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           {/* <Route path="/vendor-kyc" element={<VendorKycPage />} /> */}
           <Route path="/outlet/order-history" element={<OrderHistory />} />
-          <Route path="/outlet/order-history/view/:id" element={<ViewOrderDetails />} />
+          <Route path="/outlet/order-history/view/:id" element={<ViewOrder />} />
           <Route path="/team" element={<TeamManagement />} />
           <Route path="/team/add-team-member" element={<AddTeamMember />} />
-          
+
           <Route path="/outlet/restaurant-profile" element={<RestaurantProfile />} />
           <Route path="/outlet/rating" element={<Rating />} />
           <Route path="/outlet/payment-logs" element={<PaymentLogs />} />
@@ -58,11 +57,12 @@ const AppRoutes = () => {
           {/* Timings */}
           <Route path="/timings" element={<Timings />} />
           <Route path="/food-menu" element={<FoodMenu />} />
+          <Route path="/food-menu/add-product" element={<AddFoodItem />} />
+
           <Route path="/food-item/:id" element={<FoodItemDetail />} />
           {/* ....Setting.... */}
           <Route path="/setting/manage-profile" element={<VendorProfile />} />
 
-          <Route path="/add-product" element={<AddFoodItem />} />
           <Route path="/food-item/edit" element={<FoodItemEdit />} />
 
         </Route>

@@ -4,6 +4,8 @@ import MenuIcon from "../../lib/MenuIcon";
 import Cookies from "js-cookie"; // Make sure you have this installed: `npm install js-cookie`
 import Spinner from "../loader/Spinner";
 import logo from "../../assets/images/logo.png";
+import axiosInstance from "../../api/apiInstance";
+import { toast } from "react-toastify";
 
 type MenuItem = {
   label: string;
@@ -77,21 +79,40 @@ const Sidebar: React.FC = () => {
   const isActive = (path?: string) =>
     path ? location.pathname.startsWith(path) : false;
 
-  const handleLogout = () => {
-    setIsLoggingOut(true);
+  //   const handleLogout = () => {
+  //     setIsLoggingOut(true);
+  // // /vendor/logout
+  // setTimeout(() => {
+  //   localStorage.removeItem("accessToken");
+  //   localStorage.removeItem("isKycCompleted");
+  //   localStorage.removeItem("vendor_id");
+  //   localStorage.removeItem("restaurant_id");
+  //   Cookies.remove("authToken");
 
-    setTimeout(() => {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("isKycCompleted");
-      localStorage.removeItem("vendor_id");
-      localStorage.removeItem("restaurant_id");
-      Cookies.remove("authToken");
+  //   setIsLoggingOut(false);
+  //   navigate("/login");
+  // }, 1000);
+  //   };
+  const handleLogout = async () => {
+    try {
+      const response = await axiosInstance("get", "/vendor/logout");
+      console.log("response", response);
+      setTimeout(() => {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("isKycCompleted");
+        localStorage.removeItem("vendor_id");
+        localStorage.removeItem("restaurant_id");
+        Cookies.remove("authToken");
 
-      setIsLoggingOut(false);
-      navigate("/login");
-    }, 1000);
+        setIsLoggingOut(false);
+        navigate("/login");
+      }, 1000);
+      toast.success(response?.data?.message || "")
+    } catch (error) {
+      console.error("Failed to update offer status", error);
+      alert("Failed to update offer status. Please try again.");
+    }
   };
-
   return (
     <aside className="w-64 bg-[#8E3CF7] text-white h-screen flex flex-col py-6 px-4">
       <nav className="space-y-2 overflow-y-auto">

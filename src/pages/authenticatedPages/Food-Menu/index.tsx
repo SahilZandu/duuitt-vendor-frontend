@@ -141,7 +141,7 @@ const FoodMenu = () => {
 
                 {/* Add Product Button */}
                 <button
-                    onClick={() => navigate("/add-product")}
+                    onClick={() => navigate("/food-menu/add-product")}
                     className="bg-[#8E3CF7] hover:bg-green-700 text-white px-4 py-2 rounded-md transition"
                 >
                     + Add Product

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import FormatDate from "../../../../components/Ui/FormatDate";
 import MenuIcon from "../../../../lib/MenuIcon";
 import { fetchOrderById } from "../../../../api/OrderApi";
@@ -37,6 +37,12 @@ type OrderType = {
   gst_percentage?: number;
   packing_fee?: number;
   platform_fee?: number;
+  after_discount_sub_amt?: number;
+  distance_from_customer?: number;
+  coupon_amount?: number;
+  delivery_fee?: number;
+  original_total_amount?: number;
+  payment_status?: number;
 };
 
 const ViewOrder = () => {
@@ -60,6 +66,16 @@ const ViewOrder = () => {
   useEffect(() => {
     if (id) getOrder();
   }, [id]);
+  const location = useLocation();
+  console.log(location.pathname);
+
+  const handleRedirectToBack = () => {
+    if (location.pathname.includes("order-history")) {
+      navigate('/outlet/order-history');
+    } else {
+      navigate('/orders');
+    }
+  };
 
   if (loading) {
     return <Loader />;
@@ -68,35 +84,37 @@ const ViewOrder = () => {
   return (
     <div className="p-4 bg-white min-h-screen">
       <button
-        onClick={() => navigate('/orders')}
+        onClickCapture={() => handleRedirectToBack()}
+        // onClick={() => navigate('/orders')}
         className="cursor-pointer inline-flex items-center text-base px-3 py-1 bg-gray-200 rounded-lg"
       >
         <span className="icon mr-2 text-lg">←</span>
         Back
       </button>
 
-      <div className="flex flex-col my-4">
+      <div className="flex flex-col">
         <PageTitle title="Order Details" />
-        <span className="text-sm font-medium text-gray-600">
-          #{order?.order_id}
-        </span>
       </div>
 
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium">{order?.user_name || "Sami"}</span>
+        <span className="text-lg font-medium font-bold">
+          #{order?.order_id}
+        </span>
         <div
           className={`inline-block mb-4 px-3 py-1 rounded-full text-white text-sm font-medium ${order?.status === "cooking"
+            ? "bg-green-500"
+            : order?.status === "ready_to_pickup"
               ? "bg-orange-500"
-              : order?.status === "ready_to_pickup"
-                ? "bg-green-500"
-                : order?.status === "packing_processing"
-                  ? "bg-blue-500"
-                  : "bg-gray-400"
+              : order?.status === "packing_processing"
+                ? "bg-blue-500"
+                : order?.status === "declined"
+                  ? "bg-red-500" : "bg-gray-400"
             }`}
         >
           {order?.status && statusLabel[order.status]}
         </div>
       </div>
+      {/* <span className="text-sm font-medium">{order?.user_name || "Sami"}</span> */}
 
       <span className="text-sm text-gray-500">
         {order?.createdAt && <FormatDate isoDate={order.createdAt} />}
@@ -106,7 +124,7 @@ const ViewOrder = () => {
         {order?.cartitems?.map((item: CartItem, idx: number) => (
           <li
             key={idx}
-            className="flex justify-between items-start border-b pb-1"
+            className="flex justify-between items-start border-b border-dashed pb-1"
           >
             <div>
               <div className="flex items-center gap-2 text-sm">
@@ -127,15 +145,15 @@ const ViewOrder = () => {
       <div className="mt-4 pt-4 space-y-2 text-sm">
         <div className="flex justify-between">
           <span>Item total</span>
-          <span>₹{order?.total_amount}</span>
+          <span>₹{order?.after_discount_sub_amt}</span>
         </div>
         <div className="flex justify-between">
           <span>Restaurant Charges</span>
           <span>₹{order?.restaurant_charge_amount || 0}</span>
         </div>
         <div className="flex justify-between">
-          <span>GST</span>
-          <span>{order?.gst_percentage || 0}%</span>
+          <span>Management Charges</span>
+          <span>₹{order?.distance_from_customer || 0}</span>
         </div>
         <div className="flex justify-between">
           <span>Packing Charges</span>
@@ -143,8 +161,39 @@ const ViewOrder = () => {
         </div>
         <div className="flex justify-between">
           <span>Platform Fee</span>
-          <span>₹{order?.platform_fee || 0}</span>
+          <span>₹{order?.packing_fee || 0}</span>
         </div>
+        <div className="flex justify-between">
+          <span>Discount</span>
+          <span>₹{order?.coupon_amount || 0}</span>
+        </div>
+
+        <div className="flex justify-between">
+          <span>Delivery Charges</span>
+          <span>₹{order?.delivery_fee || 0}</span>
+        </div>
+        <div className="flex justify-between border-b border-t border-dashed py-4">
+          <span className="text-lg font-medium">Grand Total</span>
+          <span className="text-lg font-medium">₹{order?.original_total_amount || 0}</span>
+        </div>
+        <div className="mt-2 pt-2 text-sm font-medium flex justify-between">
+          <span className="flex items-center gap-2">
+            Total bill:
+            <span
+              className={`px-2 py-1 rounded text-xs font-semibold ${String(order?.payment_status) === "captured"
+                ? "bg-gray-100 text-gray-700"
+                : String(order?.payment_status) === "failed"
+                  ? "bg-red-100 text-red-700"
+                  : "bg-gray-100 text-gray-700"
+                }`}
+            >
+              {String(order?.payment_status) === "captured" ? "Paid" : "Pending"}
+            </span>
+
+          </span>
+          <span>₹{Number(order?.total_amount || 0).toFixed(2)}</span>
+        </div>
+
       </div>
     </div>
   );

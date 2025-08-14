@@ -10,6 +10,8 @@ import { validateFormData } from "../../../../utils/validateForm";
 import { restaurantProfileSchema } from "../../../../validations/restaurantProfileSchema";
 import DeleteModal from "../../../../components/modals/DeleteModal";
 import MenuIcon from "../../../../lib/MenuIcon";
+import AddressAutocomplete from "../../../../components/Ui/AddressAutocomplete";
+import { useLoadScript } from "../../../../hooks/useLoadScript";
 type FormDataType = {
     banner: string | File;
     files: (string | File)[];
@@ -25,6 +27,8 @@ type FormDataType = {
     restaurant_charge: string;
     admin_commission: string;
     gst_percentage: string;
+    location?: { type: "Point"; coordinates: [number, number] }; // <— Added
+
 };
 
 const RestaurantProfile = () => {
@@ -90,6 +94,15 @@ const RestaurantProfile = () => {
                         restaurant_charge: fetchedData[0]?.restaurant_charge,
                         admin_commission: fetchedData[0]?.admin_commission,
                         gst_percentage: fetchedData[0]?.gst_percentage,
+                        location: fetchedData[0]?.location
+                            ? {
+                                type: "Point",
+                                coordinates: [
+                                    fetchedData[0].location.coordinates[0],
+                                    fetchedData[0].location.coordinates[1]
+                                ]
+                            }
+                            : undefined
                     });
                 } else {
                     console.warn("No restaurant data returned.");
@@ -181,6 +194,9 @@ const RestaurantProfile = () => {
                 formDataToSend.append(`files`, asset);
             }
         });
+        if (data.location) {
+            formDataToSend.append("location", JSON.stringify(data.location));
+        }
 
         // Append other scalar fields
         formDataToSend.append("name", data.name);
@@ -225,7 +241,9 @@ const RestaurantProfile = () => {
             setIsSubmitting(false);
         }
     };
-
+    const loaded = useLoadScript(
+        `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`
+    );
     if (loading) {
         return <Loader />;
     }
@@ -380,7 +398,7 @@ const RestaurantProfile = () => {
                         />
                     </div>
 
-                    <div className="md:col-span-2">
+                    {/* <div className="md:col-span-2">
                         <Input
                             type="text"
                             name="address"
@@ -393,8 +411,38 @@ const RestaurantProfile = () => {
                             error={errors?.address}
                             required
                         />
+                    </div> */}
+                    <div className="md:col-span-2">
+                        <label className="block font-semibold mb-1">Restaurant Address</label>
+                        {loaded ? (
+                            <div className="border border-gray-300 p-2 rounded-[8px]">
+                                <AddressAutocomplete
+                                    value={formData.address}
+                                    onChange={(address, coordinates) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            address,
+                                            ...(coordinates && {
+                                                location: {
+                                                    type: "Point",
+                                                    coordinates, // [lng, lat]
+                                                },
+                                            }),
+                                        }))
+                                    }
+                                // disabled={isPending}
+                                />
+                            </div>
+                        ) : (
+                            <input
+                                type="text"
+                                disabled
+                                placeholder="Loading..."
+                                className="input"
+                            />
+                        )}
+                        {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
                     </div>
-
                     <Input
                         type="number"
                         name="phone"

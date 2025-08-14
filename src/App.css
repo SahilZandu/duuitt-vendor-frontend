@@ -41,4 +41,6 @@
   color: #888;
 }
 
-
+.input .pac-target-input{
+   width: 100% !important ;
+}
