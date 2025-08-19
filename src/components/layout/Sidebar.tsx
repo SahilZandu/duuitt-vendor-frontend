@@ -27,10 +27,10 @@ const topMenuItems: MenuItem[] = [
       { label: "Payment Logs", to: "/outlet/payment-logs", icon: "payment" },
     ],
   },
-  // { label: "Messages", to: "/messages", icon: "message" },
   { label: "Offers", to: "/offers", icon: "offers" },
   { label: "Timing", to: "/timings", icon: "time" },
-  { label: "KYC Documents", to: "/kyc-documents", icon: "kyc" },
+  { label: "KYC Documents", to: "/kyc-documents", icon: "document" },
+  { label: "Pending Payouts", to: "/pending-payouts", icon: "pending" },
   // { label: "Reports", to: "/reports", icon: "report" },
 ];
 

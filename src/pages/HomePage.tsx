@@ -126,7 +126,7 @@ const HomePage = () => {
         localStorage.setItem("vendor_id", userData?._id || "");
 
         // Save vendor KYC status
-        localStorage.setItem("is_kyc_completed", userData?.is_kyc_completed || false);
+        // localStorage.setItem("is_kyc_completed", userData?.is_kyc_completed || false);
 
         // Request FCM token
         const deviceId = getOrCreateDeviceId();
@@ -146,8 +146,6 @@ const HomePage = () => {
       setIsVerifed(false);
     }
   };
-
-
 
   const handleCloseModal = () => {
     setShowOTP(false);

@@ -51,11 +51,11 @@ const Register = () => {
 
     try {
       const response = await axiosInstance("post", "/vendor/sign-up", formData);
+      console.log("response--------", response);
+      const { data,} = response.data;
 
-      const { data, statusCode, message } = response.data;
-
-      if (statusCode !== 200 || !data) {
-        toast.error(message || "Something went wrong.");
+      if (response?.data?.statusCode == 409) {
+        toast.error(response?.data?.message || "Something went wrong.");
         setLoading(false);
         return;
       }
@@ -103,7 +103,7 @@ const Register = () => {
 
         localStorage.setItem("accessToken", data.access_token);
         localStorage.setItem("restaurant_id", data.restaurant?._id || "");
-        localStorage.setItem("is_kyc_completed", data.is_kyc_completed || "");
+        // localStorage.setItem("is_kyc_completed", data.is_kyc_completed || "");
         localStorage.setItem("vendor_id", data._id || "");
 
         Cookies.set("authToken", data.access_token);
@@ -120,6 +120,7 @@ const Register = () => {
         }
       } else {
         setError("Invalid OTP or verification failed.");
+        // toast.error(response?.message)
       }
     } catch (error) {
       console.error("OTP verification error:", error);

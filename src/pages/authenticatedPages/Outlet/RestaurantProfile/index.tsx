@@ -418,6 +418,7 @@ const RestaurantProfile = () => {
                             <div className="border border-gray-300 p-2 rounded-[8px]">
                                 <AddressAutocomplete
                                     value={formData.address}
+                                    disabled={isPending}
                                     onChange={(address, coordinates) =>
                                         setFormData((prev) => ({
                                             ...prev,

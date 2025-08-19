@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 
 const MainLayout: React.FC = () => {
+
   return (
     <div className="flex min-h-screen">
       {/* Fixed Sidebar */}

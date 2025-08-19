@@ -36,6 +36,48 @@ const iconMap: Record<string, (className?: string) => JSX.Element> = {
             />
         </svg>
     ),
+    document: (className) => (
+        <svg
+            width="20"
+            height="20"
+            className={className}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+        >
+            <path
+                d="M7 2h7l5 5v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <path
+                d="M14 2v6h6"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    ),
+
+    cross: (className) => (
+        <svg
+            width="20"
+            height="20"
+            className={className}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+        >
+            <path
+                d="M6 6l12 12M6 18L18 6"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    ),
+
     bulb: (className) => (
         <svg
             width="20"

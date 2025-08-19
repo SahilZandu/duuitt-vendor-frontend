@@ -27,6 +27,11 @@ interface Offer {
     };
     createdAt?: string;
     is_vendor_accepted?: boolean | string;
+    vendor_list?: {
+        vendor_id: string;
+        status: "active" | "pending";
+
+    }[];
 }
 
 // Replace this with your actual date formatting function
@@ -45,11 +50,15 @@ const OfferManagement = () => {
     const [searchText, setSearchText] = useState("");
 
     // Filter logic
-    const filteredOffers = offers.filter((offer) => {
+
+    const filteredOffers = offers && offers?.filter((offer) => {
+        const vendorId = localStorage.getItem("vendor_id");
+        const vendor = offer?.vendor_list?.find(v => v.vendor_id === vendorId);
+
         const matchesStatus =
             statusFilter === "all" ||
-            (statusFilter === "active" && offer.is_vendor_accepted === true) ||
-            (statusFilter === "inactive" && offer.is_vendor_accepted !== true);
+            (statusFilter === "active" && vendor?.status === "active") ||
+            (statusFilter === "inactive" && vendor?.status !== "active");
 
         const matchesSearch =
             offer.title?.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -57,7 +66,6 @@ const OfferManagement = () => {
 
         return matchesStatus && matchesSearch;
     });
-
 
     const fetchOffers = async () => {
         setLoading(true);
@@ -79,27 +87,47 @@ const OfferManagement = () => {
         fetchOffers();
     }, []);
 
-    const handleToggleOfferStatus = async (offer: Offer) => {
-        const updatedStatus = !(offer.is_vendor_accepted === true);
+    const handleToggleOfferStatus = async (offer: Offer, vendorId: string | null) => {
+        if (!vendorId) return;
+
+        const vendor = offer?.vendor_list?.find(v => v.vendor_id === vendorId);
+        if (!vendor) return;
+
+        const updatedStatus = vendor?.status === "active" ? false : true;
 
         try {
             const response = await axiosInstance("post", "/offers/vendor-offer-status", {
                 offer_id: offer._id,
                 is_vendor_accepted: updatedStatus,
             });
-            console.log("response", response);
 
-            toast.success(response?.data?.message || "")
-            // Update the local state optimistically
+            toast.success(response?.data?.message || "");
+
+            // Optimistic update
+            // Optimistic update
             setOffers(prev =>
-                prev.map(o => o._id === offer._id ? { ...o, is_vendor_accepted: updatedStatus } : o)
+                prev.map(o =>
+                    o._id === offer._id
+                        ? {
+                            ...o,
+                            vendor_list: o.vendor_list?.map(v =>
+                                v.vendor_id === vendorId
+                                    ? {
+                                        ...v,
+                                        status: updatedStatus ? "active" : "pending"
+                                    }
+                                    : v
+                            ),
+                        }
+                        : o
+                )
             );
+
         } catch (error) {
             console.error("Failed to update offer status", error);
             alert("Failed to update offer status. Please try again.");
         }
     };
-
 
     const columns: TableColumn<Offer>[] = [
         {
@@ -152,19 +180,32 @@ const OfferManagement = () => {
             width: '170px',
         },
         {
-            name: 'Active/Inactive Offer',
-            cell: (row: Offer) => (
-                <label className="inline-flex items-center cursor-pointer">
-                    <input
-                        type="checkbox"
-                        checked={row.is_vendor_accepted === true}
-                        onChange={() => handleToggleOfferStatus(row)}
-                        className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500 rounded-full peer dark:bg-gray-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600 relative"></div>
-                </label>
-            ),
-            width: '140px',
+            name: "Active/Inactive Offer",
+            cell: (row: Offer) => {
+                const vendorId = localStorage.getItem("vendor_id");
+                const vendor = row?.vendor_list?.find(v => v.vendor_id === vendorId);
+                console.log("vendor", vendor);
+
+                const isActive = vendor?.status === "active";
+
+                return (
+                    <div className="flex items-center gap-2">
+                        <label className="inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={isActive}
+                                onChange={() => handleToggleOfferStatus(row, vendorId)}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500 rounded-full peer dark:bg-gray-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600 relative"></div>
+                        </label>
+                        <span className={isActive ? "text-green-600" : "text-red-600"}>
+                            {isActive ? "Active" : "Pending"}
+                        </span>
+                    </div>
+                );
+            },
+            width: "200px",
         }
 
     ];

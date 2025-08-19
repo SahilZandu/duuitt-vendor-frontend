@@ -5,6 +5,8 @@ import type { FoodItem } from "../../../types/types";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import DeleteModal from "../../../components/modals/DeleteModal";
+import Button from "../../../components/Ui/Button";
+import MenuIcon from "../../../lib/MenuIcon";
 
 const FoodMenu = () => {
     const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
@@ -140,12 +142,14 @@ const FoodMenu = () => {
                 </div>
 
                 {/* Add Product Button */}
-                <button
+                <Button
                     onClick={() => navigate("/food-menu/add-product")}
+                    label="Add Product"
+                    variant="primary"
+                    iconLeft={<MenuIcon name="add"/>}
                     className="bg-[#8E3CF7] hover:bg-green-700 text-white px-4 py-2 rounded-md transition"
-                >
-                    + Add Product
-                </button>
+                />
+               
             </div>
 
 

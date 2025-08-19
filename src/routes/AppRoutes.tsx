@@ -24,6 +24,11 @@ import FoodMenu from "../pages/authenticatedPages/Food-Menu";
 import AddTeamMember from "../pages/authenticatedPages/team/AddTeamMember";
 import KycDocuments from "../pages/authenticatedPages/KycDocuments";
 import KycDetail from "../pages/authenticatedPages/KycDocuments/KycDetail";
+import PendingPayouts from "../pages/authenticatedPages/PendingPayouts";
+import KycLayout from "../components/layout/KycLayout";
+import TermsAndConditions from "../pages/TermsAndConditions";
+import PrivacyPolicy from "../pages/PrivacyPolicy";
+import OpenSourceLibrary from "../pages/OpenSourceLibrary";
 
 const AppRoutes = () => {
   return (
@@ -35,14 +40,21 @@ const AppRoutes = () => {
       </Route>
 
       {/* Protected routes */}
-      <Route path="/kyc-submitted" element={<KycSubmitted />} />
-      <Route element={<ProtectedRoute />}>
+      <Route element={<KycLayout />}>
+        <Route path="/kyc-submitted" element={<KycSubmitted />} />
         <Route path="/vendor-kyc" element={<VendorKycPage />} />
+        <Route path="/vendor-kyc/kyc-detail" element={<KycDetail />} />
+      </Route>
 
+      <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/open-source-library" element={<OpenSourceLibrary />} />
+
+
+      <Route element={<ProtectedRoute />}>
         {/* All protected routes use layout */}
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          {/* <Route path="/vendor-kyc" element={<VendorKycPage />} /> */}
           <Route path="/outlet/order-history" element={<OrderHistory />} />
           <Route path="/outlet/order-history/view/:id" element={<ViewOrder />} />
           <Route path="/team" element={<TeamManagement />} />
@@ -67,7 +79,9 @@ const AppRoutes = () => {
           <Route path="/food-item/edit" element={<FoodItemEdit />} />
 
           <Route path="/kyc-documents" element={<KycDocuments />} />
-          <Route path="/kyc-detail" element={<KycDetail />} />
+          <Route path="/kyc-documents/kyc-detail" element={<KycDetail />} />
+
+          <Route path="/pending-payouts" element={<PendingPayouts />} />
 
         </Route>
       </Route>

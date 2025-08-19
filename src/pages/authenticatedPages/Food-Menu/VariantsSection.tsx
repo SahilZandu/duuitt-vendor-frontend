@@ -112,14 +112,14 @@
 //                 )}
 //             </div>
 
-//             {variants.map((variant, i) => (
+//             {variants && variants?.length > 0 && variants?.map((variant, i) => (
 //                 <div key={variant.id} className="border p-4 my-6 rounded-md bg-gray-50">
 //                     <div className="flex justify-between items-center mb-3">
 //                         <h3 className="text-purple-600 font-semibold text-lg">Variant {i + 1}</h3>
 //                         <Button variant="danger" label="Delete" iconLeft={<MenuIcon name="delete" />} onClick={() => removeVariant(variant.id)} />
 //                     </div>
 
-//                     <Input placeholder="Enter variant group" value={variant.group} onChange={e => updateGroup(variant.id, e.target.value)} error={errors[`group-${variant.id}`]} />
+//                     <Input placeholder="Enter variant group" value={variant?.group} onChange={e => updateGroup(variant.id, e.target.value)}  />
 
 //                     <div className="flex justify-between mt-3">
 //                         <label>Values</label>
@@ -128,7 +128,7 @@
 
 //                     {variant.variant.map((val, idx) => (
 //                         <div key={val.id} className="flex items-center gap-2 my-2">
-//                             <Input value={val.name} onChange={e => updateValue(variant.id, val.id, e.target.value)} placeholder="Variant value" error={errors[`value-${val.id}`]}/>
+//                             <Input value={val.name} onChange={e => updateValue(variant.id, val.id, e.target.value)} placeholder="Variant value" />
 //                             {idx !== 0 && (
 //                                 <Button variant="danger" label="Delete" iconLeft={<MenuIcon name="delete" />} onClick={() => removeValue(variant.id, val.id)} />
 //                             )}

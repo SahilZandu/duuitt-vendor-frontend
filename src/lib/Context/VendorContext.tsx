@@ -62,6 +62,7 @@ interface PanDetail {
 interface Vendor {
     restaurant_id: string;
     restaurant_name: string;
+    is_kyc_completed: boolean;
     restaurant?: Restaurant;
     bank_detail?: BankDetail;
     fssai_detail?: FssaiDetail;

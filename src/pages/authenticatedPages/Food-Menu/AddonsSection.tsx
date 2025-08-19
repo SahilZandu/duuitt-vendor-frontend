@@ -65,20 +65,29 @@
 //                 )}
 //             </div>
 
-//             {addons.map((group, idx) => (
+//             {addons && addons?.length > 0 && addons?.map((group, idx) => (
 //                 <div key={group.id} className="border p-4 rounded mb-4 bg-gray-50">
 //                     <div className="flex justify-between items-center mb-3 gap-2">
 //                         <Input label={`Group Title ${idx + 1}`} required={required} value={group.group} onChange={e => updateGroupName(group.id, e.target.value)} />
 //                         <Button label="" variant="danger" iconLeft={<MenuIcon name="delete" />} onClick={() => removeGroup(group.id)} />
 //                     </div>
 
-
-//                     <label className="flex items-center gap-2 mb-4">
-//                         <input type="checkbox" checked={group.is_price_related} onChange={() => togglePriceable(group.id)} />
+//                     <div className="flex items-center gap-2 mb-2">
 //                         Priceable
-//                     </label>
+//                         <label className="inline-flex items-center cursor-pointer ">
 
-//                     {group.addon.map((value, index) => (
+//                             <input
+//                                 type="checkbox"
+//                                 checked={group.is_price_related}
+//                                 onChange={() => togglePriceable(group?.id)}
+//                                 className="sr-only peer"
+//                             />
+//                             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500 rounded-full peer dark:bg-gray-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600 relative"></div>
+//                         </label>
+
+//                     </div>
+
+//                     {group?.addon?.map((value, index) => (
 //                         <div key={value.id} className="flex items-center gap-2">
 //                             <Input placeholder="Addon Name" value={value.name} required={required} onChange={e => updateAddonName(group.id, value.id, e.target.value)} />
 //                             {group.is_price_related && (
@@ -94,12 +103,24 @@
 //                         type="number"
 //                         required={required}
 //                         value={group.max_selection}
-//                         disabled={group.addon.length === 0} // disable if no addons
+//                         disabled={group.addon.length === 0}
 //                         min={1}
-//                         max={group.addon.length} // cap at addons length
-//                         onChange={e => updateMaxSelection(group.id, e.target.value)}
+//                         max={group.addon.length}
+//                         onChange={(e) => {
+//                             // just update whatever user types
+//                             updateMaxSelection(group.id, e.target.value);
+//                         }}
+//                         onBlur={(e) => {
+//                             let val = Number(e.target.value);
+//                             if (val > group.addon.length) {
+//                                 val = group.addon.length; // clamp on blur
+//                             }
+//                             if (val < 1) {
+//                                 val = 1; // minimum 1
+//                             }
+//                             updateMaxSelection(group.id, val.toString());
+//                         }}
 //                     />
-
 //                     <Button variant="soft-success" iconLeft={<MenuIcon name="add" />} label="Add More" onClick={() => addAddonValue(group.id)} className="mt-3" />
 //                 </div>
 //             ))}

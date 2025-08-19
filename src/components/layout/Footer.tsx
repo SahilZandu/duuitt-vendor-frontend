@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Footer = () => {
   const location = useLocation();
@@ -9,9 +9,8 @@ const Footer = () => {
 
   return (
     <footer
-      className={`bg-purple-700 text-white ${
-        showFullFooter ? "py-12 px-8 lg:px-16" : "py-4 px-4"
-      }`}
+      className={`bg-purple-700 text-white ${showFullFooter ? "py-12 px-8 lg:px-16" : "py-4 px-4"
+        }`}
     >
       <div className="max-w-6xl mx-auto">
         {showFullFooter && (
@@ -56,8 +55,28 @@ const Footer = () => {
             <div>
               <h4 className="font-semibold mb-4 text-white">Learn More</h4>
               <div className="space-y-2 text-purple-200">
-                <p className="hover:text-white cursor-pointer">Terms & Conditions</p>
-                <p className="hover:text-white cursor-pointer">Privacy Policy</p>
+                <div>
+                  <Link
+                    to="/terms-and-conditions"
+                    className="hover:text-white cursor-pointer"
+                  >
+                    Terms & Conditions
+                  </Link>
+                </div>
+                <Link
+                  to="/privacy-policy"
+                  className="hover:text-white cursor-pointer"
+                >
+                  Privacy Policy
+                </Link>
+                <div>
+                  <Link
+                    to="/open-source-library"
+                    className="hover:text-white cursor-pointer"
+                  >
+                    Open Source Library
+                  </Link>
+                </div>
               </div>
             </div>
 
@@ -79,7 +98,7 @@ const Footer = () => {
 
         <div className="border-t border-purple-600 mt-8 pt-6 text-center">
           <p className="text-purple-200 text-sm">
-          Copyright © {new Date().getFullYear()} Duuitt
+            Copyright © {new Date().getFullYear()} Duuitt
           </p>
         </div>
       </div>
