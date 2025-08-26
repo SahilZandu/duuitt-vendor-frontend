@@ -7,15 +7,16 @@ import { toast } from "react-toastify";
 import DeleteModal from "../../../components/modals/DeleteModal";
 import Button from "../../../components/Ui/Button";
 import MenuIcon from "../../../lib/MenuIcon";
+import PageTitle from "../../../components/Ui/PageTitle";
 
 const FoodMenu = () => {
-    const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
+    // const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
     const [filteredItems, setFilteredItems] = useState<FoodItem[]>([]);
     const [visibleCount, setVisibleCount] = useState(9);
     const [loadingMore, setLoadingMore] = useState(false);
-    const [search, setSearch] = useState("");
-    const [vegFilter, setVegFilter] = useState("All");
-    const [tagFilter, setTagFilter] = useState("All");
+    // const [search, setSearch] = useState("");
+    // const [vegFilter, setVegFilter] = useState("All");
+    // const [tagFilter, setTagFilter] = useState("All");
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -29,7 +30,7 @@ const FoodMenu = () => {
             const restaurant_id = localStorage.getItem("restaurant_id");
             const response = await axiosInstance("post", "/food-item/all", { restaurant_id });
             const data = response.data.data || [];
-            setFoodItems(data);
+            // setFoodItems(data);
             setFilteredItems(data);
         } catch (error) {
             console.error("Error fetching food items:", error);
@@ -41,30 +42,30 @@ const FoodMenu = () => {
     }, []);
 
 
-    useEffect(() => {
-        filterItems();
-        setVisibleCount(9); // Reset to first 9 on filter change
-    }, [search, vegFilter, tagFilter, foodItems]);
+    // useEffect(() => {
+    //     filterItems();
+    //     setVisibleCount(9); // Reset to first 9 on filter change
+    // }, [search, vegFilter, tagFilter, foodItems]);
 
-    const filterItems = () => {
-        let items = [...foodItems];
+    // const filterItems = () => {
+    //     let items = [...foodItems];
 
-        if (search.trim()) {
-            items = items.filter((item) =>
-                item.name.toLowerCase().includes(search.toLowerCase())
-            );
-        }
+    //     if (search.trim()) {
+    //         items = items.filter((item) =>
+    //             item.name.toLowerCase().includes(search.toLowerCase())
+    //         );
+    //     }
 
-        if (vegFilter !== "All") {
-            items = items.filter((item) => item.veg_nonveg === vegFilter);
-        }
+    //     if (vegFilter !== "All") {
+    //         items = items.filter((item) => item.veg_nonveg === vegFilter);
+    //     }
 
-        if (tagFilter !== "All") {
-            items = items.filter((item) => item.tag === tagFilter);
-        }
+    //     if (tagFilter !== "All") {
+    //         items = items.filter((item) => item.tag === tagFilter);
+    //     }
 
-        setFilteredItems(items);
-    };
+    //     setFilteredItems(items);
+    // };
 
 
     const handleLoadMore = () => {
@@ -109,7 +110,7 @@ const FoodMenu = () => {
         <div className="p-4 h-[100vh] flex flex-col">
             {/* Sticky Filters */}
             <div className="bg-white z-10 sticky top-0 p-4 flex flex-wrap gap-4 items-center justify-between border-b">
-                <div className="flex flex-wrap gap-4 w-full sm:w-auto">
+                {/* <div className="flex flex-wrap gap-4 w-full sm:w-auto">
                     <input
                         type="text"
                         placeholder="Search food..."
@@ -139,7 +140,8 @@ const FoodMenu = () => {
                         <option value="Best Selling">Best Selling</option>
                         <option value="Chef's Special">Chef's Special</option>
                     </select>
-                </div>
+                </div> */}
+                <PageTitle title="Food Menu"/>
 
                 {/* Add Product Button */}
                 <Button

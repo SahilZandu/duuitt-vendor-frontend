@@ -16,6 +16,8 @@ interface Props {
   required?: boolean;
   min?: number;  // added
   max?: number;  // added
+  onBlur?: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+
 }
 
 const Input: React.FC<Props> = ({
@@ -33,6 +35,7 @@ const Input: React.FC<Props> = ({
   required = false,
   min,   // added
   max,   // added
+  onBlur,
 }) => {
   const baseClass = clsx(
     "w-full px-4 py-2 border rounded-md text-sm transition duration-200",
@@ -65,6 +68,7 @@ const Input: React.FC<Props> = ({
           disabled={disabled}
           rows={rows}
           className={baseClass}
+          onBlur={onBlur}
         />
       ) : (
         <input
@@ -76,8 +80,9 @@ const Input: React.FC<Props> = ({
           onChange={onChange}
           disabled={disabled}
           className={baseClass}
-          min={min}     
-          max={max}     
+          min={min}
+          max={max}
+          onBlur={onBlur}
         />
       )}
 

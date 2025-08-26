@@ -11,7 +11,7 @@ interface RadioGroupProps {
   options: Option[];
   selected: string;
   onChange: (value: string) => void;
-  disabled: boolean;
+  disabled?: boolean;
   required?: boolean;
   error?: string;
 }

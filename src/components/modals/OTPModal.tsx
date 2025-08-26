@@ -1,5 +1,6 @@
 import Spinner from "../loader/Spinner";
 import logo from "../../assets/images/logo.svg";
+import MenuIcon from "../../lib/MenuIcon";
 
 
 interface OTPModalProps {
@@ -23,7 +24,7 @@ const OTPModal: React.FC<OTPModalProps> = ({ phone, onClose, onVerify, otp, setO
                         onClick={onClose}
                         className="text-gray-400 hover:text-gray-600 text-xl font-light"
                     >
-                        ×
+                        <MenuIcon name="close"/>
                     </button>
                 </div>
 
@@ -45,7 +46,6 @@ const OTPModal: React.FC<OTPModalProps> = ({ phone, onClose, onVerify, otp, setO
                         Enter OTP Code Sent to  Sent to {phone}
                     </h2>
 
-                    {/* OTP Input */}
                     {/* OTP Input Boxes */}
                     <div className="mb-6 flex justify-center space-x-2">
                         {otp.split('').map((digit, index) => (

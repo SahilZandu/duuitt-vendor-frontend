@@ -4,7 +4,7 @@ import axiosInstance from "../api/apiInstance";
 import OTPModal from "../components/modals/OTPModal";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/images/logo.png";
 import { getOrCreateDeviceId } from "../utils/getOrCreateDeviceId";
 import { requestNotificationPermissionAndSendToken } from "../utils/firebase";
@@ -254,9 +254,9 @@ const Register = () => {
 
             <p className="text-sm mt-4 text-center text-gray-600">
               Already have an account?{" "}
-              <a href="/" className="text-purple-600 hover:underline font-medium">
+              <Link to="/" className="text-purple-600 hover:underline font-medium">
                 Login
-              </a>
+              </Link>
             </p>
           </div>
         </div>

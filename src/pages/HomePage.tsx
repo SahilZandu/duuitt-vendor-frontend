@@ -118,6 +118,7 @@ const HomePage = () => {
         toast.success(response?.data?.message || "Login successful");
 
         const userData = response?.data?.data;
+        const isKycCompleted = !!userData?.is_kyc_completed;
 
         // Save tokens and IDs
         localStorage.setItem("accessToken", userData?.access_token);
@@ -133,11 +134,12 @@ const HomePage = () => {
         await requestNotificationPermissionAndSendToken(userData, deviceId);
 
         // Navigate based on vendor KYC status
-        if (userData?.is_kyc_completed) {
+        if (isKycCompleted) {
           navigate("/dashboard");
         } else {
           navigate("/vendor-kyc");
         }
+
       }
     } catch (error) {
       console.error("OTP verification error:", error);
