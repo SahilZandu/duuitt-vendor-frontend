@@ -23,13 +23,13 @@ interface AddonValue {
 interface AddonGroup {
     id: number;
     groupName: string;
-    group: string; 
+    group: string;
     priceable: boolean;
     maxSelectionLimit: string;
     values: AddonValue[];
-     is_price_related?: boolean;    // optional, if sometimes missing
-    max_selection?: number; 
-    addon: AddonValue[]; 
+    is_price_related?: boolean;    // optional, if sometimes missing
+    max_selection?: number;
+    addon: AddonValue[];
 }
 interface VariantValue {
     id: number;
@@ -43,8 +43,8 @@ interface Variant {
 }
 
 interface ProductData {
-    name: string;  
-    product_name: string;
+    name: string;
+    product_name?: string;
     description: string;
     selling_price: string;
     dish_category_id?: string;
@@ -67,9 +67,9 @@ const AddFoodItem = () => {
     const dishOptions = dishCategories && dishCategories?.length > 0 && dishCategories?.map((option) => ({
         label: option?.name,
         value: option?.name,
-    }));
+    })) || [];
     const [variants, setVariants] = useState<Variant[]>([]);
-    console.log("variants-----", variants);
+    // console.log("variants-----", variants);
     const variantsSectionRef = useRef<any>(null);
 
     const [addons, setAddons] = useState<AddonGroup[]>([]);
@@ -82,6 +82,7 @@ const AddFoodItem = () => {
     const [productData, setProductData] = useState<ProductData>({
         dish_category_id: "",
         name: "",
+        product_name: "",
         selling_price: "",
         description: "",
         veg_nonveg: "",
@@ -112,18 +113,18 @@ const AddFoodItem = () => {
         setGeneratedCombinations(combinations);
     };
     const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-) => {
-  const { name, value, type } = e.currentTarget;
-  const checked = (e.currentTarget as HTMLInputElement).checked;
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+        const { name, value, type } = e.currentTarget;
+        const checked = (e.currentTarget as HTMLInputElement).checked;
 
-  setProductData((prev) => ({
-    ...prev,
-    [name]: type === "checkbox" ? checked : value,
-  }));
+        setProductData((prev) => ({
+            ...prev,
+            [name]: type === "checkbox" ? checked : value,
+        }));
 
-  setErrors((prev) => ({ ...prev, [name]: "" }));
-};
+        setErrors((prev) => ({ ...prev, [name]: "" }));
+    };
 
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -138,13 +139,10 @@ const AddFoodItem = () => {
     const handleRecommendedChange = (selected: string[]) => {
         setProductData(prev => ({
             ...prev,
-            recomended: selected.length === 1 && selected[0] === "recomended"
-                ? true
-                : selected.length > 1
-                    ? selected
-                    : false
+            recomended: selected.includes("recomended") ? ["recomended"] : [],
         }));
     };
+
     const restaurant_id = localStorage.getItem("restaurant_id");
     const [errors, setErrors] = useState<Record<string, string>>({});
     console.log({ errors });
@@ -251,7 +249,7 @@ const AddFoodItem = () => {
                     }
                 }
             });
-         formData.append("restaurant_id", restaurant_id ?? "");
+            formData.append("restaurant_id", restaurant_id ?? "");
             // Append variants
             formData.append("variants", JSON.stringify(variants));
             const productType = variants?.length > 0 ? "variable" : "simple";
@@ -269,7 +267,7 @@ const AddFoodItem = () => {
             }
             // API call
             const response = await axiosInstance("post", "/food-item", formData);
-console.log("response", response);
+            console.log("response", response);
 
             // toast.success("Product added successfully");
             // navigate("/food-menu");
@@ -337,7 +335,7 @@ console.log("response", response);
                         label="Select Dish Type"
                         options={dishOptions}
                         required
-                        value={productData?.dish_category_id}
+                        value={productData.dish_category_id || ""}
                         onChange={(e) => setProductData(prev => ({ ...prev, dish_category_id: e.target.value }))}
                         error={errors?.dish_category_id}
                     />
