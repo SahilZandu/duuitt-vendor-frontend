@@ -7,8 +7,8 @@ import Dropdown from "../../../components/Ui/Dropdown";
 import RadioButton from "../../../components/Ui/RadioButton";
 import CheckBox from "../../../components/Ui/CheckBox";
 import Button from "../../../components/Ui/Button";
-import VariantsSection from "./VariantsSection";
-import AddonsSection from "./AddonsSection";
+// import VariantsSection from "./VariantsSection";
+// import AddonsSection from "./AddonsSection";
 import MenuIcon from "../../../lib/MenuIcon";
 import { toast } from "react-toastify";
 import { validateFormData } from "../../../utils/validateForm";
@@ -23,9 +23,13 @@ interface AddonValue {
 interface AddonGroup {
     id: number;
     groupName: string;
+    group: string; 
     priceable: boolean;
     maxSelectionLimit: string;
     values: AddonValue[];
+     is_price_related?: boolean;    // optional, if sometimes missing
+    max_selection?: number; 
+    addon: AddonValue[]; 
 }
 interface VariantValue {
     id: number;
@@ -39,6 +43,7 @@ interface Variant {
 }
 
 interface ProductData {
+    name: string;  
     product_name: string;
     description: string;
     selling_price: string;
@@ -47,7 +52,7 @@ interface ProductData {
     veg_nonveg?: string;
     status?: boolean;
     in_stock?: boolean;
-    recomended?: boolean;
+    recomended?: string[];
     image?: File | null;
     vendor_id?: string;
     restaurant_id?: string;
@@ -106,14 +111,20 @@ const AddFoodItem = () => {
     const handleCombinationsChange = (combinations: any[]) => {
         setGeneratedCombinations(combinations);
     };
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value, type, checked } = e.target;
-        setProductData(prev => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value
-        }));
-        setErrors((prev) => ({ ...prev, [name]: "" }));
-    };
+    const handleChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+) => {
+  const { name, value, type } = e.currentTarget;
+  const checked = (e.currentTarget as HTMLInputElement).checked;
+
+  setProductData((prev) => ({
+    ...prev,
+    [name]: type === "checkbox" ? checked : value,
+  }));
+
+  setErrors((prev) => ({ ...prev, [name]: "" }));
+};
+
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,7 +146,7 @@ const AddFoodItem = () => {
         }));
     };
     const restaurant_id = localStorage.getItem("restaurant_id");
-    const [errors, setErrors] = useState("");
+    const [errors, setErrors] = useState<Record<string, string>>({});
     console.log({ errors });
 
     const validateAddons = (addons: AddonGroup[]) => {
@@ -161,7 +172,7 @@ const AddFoodItem = () => {
             }
 
             // Validate addons
-            group.addon.forEach(v => {
+            group.addon.forEach((v: any) => {
                 if (!groupErr.addon) groupErr.addon = {};
 
                 if (!v.name.trim()) {
@@ -240,7 +251,7 @@ const AddFoodItem = () => {
                     }
                 }
             });
-            formData.append("restaurant_id", restaurant_id);
+         formData.append("restaurant_id", restaurant_id ?? "");
             // Append variants
             formData.append("variants", JSON.stringify(variants));
             const productType = variants?.length > 0 ? "variable" : "simple";
@@ -258,6 +269,7 @@ const AddFoodItem = () => {
             }
             // API call
             const response = await axiosInstance("post", "/food-item", formData);
+console.log("response", response);
 
             // toast.success("Product added successfully");
             // navigate("/food-menu");
@@ -372,7 +384,7 @@ const AddFoodItem = () => {
                                 { label: "Non Veg", value: "Non Veg" },
                                 { label: "Egg", value: "egg" },
                             ]}
-                            selected={productData.veg_nonveg}
+                            selected={productData.veg_nonveg || ""}
                             onChange={(value) => {
                                 setProductData(prev => ({ ...prev, veg_nonveg: value }));
                                 setErrors(prev => ({ ...prev, veg_nonveg: "" }));
@@ -412,18 +424,16 @@ const AddFoodItem = () => {
                             onChange={handleRecommendedChange}
                         />
                     </div>
-
-
                 </div>
-                <VariantsSection
+                {/* <VariantsSection
                     variants={variants}
                     ref={variantsSectionRef}
                     setVariants={setVariants}
                     generatedCombinations={generatedCombinations}
                     setGeneratedCombinations={setGeneratedCombinations}
                     onCombinationsChange={handleCombinationsChange}
-                />
-                <AddonsSection
+                /> */}
+                {/* <AddonsSection
                     addons={addons}
                     setAddons={setAddons}
                     required={isAddonSectionOpen}
@@ -436,7 +446,7 @@ const AddFoodItem = () => {
                                 : updater
                         }));
                     }}
-                />
+                /> */}
 
                 <div className="mt-8 flex gap-4">
                     <Button
