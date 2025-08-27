@@ -423,15 +423,15 @@ const AddFoodItem = () => {
                         />
                     </div>
                 </div>
-                {/* <VariantsSection
+                <VariantsSection
                     variants={variants}
                     ref={variantsSectionRef}
                     setVariants={setVariants}
                     generatedCombinations={generatedCombinations}
                     setGeneratedCombinations={setGeneratedCombinations}
                     onCombinationsChange={handleCombinationsChange}
-                /> */}
-                {/* <AddonsSection
+                /> 
+                <AddonsSection
                     addons={addons}
                     setAddons={setAddons}
                     required={isAddonSectionOpen}
@@ -444,7 +444,7 @@ const AddFoodItem = () => {
                                 : updater
                         }));
                     }}
-                /> */}
+                />
 
                 <div className="mt-8 flex gap-4">
                     <Button
