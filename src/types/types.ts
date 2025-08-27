@@ -127,3 +127,35 @@ export interface EditingSlot {
     slotIndex: number;
     slotData: Slot;
 }
+
+// src/types/foodMenu.types.ts
+
+export interface AddonValue {
+  id: number;
+  name: string;
+  price?: string;
+}
+
+export interface AddonGroups {
+  id: number;
+  groupName: string;
+  group: string;
+  priceable: boolean;
+  maxSelectionLimit: string;
+  values: AddonValue[];
+  is_price_related?: boolean;  // optional
+  max_selection?: string;
+  addon: AddonValue[];
+}
+
+export interface VariantValue {
+  id: number;
+  value?: string;
+  name?: string;  // keep optional if some places expect it
+}
+
+export interface Variant {
+  id: number;
+  group: string;
+  variant: VariantValue[];
+}

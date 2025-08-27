@@ -7,40 +7,42 @@ import Dropdown from "../../../components/Ui/Dropdown";
 import RadioButton from "../../../components/Ui/RadioButton";
 import CheckBox from "../../../components/Ui/CheckBox";
 import Button from "../../../components/Ui/Button";
-// import VariantsSection from "./VariantsSection";
-// import AddonsSection from "./AddonsSection";
+import VariantsSection from "./VariantsSection";
+import AddonsSection from "./AddonsSection";
 import MenuIcon from "../../../lib/MenuIcon";
 import { toast } from "react-toastify";
 import { validateFormData } from "../../../utils/validateForm";
 import { foodMenuSchema } from "../../../validations/foodMenuSchema";
+import type { AddonGroups, Variant, } from "../../../types/types";
 
-interface AddonValue {
-    id: number;
-    name: string;
-    price?: string;
-}
+// interface AddonValue {
+//     id: number;
+//     name: string;
+//     price?: string;
+// }
 
-interface AddonGroup {
-    id: number;
-    groupName: string;
-    group: string;
-    priceable: boolean;
-    maxSelectionLimit: string;
-    values: AddonValue[];
-    is_price_related?: boolean;    // optional, if sometimes missing
-    max_selection?: number;
-    addon: AddonValue[];
-}
-interface VariantValue {
-    id: number;
-    value: string;
-}
+// interface AddonGroup {
+//     id: number;
+//     groupName: string;
+//     group: string;
+//     priceable: boolean;
+//     maxSelectionLimit: string;
+//     values: AddonValue[];
+//     is_price_related?: boolean;    // optional, if sometimes missing
+//     max_selection?: number;
+//     addon: AddonValue[];
+// }
+// interface VariantValue {
+//     id: number;
+//     value: string;
+//     name?: string; 
+// }
 
-interface Variant {
-    id: number;
-    group: string;
-    variant: VariantValue[];
-}
+// interface Variant {
+//     id: number;
+//     group: string;
+//     variant: VariantValue[];
+// }
 
 interface ProductData {
     name: string;
@@ -72,7 +74,7 @@ const AddFoodItem = () => {
     // console.log("variants-----", variants);
     const variantsSectionRef = useRef<any>(null);
 
-    const [addons, setAddons] = useState<AddonGroup[]>([]);
+    const [addons, setAddons] = useState<AddonGroups[]>([]);
     console.log("addons-----", addons);
     const isAddonSectionOpen = addons?.length > 0;
 
@@ -147,7 +149,7 @@ const AddFoodItem = () => {
     const [errors, setErrors] = useState<Record<string, string>>({});
     console.log({ errors });
 
-    const validateAddons = (addons: AddonGroup[]) => {
+    const validateAddons = (addons: AddonGroups[]) => {
         const errors: Record<
             number,
             {
@@ -214,7 +216,7 @@ const AddFoodItem = () => {
 
         return errors;
     };
-
+const addonErrors = validateAddons(addons);
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const { valid, errors: mainErrors } = await validateFormData(foodMenuSchema, productData);
@@ -224,12 +226,12 @@ const AddFoodItem = () => {
             validVariants = variantsSectionRef.current.validateVariants();
         }
 
-        const addonErrors = validateAddons(addons);
-
         if (!valid || !validVariants || Object.keys(addonErrors).length > 0) {
             setErrors({
                 ...mainErrors,
-                addons: addonErrors
+                addons: Object.keys(addonErrors).length > 0
+                    ? "Invalid addon selection"
+                    : ""
             });
             return;
         }
@@ -398,7 +400,7 @@ const AddFoodItem = () => {
                                 { label: "Chef's Special", value: "Chef's Special" },
                                 { label: "Best Selling", value: "Best Selling" },
                             ]}
-                            selected={productData.tag}
+                           selected={productData.tag ?? ""}  
                             // onChange={(value) => setProductData(prev => ({ ...prev, tag: value }))}
                             onChange={(value) => {
                                 setProductData(prev => ({ ...prev, tag: value }));
@@ -425,25 +427,25 @@ const AddFoodItem = () => {
                 </div>
                 <VariantsSection
                     variants={variants}
-                    ref={variantsSectionRef}
                     setVariants={setVariants}
                     generatedCombinations={generatedCombinations}
                     setGeneratedCombinations={setGeneratedCombinations}
                     onCombinationsChange={handleCombinationsChange}
-                /> 
+                    errors={errors}
+                />
                 <AddonsSection
-                    addons={addons}
+                    addons={addons} 
                     setAddons={setAddons}
                     required={isAddonSectionOpen}
-                    errors={errors?.addons}
-                    setErrors={(updater) => {
-                        setErrors(prev => ({
-                            ...prev,
-                            addons: typeof updater === "function"
-                                ? updater(prev.addons)      // 👈 let child update only addons errors
-                                : updater
-                        }));
-                    }}
+                    errors={addonErrors} 
+                // setErrors={(updater) => {
+                //     setErrors(prev => ({
+                //         ...prev,
+                //         addons: typeof updater === "function"
+                //             ? updater(prev.addons)      // 👈 let child update only addons errors
+                //             : updater
+                //     }));
+                // }}
                 />
 
                 <div className="mt-8 flex gap-4">
@@ -459,11 +461,3 @@ const AddFoodItem = () => {
 };
 
 export default AddFoodItem;
-
-// const AddFoodItem = () => {
-//     return(
-//         <h1>Coming Soon</h1>
-//     )
-// };
-
-// export default AddFoodItem;

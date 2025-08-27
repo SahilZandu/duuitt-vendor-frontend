@@ -1,80 +1,46 @@
 import Input from "../../../components/Ui/Input";
 import Button from "../../../components/Ui/Button";
 import MenuIcon from "../../../lib/MenuIcon";
-
-interface AddonValue {
-    id: number;
-    name: string;
-    price?: string;
-}
-
-interface AddonGroup {
-    id: number;
-    group: string;
-    is_price_related: boolean;
-    max_selection: string;
-    addon: AddonValue[];
+import type { AddonGroups } from "../../../types/types";
+interface AddonError {
+    group?: string;
+    max_selection?: string;
+    addon?: Record<
+        number,
+        {
+            name?: string;
+            price?: string;
+        }
+    >;
 }
 interface AddonsSectionProps {
-    addons: AddonGroup[];
-    setAddons: React.Dispatch<React.SetStateAction<AddonGroup[]>>;
+    addons: AddonGroups[];
+    setAddons: React.Dispatch<React.SetStateAction<AddonGroups[]>>;
     required?: boolean;
-    errors?: Record<number, string[]>;
+    errors?: Record<number, AddonError>;
     setErrors?: React.Dispatch<React.SetStateAction<Record<number, string[]>>>;
 
 }
 
-export default function AddonsSection({ addons, setAddons, required = false, errors, setErrors }: AddonsSectionProps) {
+export default function AddonsSection({ addons, setAddons, required = false, errors }: AddonsSectionProps) {
     console.log("errors in addons-------------------", errors);
     console.log("addons-----------", addons);
 
     const generateId = () => Math.floor(Math.random() * 100000);
 
-    const clearError = (
-        groupId: number,
-        field: "group" | "max_selection" | "addon",
-        addonId?: number,
-        addonField?: "name" | "price"
-    ) => {
-        if (!setErrors) return;
-        setErrors(prev => {
-            const groupErrors = prev?.[groupId] || {};
-            const newGroupErrors = { ...groupErrors };
-
-            if (field === "addon" && addonId && addonField) {
-                if (newGroupErrors.addon?.[addonId]) {
-                    const { [addonField]: _, ...rest } = newGroupErrors.addon[addonId];
-                    newGroupErrors.addon = { ...newGroupErrors.addon, [addonId]: rest };
-                    if (Object.keys(newGroupErrors.addon[addonId]).length === 0) {
-                        delete newGroupErrors.addon[addonId];
-                    }
-                }
-            } else {
-                delete newGroupErrors[field];
-            }
-
-            // Clean up if no errors left
-            if (
-                !newGroupErrors.group &&
-                !newGroupErrors.max_selection &&
-                (!newGroupErrors.addon || Object.keys(newGroupErrors.addon).length === 0)
-            ) {
-                const { [groupId]: _, ...rest } = prev;
-                return rest;
-            }
-
-            return { ...prev, [groupId]: newGroupErrors };
-        });
-    };
-
-
-    const createGroup = (): AddonGroup => ({
+    const createGroup = (): AddonGroups => ({
         id: generateId(),
-        group: "",
+        groupName: "",                     // required
+        group: "",                         // required
+        priceable: false,                  // required
+        maxSelectionLimit: "",             // required (string in your interface)
+        values: [],                        // required
+        // legacy/optional fields:
         is_price_related: false,
         max_selection: "",
         addon: [{ id: generateId(), name: "", price: "" }]
     });
+
 
     const addGroup = () => {
         if (addons.length >= 3) return;
@@ -115,7 +81,6 @@ export default function AddonsSection({ addons, setAddons, required = false, err
                         <Input label={`Group Title ${idx + 1}`} error={errors?.[group.id]?.group} required={required} value={group.group}
                             onChange={e => {
                                 updateGroupName(group.id, e.target.value);
-                                clearError(group.id, "group");
                             }} />
                         <Button label="" variant="danger" iconLeft={<MenuIcon name="delete" />} onClick={() => removeGroup(group.id)} />
                     </div>
@@ -140,13 +105,11 @@ export default function AddonsSection({ addons, setAddons, required = false, err
                             <Input placeholder="Addon Name" error={errors?.[group.id]?.addon?.[value.id]?.name} value={value.name} required={required}
                                 onChange={e => {
                                     updateAddonName(group.id, value.id, e.target.value);
-                                    clearError(group.id, "addon", value.id, "name"); // 👈 clears only this field
                                 }} />
                             {group.is_price_related && (
-                                <Input placeholder="Selling Price" error={errors?.[group.id]?.addon?.[value.id]?.price} type="number" required={required} value={value?.price}
+                                <Input placeholder="Selling Price" error={errors?.[group.id]?.addon?.[value.id]?.price} type="number" required={required} value={value?.price || ""}
                                     onChange={e => {
                                         updateAddonPrice(group.id, value.id, e.target.value);
-                                        clearError(group.id, "addon", value.id, "price"); // 👈 clears only price error
                                     }} />
                             )}
                             {index !== 0 && (
@@ -158,11 +121,10 @@ export default function AddonsSection({ addons, setAddons, required = false, err
                         label="Maximum Selection Limit"
                         type="number"
                         required={required}
-                        value={group.max_selection}
+                        value={group?.max_selection || ""}
                         disabled={group.addon.length === 0}
                         onChange={(e) => {
                             updateMaxSelection(group.id, e.target.value);
-                            clearError(group.id, "max selection");
                         }}
                     />
 

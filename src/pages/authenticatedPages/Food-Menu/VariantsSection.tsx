@@ -1,7 +1,7 @@
-import { useState } from "react";
 import Input from "../../../components/Ui/Input";
 import Button from "../../../components/Ui/Button";
 import MenuIcon from "../../../lib/MenuIcon";
+import type { Variant } from "../../../types/types";
 
 interface VariantsSectionProps {
     variants: Variant[];
@@ -12,7 +12,7 @@ interface VariantsSectionProps {
     errors: { [key: string]: string };
     // setErrors: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
 }
-export default function VariantsSection({ variants, setVariants, generatedCombinations, setGeneratedCombinations, onCombinationsChange, errors, setErrors }: VariantsSectionProps) {
+export default function VariantsSection({ variants, setVariants, generatedCombinations, setGeneratedCombinations, onCombinationsChange }: VariantsSectionProps) {
     console.log("generatedCombinations--------------", generatedCombinations);
 
     const generateId = () => Math.floor(Math.random() * 100000);
@@ -41,14 +41,14 @@ export default function VariantsSection({ variants, setVariants, generatedCombin
     const updateValue = (variantId: number, valueId: number, name: string) => {
         setVariants(prev => prev.map(v =>
             v.id === variantId
-                ? { ...v, variant: v.variant.map(val => val.id === valueId ? { ...val, name } : val) }
+                ? { ...v, variant: v.variant.map((val: any) => val.id === valueId ? { ...val, name } : val) }
                 : v
         ));
     };
 
     const removeValue = (variantId: number, valueId: number) => {
         setVariants(prev => prev.map(v =>
-            v.id === variantId ? { ...v, variant: v.variant.filter(val => val.id !== valueId) } : v
+            v.id === variantId ? { ...v, variant: v.variant.filter((val: any)  => val.id !== valueId) } : v
         ));
         setGeneratedCombinations([]);
     };
@@ -61,7 +61,7 @@ export default function VariantsSection({ variants, setVariants, generatedCombin
                 newErrors[`group-${v.id}`] = "Variant group is required";
                 hasError = true;
             }
-            v.variant.forEach(val => {
+            v.variant.forEach((val:any) => {
                 if (!val.name.trim()) {
                     newErrors[`value-${val.id}`] = "Variant value is required";
                     hasError = true;
@@ -75,20 +75,20 @@ export default function VariantsSection({ variants, setVariants, generatedCombin
     const generateCombinations = () => {
         if (!variants.length) return;
         if (!validateVariants()) return;
-        const variantValues = variants.map(v => v.variant.map(val => val.name).filter(Boolean));
+        const variantValues = variants.map(v => v.variant.map((val:any) => val.name).filter(Boolean));
         if (variantValues.some(arr => arr.length === 0)) return;
 
         let combos: any[] = [];
 
         if (variantValues.length === 1) {
-            combos = variantValues[0].map(value => ({
+            combos = variantValues[0].map((value : any) => ({
                 first_gp: value,
                 second_gp: "",  // empty string here
                 price: "",
             }));
         } else if (variantValues.length === 2) {
-            combos = variantValues[0].flatMap(first =>
-                variantValues[1].map(second => ({
+            combos = variantValues[0].flatMap((first : any) =>
+                variantValues[1].map((second : any) => ({
                     first_gp: first,
                     second_gp: second,
                     price: "",
@@ -126,7 +126,7 @@ export default function VariantsSection({ variants, setVariants, generatedCombin
                         <Button type="button" variant="soft-success" iconLeft={<MenuIcon name="add" />} label="Add More" onClick={() => addValue(variant.id)} />
                     </div>
 
-                    {variant.variant.map((val, idx) => (
+                    {variant.variant.map((val: any, idx : any) => (
                         <div key={val.id} className="flex items-center gap-2 my-2">
                             <Input value={val.name} onChange={e => updateValue(variant.id, val.id, e.target.value)} placeholder="Variant value" />
                             {idx !== 0 && (
