@@ -1,8 +1,8 @@
 // ---------- types.ts ----------
 export interface TimeSlotEntry {
   _id: string;
-  open_times: string;   // e.g. "08:00"
-  close_time: string;   // e.g. "12:00"
+  open_times: string; // e.g. "08:00"
+  close_time: string; // e.g. "12:00"
   is_edit_delete: boolean;
   days_of_week: number; // 0 = Sunday, 1 = Monday, ...
 }
@@ -26,7 +26,7 @@ export type AllDaysTimingPayload = {
   outlet_status: boolean;
   timings: TimeSlotPayload[];
 };
-export type SpecifiedDayTimingPayload = Omit<SpecifiedDayTiming, 'timings'> & {
+export type SpecifiedDayTimingPayload = Omit<SpecifiedDayTiming, "timings"> & {
   timings: TimeSlotPayload[];
 };
 export interface RestaurantTimingPayload {
@@ -59,7 +59,7 @@ export interface Vendor {
     timings?: RestaurantTiming;
   };
 }
-export type TimeSlotPayload = Omit<TimeSlotEntry, '_id'>;
+export type TimeSlotPayload = Omit<TimeSlotEntry, "_id">;
 
 export type OrderStatus =
   | "pending"
@@ -80,7 +80,13 @@ export type CartItem = {
 export type OrderType = {
   order_id: string;
   user_name: string;
-  status: "waiting_for_confirmation" | "cooking" | "packing_processing" | "ready_to_pickup" | "declined" | "completed";
+  status:
+    | "waiting_for_confirmation"
+    | "cooking"
+    | "packing_processing"
+    | "ready_to_pickup"
+    | "declined"
+    | "completed";
   createdAt: string;
   cartitems: CartItem[];
   total_amount: number;
@@ -93,8 +99,8 @@ export type OrderType = {
 type VariantGroup = {
   group: string;
   variant: {
-      _id: string;
-      name: string;
+    _id: string;
+    name: string;
   }[];
 };
 
@@ -103,12 +109,11 @@ type AddonGroup = {
   max_selection: number;
   is_price_related: boolean;
   addon: {
-      _id: string;
-      name: string;
-      price?: number;
+    _id: string;
+    name: string;
+    price?: number;
   }[];
 };
-
 
 export type FoodItem = {
   _id: string;
@@ -117,15 +122,15 @@ export type FoodItem = {
   description?: string;
   selling_price?: number;
   tag?: string;
-  in_stock:number;
-  veg_nonveg?: "veg" | "nonveg"|"egg";
+  in_stock: number;
+  veg_nonveg?: "veg" | "nonveg" | "egg";
   variants?: VariantGroup[];
   addon?: AddonGroup[];
 };
 
 export interface EditingSlot {
-    slotIndex: number;
-    slotData: Slot;
+  slotIndex: number;
+  slotData: Slot;
 }
 
 // src/types/foodMenu.types.ts
@@ -143,7 +148,7 @@ export interface AddonGroups {
   priceable: boolean;
   maxSelectionLimit: string;
   values: AddonValue[];
-  is_price_related?: boolean;  // optional
+  is_price_related?: boolean; // optional
   max_selection?: string;
   addon: AddonValue[];
 }
@@ -151,11 +156,66 @@ export interface AddonGroups {
 export interface VariantValue {
   id: number;
   value?: string;
-  name?: string;  // keep optional if some places expect it
+  name?: string; // keep optional if some places expect it
 }
 
 export interface Variant {
   id: number;
   group: string;
   variant: VariantValue[];
+}
+
+export interface Vendor {
+  name?: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface Restaurant {
+  name?: string;
+  address?: string;
+}
+
+export interface FoodOrderDetails {
+  total_amount?: number;
+  refund_amt?: number;
+  admin_pay_amt?: number;
+  org_pay_amt?: number;
+  status?: string;
+  refund_status?: string;
+}
+
+export interface OrderLog {
+  order_id?: string | number;
+  invoice_id?: string | number;
+  payment_id?: string | number;
+  order_date?: string;
+  food_order_details?: FoodOrderDetails;
+}
+
+export interface SettledPaymentRow {
+  _id: string;
+  restaurant_id?: Partial<Restaurant>;
+  vendor_id?: Vendor;
+  payout_cycle?: string;
+  total_week_order?: number;
+  payout_date?: string;
+  payout_amt?: number;
+  status?: string;
+  order_log?: OrderLog[];
+}
+
+export type PaymentFilterBody = {
+  date_filter: string;
+  restaurant_id?: string | null;
+  start_date?: string;
+  end_date?: string;
+};
+
+type TabType = "all" | "specific";
+
+export interface TabsProps {
+  tabs: TabType[];
+  activeTab: TabType;
+  onTabChange: (tab: TabType) => void;
 }

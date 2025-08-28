@@ -25,10 +25,12 @@ import AddTeamMember from "../pages/authenticatedPages/team/AddTeamMember";
 import KycDocuments from "../pages/authenticatedPages/KycDocuments";
 import KycDetail from "../pages/authenticatedPages/KycDocuments/KycDetail";
 import PendingPayouts from "../pages/authenticatedPages/PendingPayouts";
+
 import KycLayout from "../components/layout/KycLayout";
 import TermsAndConditions from "../pages/TermsAndConditions";
 import PrivacyPolicy from "../pages/PrivacyPolicy";
 import OpenSourceLibrary from "../pages/OpenSourceLibrary";
+import SettledPaymentList from "../pages/SettledPayment/SettledPaymentList";
 
 const AppRoutes = () => {
   return (
@@ -50,17 +52,22 @@ const AppRoutes = () => {
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/open-source-library" element={<OpenSourceLibrary />} />
 
-
       <Route element={<ProtectedRoute />}>
         {/* All protected routes use layout */}
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/outlet/order-history" element={<OrderHistory />} />
-          <Route path="/outlet/order-history/view/:id" element={<ViewOrder />} />
+          <Route
+            path="/outlet/order-history/view/:id"
+            element={<ViewOrder />}
+          />
           <Route path="/team" element={<TeamManagement />} />
           <Route path="/team/add-team-member" element={<AddTeamMember />} />
 
-          <Route path="/outlet/restaurant-profile" element={<RestaurantProfile />} />
+          <Route
+            path="/outlet/restaurant-profile"
+            element={<RestaurantProfile />}
+          />
           <Route path="/outlet/rating" element={<Rating />} />
           <Route path="/outlet/payment-logs" element={<PaymentLogs />} />
           <Route path="/offers" element={<OfferManagement />} />
@@ -82,7 +89,10 @@ const AppRoutes = () => {
           <Route path="/kyc-documents/kyc-detail" element={<KycDetail />} />
 
           <Route path="/pending-payouts" element={<PendingPayouts />} />
-
+          <Route
+            path="/settled-payment-list"
+            element={<SettledPaymentList />}
+          />
         </Route>
       </Route>
 

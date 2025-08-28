@@ -1,23 +1,26 @@
-import React from "react";
 import MenuIcon from "../../lib/MenuIcon";
 
-type TabOption = {
+export type TabOption<T extends string> = {
   label: string;
-  value: string;
-  icon?: string; // 👈 add optional icon name
+  value: T;
+  icon?: string;
 };
 
-interface TabsProps {
-  tabs: TabOption[];
-  activeTab: string;
-  onTabChange: (tab: string) => void;
+export interface TabsProps<T extends string> {
+  tabs: TabOption<T>[];
+  activeTab: T;
+  onTabChange: (tab: T) => void;
 }
 
-const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabChange }) => {
+function Tabs<T extends string>({
+  tabs,
+  activeTab,
+  onTabChange,
+}: TabsProps<T>) {
   return (
     <div className="bg-white p-4 rounded-xl shadow-md mb-6">
-      <div className="flex space-x-4 md:space-x-6  border-b border-gray-200">
-        {tabs.map((tab) => {
+      <div className="flex space-x-4 md:space-x-6 border-b border-gray-200">
+        {tabs.map((tab: TabOption<T>) => {
           const isActive = activeTab === tab.value;
           return (
             <button
@@ -31,7 +34,12 @@ const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabChange }) => {
                 }`}
             >
               {tab.icon && (
-                <MenuIcon name={tab.icon} className={`w-4 h-4 ${isActive ? "text-[#8E3CF7]" : "text-gray-500"}`} />
+                <MenuIcon
+                  name={tab.icon}
+                  className={`w-4 h-4 ${
+                    isActive ? "text-[#8E3CF7]" : "text-gray-500"
+                  }`}
+                />
               )}
               <span>{tab.label}</span>
               {isActive && (
@@ -43,6 +51,6 @@ const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabChange }) => {
       </div>
     </div>
   );
-};
+}
 
 export default Tabs;
