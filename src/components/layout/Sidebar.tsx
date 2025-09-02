@@ -58,8 +58,17 @@ const bottomMenuItems: MenuItem[] = [
 
 const Sidebar: React.FC = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [restaurantName, setRestaurantName] = useState<string>("");
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch restaurant_name from localStorage
+    const name = localStorage.getItem("restaurant_name");
+    if (name) {
+      setRestaurantName(name);
+    }
+  }, []);
 
   const getInitialOpenMenus = () => {
     const openState: Record<string, boolean> = {};
@@ -116,6 +125,7 @@ const Sidebar: React.FC = () => {
       setTimeout(() => {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("isKycCompleted");
+        localStorage.removeItem("restaurant_name");
         localStorage.removeItem("vendor_id");
         localStorage.removeItem("restaurant_id");
         Cookies.remove("authToken");
@@ -141,6 +151,18 @@ const Sidebar: React.FC = () => {
             className="max-w-[100px] h-auto object-contain"
           />
         </Link>
+
+        {/* Restaurant Name */}
+        {restaurantName && (
+          <div className="flex items-center justify-center gap-2 bg-white/20 rounded-lg py-2 px-3 mb-6 shadow">
+            <span className="bg-white text-[#8E3CF7] rounded-full w-8 h-8 flex items-center justify-center font-bold">
+              {restaurantName.charAt(0)}
+            </span>
+            <h2 className="text-sm font-medium text-white truncate">
+              {restaurantName}
+            </h2>
+          </div>
+        )}
 
         {topMenuItems.map((item, idx) => {
           const hasChildren = !!item.children?.length;

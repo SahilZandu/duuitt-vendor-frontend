@@ -10,7 +10,6 @@ import logo from "../assets/images/logo.png";
 import { requestNotificationPermissionAndSendToken } from "../utils/firebase";
 import { getOrCreateDeviceId } from "../utils/getOrCreateDeviceId";
 
-
 const HomePage = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isVerfied, setIsVerifed] = useState(false);
@@ -77,7 +76,6 @@ const HomePage = () => {
   //       localStorage.setItem("restaurant_id", response?.data?.data?.restaurant?._id);
   //       Cookies.set("authToken", response?.data?.data?.access_token);
 
-
   //       const vendorProfile = response?.data?.data;
   //       localStorage.setItem("is_kyc_completed", vendorProfile?.is_kyc_completed);
   //       localStorage.setItem("vendor_id", vendorProfile?._id);
@@ -125,6 +123,10 @@ const HomePage = () => {
         Cookies.set("authToken", userData?.access_token);
         localStorage.setItem("restaurant_id", userData?.restaurant?._id || "");
         localStorage.setItem("vendor_id", userData?._id || "");
+        localStorage.setItem(
+          "restaurant_name",
+          userData?.restaurant?.name || ""
+        );
 
         // Save vendor KYC status
         // localStorage.setItem("is_kyc_completed", userData?.is_kyc_completed || false);
@@ -139,7 +141,6 @@ const HomePage = () => {
         } else {
           navigate("/vendor-kyc");
         }
-
       }
     } catch (error) {
       console.error("OTP verification error:", error);
@@ -162,9 +163,10 @@ const HomePage = () => {
         <div
           className="absolute inset-0 opacity-40"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
           }}
         ></div>
 
@@ -186,7 +188,9 @@ const HomePage = () => {
 
           {/* Right side - Registration Form */}
           <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl m-8 p-8 h-fit self-center">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">Get Started</h2>
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">
+              Get Started
+            </h2>
 
             <div className="space-y-4">
               <div>
@@ -222,7 +226,6 @@ const HomePage = () => {
         </div>
       </section>
 
-
       {/* Steps Section */}
       <section className="py-16 px-6 lg:px-24 bg-white text-center">
         <h2 className="text-3xl font-bold mb-2">
@@ -236,19 +239,25 @@ const HomePage = () => {
           <div>
             <h3 className="text-xl font-bold text-orange-500 mb-2">STEP 1</h3>
             <p>
-              Download the DUUITT Restaurant App<br />Available on Android & iOS
+              Download the DUUITT Restaurant App
+              <br />
+              Available on Android & iOS
             </p>
           </div>
           <div>
             <h3 className="text-xl font-bold text-yellow-500 mb-2">STEP 2</h3>
             <p>
-              Sign in or create your account<br />Just use your mobile number and some details
+              Sign in or create your account
+              <br />
+              Just use your mobile number and some details
             </p>
           </div>
           <div>
             <h3 className="text-xl font-bold text-purple-500 mb-2">STEP 3</h3>
             <p>
-              Add your restaurant details & menu<br />We'll help you get listed and ready to serve
+              Add your restaurant details & menu
+              <br />
+              We'll help you get listed and ready to serve
             </p>
           </div>
         </div>

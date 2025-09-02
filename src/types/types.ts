@@ -143,14 +143,24 @@ export interface AddonValue {
 
 export interface AddonGroups {
   id: number;
-  groupName: string;
   group: string;
-  priceable: boolean;
-  maxSelectionLimit: string;
-  values: AddonValue[];
-  is_price_related?: boolean; // optional
+  addon: {
+    id: number;
+    name: string;
+    price: string;
+  }[];
+  is_price_related?: boolean;
   max_selection?: string;
-  addon: AddonValue[];
+
+  // 👇 Add these if they are valid
+  groupName?: string;
+  priceable?: boolean;
+  maxSelectionLimit?: string;
+  values?: {
+    id: number;
+    name: string;
+    price: string;
+  }[];
 }
 
 export interface VariantValue {
