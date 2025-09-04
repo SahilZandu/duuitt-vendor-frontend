@@ -57,21 +57,21 @@ const Footer = () => {
               <div className="space-y-2 text-purple-200">
                 <div>
                   <Link
-                    to="/terms-and-conditions"
+                    to="https://duuitt.com/terms-conditions-restaurant-app"
                     className="hover:text-white cursor-pointer"
                   >
                     Terms & Conditions
                   </Link>
                 </div>
                 <Link
-                  to="/privacy-policy"
+                  to="https://duuitt.com/privicy-policy-restaurant-app"
                   className="hover:text-white cursor-pointer"
                 >
                   Privacy Policy
                 </Link>
                 <div>
                   <Link
-                    to="/open-source-library"
+                    to="https://duuitt.com/open-source-liberary-restaurant-app"
                     className="hover:text-white cursor-pointer"
                   >
                     Open Source Library
