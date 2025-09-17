@@ -8,9 +8,9 @@ import type { AddonGroups, FoodItem } from "../../../types/types";
 import RadioButton from "../../../components/Ui/RadioButton";
 
 // Define the IMAGE_BASE_URL constant
-const IMAGE_BASE_URL =
-  import.meta.env.VITE_BACKEND_BASE_URL ||
-  "https://your-api-domain.com/uploads/";
+// const IMAGE_BASE_URL =
+//   import.meta.env.VITE_BACKEND_BASE_URL ||
+//   "https://your-api-domain.com/uploads/";
 
 interface Variant {
   name: string;
@@ -142,7 +142,7 @@ const FoodItemEdit = () => {
       }));
 
       if (itemData.image) {
-        setImagePreview(`${IMAGE_BASE_URL}${itemData.image}`);
+        setImagePreview(itemData.image);
       }
 
       // Set variants, combinations, and addons if they exist
