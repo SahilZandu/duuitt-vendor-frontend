@@ -29,28 +29,6 @@ const CommonCard: React.FC<CommonCardProps> = ({
   return (
     <div className="relative flex flex-col justify-between h-full bg-white rounded-xl shadow-md p-4">
       {/* Edit/Delete Buttons (Top Right) */}
-      {(onEdit || onDelete) && (
-        <div className="absolute top-2 right-2 flex space-x-2 z-10">
-          {onEdit && (
-            <button
-              onClick={onEdit}
-              className="p-1 bg-white rounded-full shadow hover:bg-blue-100 text-blue-600"
-              title="Edit"
-            >
-              <PencilIcon className="h-4 w-4" />
-            </button>
-          )}
-          {onDelete && (
-            <button
-              onClick={onDelete}
-              className="p-1 bg-white rounded-full shadow hover:bg-red-100 text-red-600"
-              title="Delete"
-            >
-              <TrashIcon className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-      )}
 
       {/* Image */}
       <img
@@ -101,6 +79,8 @@ const CommonCard: React.FC<CommonCardProps> = ({
       </div>
 
       {/* View Details Button */}
+    <div className="flex flex-row justify-around">
+      <div className="flex-1">
       {onViewDetails && (
         <div className="mt-4">
           <button
@@ -111,6 +91,36 @@ const CommonCard: React.FC<CommonCardProps> = ({
           </button>
         </div>
       )}
+      </div>
+      {(onEdit || onDelete) && (
+        <div className="flex flex-1 items-center justify-evenly">
+          <div className="mt-4">
+          {onEdit && (
+            <button
+              onClick={onEdit}
+              className="w-full text-white bg-[#3182CE] py-3 px-4 transition rounded hover:bg-[#2B6CB0]"
+              title="Edit"
+            >
+              <PencilIcon className="h-4 w-4" />
+            </button>
+          )}
+          </div>
+          
+          <div className="mt-4">
+          {onDelete && (
+            <button
+              onClick={onDelete}
+              className=" text-white bg-[#E53E3E] py-3 rounded px-4 transition hover:bg-[#C53030]"
+              title="Delete"
+            >
+              <TrashIcon className="h-4 w-4" />
+            </button>
+          )}
+          </div>
+
+        </div>
+      )}
+    </div>
     </div>
   );
 };

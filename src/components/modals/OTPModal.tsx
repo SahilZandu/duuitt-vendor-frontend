@@ -1,7 +1,7 @@
 import Spinner from "../loader/Spinner";
 import logo from "../../assets/images/logo.svg";
 import MenuIcon from "../../lib/MenuIcon";
-
+import {useEffect} from 'react';
 
 interface OTPModalProps {
     phone: string;
@@ -15,6 +15,13 @@ interface OTPModalProps {
 }
 
 const OTPModal: React.FC<OTPModalProps> = ({ phone, onClose, onVerify, otp, setOtp, error, isVerfied }) => {
+    useEffect(()=>{
+          if(otp.length === 4){
+            onVerify();
+            console.log('loading');
+          }
+      },[otp]);
+      
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 p-8">

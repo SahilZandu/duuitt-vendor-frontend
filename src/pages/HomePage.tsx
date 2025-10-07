@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axiosInstance from "../api/apiInstance";
 import OTPModal from "../components/modals/OTPModal";
@@ -21,7 +21,7 @@ const HomePage = () => {
 
   const navigate = useNavigate();
 
-  // const isValidPhone = (phone: string) => /^[6-9]\d{9}$/.test(phone);
+  const isValidPhone = (phone: string) => /^[6-9]\d{9}$/.test(phone);
 
   const handleLogin = async () => {
     setError("");
@@ -30,22 +30,25 @@ const HomePage = () => {
       setError("Phone number is required.");
       return;
     }
-    // if (!isValidPhone(phone)) {
-    //   setError("Please enter a valid 10-digit mobile number.");
-    //   return;
-    // }
+    if (!isValidPhone(phone)) {
+      setError("Please enter a valid 10-digit mobile number.");
+      return;
+    }
     setIsLoggingIn(true);
     try {
       const response = await axiosInstance("post", "/vendor", {
         phone: Number(phone),
       });
-
-      if (response.data) {
+      if (response.data.statusCode === 200) {
         setGeneratedOTP(response.data.data.otp);
         toast.success("OTP sent successfully!");
         setShowOTP(true);
       }
-    } catch (err) {
+      else if(response.data.statusCode === 400){
+      toast.error('Account does not exist');
+      }
+    } 
+    catch (err) {
       console.error("Login error:", err);
       setError("Login failed. Please try again.");
     } finally {

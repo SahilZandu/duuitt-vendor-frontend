@@ -72,7 +72,7 @@ const OrderHistory = () => {
             name: "Status",
             cell: (row) => (
                 <span
-                    className={`px-3 py-1 rounded-full text-white text-sm capitalize ${row.status === "completed"
+                    className={`px-2 py-1 rounded-full text-white text-sm capitalize ${row.status === "completed"
                         ? "bg-green-600"
                         : row.status === "declined"
                             ? "bg-red-500"
