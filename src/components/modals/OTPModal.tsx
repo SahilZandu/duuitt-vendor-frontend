@@ -18,7 +18,6 @@ const OTPModal: React.FC<OTPModalProps> = ({ phone, onClose, onVerify, otp, setO
     useEffect(()=>{
           if(otp.length === 4){
             onVerify();
-            console.log('loading');
           }
       },[otp]);
       
