@@ -6,6 +6,7 @@ import Spinner from "../loader/Spinner";
 import logo from "../../assets/images/logo.png";
 import axiosInstance from "../../api/apiInstance";
 import { toast } from "react-toastify";
+import { useVendor } from "../../lib/Context/VendorContext";
 
 type MenuItem = {
   label: string;
@@ -58,17 +59,11 @@ const bottomMenuItems: MenuItem[] = [
 
 const Sidebar: React.FC = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [restaurantName, setRestaurantName] = useState<string>("");
+  const { vendor } = useVendor();
   const location = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Fetch restaurant_name from localStorage
-    const name = localStorage.getItem("restaurant_name");
-    if (name) {
-      setRestaurantName(name);
-    }
-  }, []);
+  const restaurantName = vendor?.restaurant_name || localStorage.getItem("restaurant_name") || "";
 
   const getInitialOpenMenus = () => {
     const openState: Record<string, boolean> = {};

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import PageTitle from "./PageTitle";
@@ -18,7 +18,52 @@ const KycPage = () => {
   console.log("vendor------", vendor);
   
   const navigate = useNavigate();
+  const previousVendor = useRef<typeof vendor | null>(null);
+  const notifyChange = (label: string, oldStatus: string, newStatus: string) => {
+    console.log(`KYC status changed for ${label}: ${oldStatus} -> ${newStatus}`);
+  };
+  
+  useEffect(() => {
+    if (vendor && previousVendor.current) {
+      const old = previousVendor.current;
+      const newv = vendor;
 
+      const compareAndNotify = (
+        label: string,
+        oldStatus?: string,
+        newStatus?: string
+      ) => {
+        if (oldStatus && newStatus && oldStatus !== newStatus) {
+          notifyChange(label, oldStatus, newStatus);
+        }
+      };
+
+      compareAndNotify(
+        "Bank Details",
+        old.bank_detail?.status,
+        newv.bank_detail?.status
+      );
+      compareAndNotify(
+        "FSSAI Details",
+        old.fssai_detail?.status,
+        newv.fssai_detail?.status
+      );
+      compareAndNotify(
+        "GST Details",
+        old.gstn_detail?.status,
+        newv.gstn_detail?.status
+      );
+      compareAndNotify(
+        "PAN Card Details",
+        old.pan_detail?.status,
+        newv.pan_detail?.status
+      );
+    }
+
+    // Update stored vendor for next comparison
+    previousVendor.current = vendor;
+  }, [vendor]);
+  
   const getStatusStyle = (status: KycItem["status"]) => {
     switch (status) {
       case "approved":

@@ -7,6 +7,7 @@ import Loader from "../../../../components/loader/Loader";
 import { toast } from "react-toastify";
 import { vendorProfileSchema } from "../../../../validations/vendorProfileSchema";
 import { validateFormData } from "../../../../utils/validateForm";
+import { useVendor } from "../../../../lib/Context/VendorContext";
 
 type FormDataType = {
   name: string;
@@ -15,6 +16,7 @@ type FormDataType = {
 };
 
 const VendorProfile = () => {
+  const { setVendor, vendor } = useVendor();
   const [formData, setFormData] = useState<FormDataType>({
     name: "",
     phone: "",
@@ -70,7 +72,18 @@ const VendorProfile = () => {
     }
 
     try {
-      await updateVendorProfile(formData);
+      const updated = await updateVendorProfile(formData);
+      if (updated) {
+        // update context so UI updates immediately
+        setVendor({
+          ...(vendor || {
+            restaurant_id: localStorage.getItem("restaurant_id") || "",
+            is_kyc_completed: false,
+            restaurant_name: "",
+          }),
+          restaurant_name: updated.name || formData.name,
+        });
+      }
       toast.success("Profile Updated Successfully");
     } catch (err) {
       toast.error("Failed to update profile");

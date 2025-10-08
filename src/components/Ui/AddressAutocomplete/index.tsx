@@ -38,7 +38,7 @@ const AddressAutocomplete = ({ value, onChange }: Props) => {
       onChange={(e) => onChange(e.target.value)}
       // disabled={disabled}
       placeholder="Enter restaurant address"
-      className="input"
+      className="input w-full focus:outline-none"
     />
   );
 };
