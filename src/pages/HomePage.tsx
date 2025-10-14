@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axiosInstance from "../api/apiInstance";
 import OTPModal from "../components/modals/OTPModal";
