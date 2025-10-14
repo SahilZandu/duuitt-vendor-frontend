@@ -800,8 +800,9 @@ const FoodItemEdit = () => {
                 {combinations.map((combo, index) => (
                   <div
                     key={index}
-                    className="flex gap-2 items-center p-2 border rounded"
+                    className="flex flex-col"
                   >
+                    <div className="flex gap-2 items-center p-2 border rounded">
                     <span className="flex-1 font-medium">
                       {combo.second_gp
                         ? `${combo.first_gp} + ${combo.second_gp}`
@@ -816,17 +817,19 @@ const FoodItemEdit = () => {
                       }
                       className="w-24 px-3 py-2 border border-gray-300 rounded-md"
                     />
+                    </div>
+                    <div>
+                      {errors[`combination_${index}`] ? (
+                  <p key={`combo_err_${index}`} className="text-red-500 text-sm">
+                    {errors[`combination_${index}`]}
+                  </p>
+                ) : null}
+                    </div>
                   </div>
+                
                 ))}
               </div>
-              {/* Errors for combinations */}
-              {combinations.map((_, idx) =>
-                errors[`combination_${idx}`] ? (
-                  <p key={`combo_err_${idx}`} className="text-red-500 text-sm">
-                    {errors[`combination_${idx}`]}
-                  </p>
-                ) : null
-              )}
+           
             </div>
           )}
         </div>
@@ -898,6 +901,7 @@ const FoodItemEdit = () => {
             {/* Addon Items */}
             {group.addon.map((item, i) => (
               <div key={i} className="flex gap-2 mb-2">
+               <div className="flex flex-col">
                 <input
                   type="text"
                   value={item.name}
@@ -909,6 +913,17 @@ const FoodItemEdit = () => {
                   }}
                   className="flex-1 border rounded px-3 py-2"
                 />
+                <div key={`addon_err_${groupIndex}_${i}`} className="space-y-1 block">
+                {errors[`addon_${groupIndex}_${i}`] && (
+                  <p className="text-red-500 text-sm">
+                    {errors[`addon_${groupIndex}_${i}`]}
+                  </p>
+                )}
+                </div>
+               </div>
+
+                <div className="flex flex-col">
+                <div className="flex">
                 {group.is_price_related && (
                   <input
                     type="number"
@@ -922,6 +937,9 @@ const FoodItemEdit = () => {
                     className="w-24 border rounded px-2 py-2"
                   />
                 )}
+
+
+                
                 <button
                   onClick={() => {
                     const updated = [...addonGroups];
@@ -931,26 +949,20 @@ const FoodItemEdit = () => {
                   className="text-red-500 hover:text-red-700"
                 >
                   <Icon path={mdiDelete} size={0.8} />
-                </button>
-              </div>
-            ))}
-
-            {/* Addon-level errors */}
-            {group.addon.map((_, i) => (
-              <div key={`addon_err_${groupIndex}_${i}`} className="space-y-1">
-                {errors[`addon_${groupIndex}_${i}`] && (
-                  <p className="text-red-500 text-sm">
-                    {errors[`addon_${groupIndex}_${i}`]}
-                  </p>
-                )}
-                {errors[`addon_${groupIndex}_${i}_price`] && (
+                </button>               
+                </div>
+               <div key={`addon_err_${groupIndex}_${i}`} className="space-y-1 block">
+                  {errors[`addon_${groupIndex}_${i}_price`] && (
                   <p className="text-red-500 text-sm">
                     {errors[`addon_${groupIndex}_${i}_price`]}
                   </p>
                 )}
-              </div>
+                </div>
+                </div>
+                </div>
             ))}
 
+         
             {/* Add Addon Button */}
             <button
               onClick={() => {

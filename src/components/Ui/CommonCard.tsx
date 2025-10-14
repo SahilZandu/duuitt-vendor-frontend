@@ -81,16 +81,16 @@ const CommonCard: React.FC<CommonCardProps> = ({
       {/* View Details Button */}
     <div className="flex flex-row justify-around">
       <div className="flex-1">
+      <div className="mt-4"> 
       {onViewDetails && (
-        <div className="mt-4">
           <button
             onClick={onViewDetails}
-            className="w-full bg-[#8E3CF7] text-white py-2 px-4 rounded hover:bg-purple-700 transition"
+            className="w-full bg-[#8E3CF7] text-white py-[10px] text-sm px-4 rounded hover:bg-purple-700 transition"
           >
             View Details
           </button>
-        </div>
       )}
+      </div>
       </div>
       {(onEdit || onDelete) && (
         <div className="flex flex-1 items-center justify-evenly">
@@ -98,10 +98,10 @@ const CommonCard: React.FC<CommonCardProps> = ({
           {onEdit && (
             <button
               onClick={onEdit}
-              className="w-full text-white bg-[#3182CE] py-3 px-4 transition rounded hover:bg-[#2B6CB0]"
+              className="w-full text-white bg-[#3182CE] py-[11px] px-4 transition rounded hover:bg-[#2B6CB0]"
               title="Edit"
             >
-              <PencilIcon className="h-4 w-4" />
+              <PencilIcon className="h-4 w-4 text-lg" />
             </button>
           )}
           </div>
@@ -110,7 +110,7 @@ const CommonCard: React.FC<CommonCardProps> = ({
           {onDelete && (
             <button
               onClick={onDelete}
-              className=" text-white bg-[#E53E3E] py-3 rounded px-4 transition hover:bg-[#C53030]"
+              className=" text-white bg-[#E53E3E] py-[11px] rounded px-4 transition hover:bg-[#C53030]"
               title="Delete"
             >
               <TrashIcon className="h-4 w-4" />

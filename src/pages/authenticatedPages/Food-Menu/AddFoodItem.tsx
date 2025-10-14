@@ -249,7 +249,7 @@ const AddFoodItem = () => {
 
   // 🔹 Validation
   const validateForm = (): boolean => {
-    const { name, base_price, product_type, dish_category_id } = productData;
+    const { name, base_price, product_type, dish_category_id, image } = productData;
     const newErrors: { [key: string]: string } = {};
     if (!name.trim()) newErrors.name = "Product name is required.";
     if (!dish_category_id)
@@ -260,6 +260,10 @@ const AddFoodItem = () => {
     if (product_type === "variable" && variantGroups.length < 2) {
       newErrors.variantGroups =
         "At least two variant groups required for variable products.";
+    }
+
+    if(!image){
+      newErrors.image = "Image is required."
     }
     // if (product_type === "variable") {
     //   if (variantGroups.length < 1) {
@@ -367,9 +371,13 @@ const AddFoodItem = () => {
         formData.append("addon", JSON.stringify(addonGroups));
       }
 
-      await axiosInstance("post", "/food-item", formData);
-      toast.success("Product added successfully");
-      navigate("/food-menu");
+      const response = await axiosInstance("post", "/food-item", formData);
+      console.log('response :', response);
+      if(response.data.statusCode === 200){
+        console.log('response:', response);
+        toast.success("Product added successfully");
+        navigate("/food-menu");
+      }
     } catch (error) {
       toast.error("Failed to add product");
       console.error(error);
@@ -487,7 +495,9 @@ const AddFoodItem = () => {
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-                className="w-full border rounded-lg px-3 py-2"
+                className={`w-full border rounded-lg px-3 py-2 ${
+                  errors.image ? "border-red-500" : "border-gray-300"
+                }`}
               />
               {imagePreview && (
                 <img

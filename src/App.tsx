@@ -4,9 +4,13 @@ import { messaging } from "./utils/firebase";
 import { toast } from "react-toastify";
 import AppRoutes from "./routes/AppRoutes";
 import { useVendor } from "./lib/Context/VendorContext";
-
+import { fetchRestaurantDetails } from "./api/ProfileUpdateApi";
 const App = () => {
   const { fetchVendor } = useVendor();
+  const restaurant_id = localStorage.getItem("restaurant_id") || '';
+  if(!restaurant_id){
+    console.error('resturant id is not found in local storage');
+  }
   useEffect(() => {
     onMessage(messaging, (payload) => {
       console.log("Foreground message received:", payload);
@@ -21,9 +25,8 @@ const App = () => {
       } else {
         toast.info(`${title || "Notification"}: ${body || ""}`);
       }
-
-      // Refetch vendor data so UI reflects latest server state (e.g., KYC status)
       fetchVendor();
+      fetchRestaurantDetails(restaurant_id);
     });
   }, []);
 
