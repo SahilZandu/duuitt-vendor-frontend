@@ -71,7 +71,7 @@ const Tooltip = ({ text, children, position = "top" }: TooltipProps) => {
   return (
     <div
       ref={ref}
-      className="relative inline-block"
+      className=""
       onMouseEnter={showTooltip}
       onMouseLeave={hideTooltip}
     >
