@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import MenuIcon from "../../lib/MenuIcon";
-import Cookies from "js-cookie"; // Make sure you have this installed: `npm install js-cookie`
+import Cookies from "js-cookie";
 import Spinner from "../loader/Spinner";
 import logo from "../../assets/images/logo.png";
 import axiosInstance from "../../api/apiInstance";
 import { toast } from "react-toastify";
-import { useVendor } from "../../lib/Context/VendorContext";
+import { useSidebar } from "../../lib/Context/SidebarContext";
+import Tooltip from "../Ui/Tooltip";
 
 type MenuItem = {
   label: string;
@@ -25,16 +26,8 @@ const topMenuItems: MenuItem[] = [
     to: "/outlet",
     icon: "outlet",
     children: [
-      {
-        label: "Restaurant Profile",
-        to: "/outlet/restaurant-profile",
-        icon: "restaurant-profile",
-      },
-      {
-        label: "Order History",
-        to: "/outlet/order-history",
-        icon: "order-history",
-      },
+      { label: "Restaurant Profile", to: "/outlet/restaurant-profile", icon: "restaurant-profile" },
+      { label: "Order History", to: "/outlet/order-history", icon: "order-history" },
       { label: "Rating", to: "/outlet/rating", icon: "rating" },
       { label: "Payment Logs", to: "/outlet/payment-logs", icon: "payment" },
     ],
@@ -43,12 +36,7 @@ const topMenuItems: MenuItem[] = [
   { label: "Timing", to: "/timings", icon: "time" },
   { label: "KYC Documents", to: "/kyc-documents", icon: "document" },
   { label: "Pending Payouts", to: "/pending-payouts", icon: "pending" },
-  {
-    label: "Settled Payments",
-    to: "/settled-payment-list",
-    icon: "settled-report",
-  },
-  // { label: "Reports", to: "/reports", icon: "report" },
+  { label: "Settled Payments", to: "/settled-payment-list", icon: "settled-report" },
 ];
 
 const bottomMenuItems: MenuItem[] = [
@@ -58,62 +46,27 @@ const bottomMenuItems: MenuItem[] = [
 ];
 
 const Sidebar: React.FC = () => {
+  const {
+    isCollapsed,
+    toggleSidebar,
+    openMenus,
+    toggleMenu,
+    isActive,
+  } = useSidebar();
+
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { vendor } = useVendor();
+  const [restaurantName, setRestaurantName] = useState<string>("");
+
   const location = useLocation();
   const navigate = useNavigate();
 
-  const restaurantName = vendor?.restaurant_name || localStorage.getItem("restaurant_name") || "";
-
-  const getInitialOpenMenus = () => {
-    const openState: Record<string, boolean> = {};
-    [...topMenuItems, ...bottomMenuItems].forEach((item) => {
-      if (item.children?.length) {
-        const hasActiveChild = item.children.some((child) =>
-          location.pathname.startsWith(child.to || "")
-        );
-        openState[item.label] = hasActiveChild;
-      }
-    });
-    return openState;
-  };
   useEffect(() => {
-    const updatedOpenMenus: Record<string, boolean> = {};
-    topMenuItems.forEach((item) => {
-      if (item.children?.length) {
-        const hasActiveChild = item.children.some((child) =>
-          location.pathname.startsWith(child.to || "")
-        );
-        updatedOpenMenus[item.label] = hasActiveChild;
-      }
-    });
-    setOpenMenus(updatedOpenMenus);
+    const restaurant = localStorage.getItem("restaurant_name");
+    if (restaurant) setRestaurantName(restaurant);
   }, [location.pathname]);
 
-  const [openMenus, setOpenMenus] =
-    useState<Record<string, boolean>>(getInitialOpenMenus);
-  const toggleMenu = (label: string) => {
-    setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
-  };
-
-  const isActive = (path?: string) =>
-    path ? location.pathname.startsWith(path) : false;
-
-  //   const handleLogout = () => {
-  //     setIsLoggingOut(true);
-  // // /vendor/logout
-  // setTimeout(() => {
-  //   localStorage.removeItem("accessToken");
-  //   localStorage.removeItem("isKycCompleted");
-  //   localStorage.removeItem("vendor_id");
-  //   localStorage.removeItem("restaurant_id");
-  //   Cookies.remove("authToken");
-
-  //   setIsLoggingOut(false);
-  //   navigate("/login");
-  // }, 1000);
-  //   };
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     try {
       const response = await axiosInstance("get", "/vendor/logout");
       console.log("response", response);
@@ -134,173 +87,153 @@ const Sidebar: React.FC = () => {
     }
   };
   return (
-    <aside className="w-64 bg-[#8E3CF7] text-white h-screen flex flex-col py-6 px-4">
-      <nav className="space-y-2 overflow-y-auto">
-        <Link
-          to="/"
-          className="mb-8 cursor-pointer flex justify-center items-center"
-        >
-          <img
-            src={logo}
-            alt="Logo"
-            className="max-w-[100px] h-auto object-contain"
-          />
-        </Link>
+    <aside
+      className={`${
+        isCollapsed ? "w-20" : "w-64"
+      } bg-[#8E3CF7] text-white h-screen fixed left-0 top-0 
+      flex flex-col py-6 px-3 transition-all duration-300 z-50`}
+    >
+      {/* Collapse Button */}
+      <button
+        onClick={toggleSidebar}
+        className="absolute top-4 -right-3 bg-white text-[#8E3CF7]
+        p-1 rounded-full shadow-md hover:scale-105 transition"
+      >
+        {isCollapsed ? ">" : "<"}
+      </button>
 
-        {/* Restaurant Name */}
-        {restaurantName && (
-          <div className="flex items-center justify-center gap-2 bg-white/20 rounded-lg py-2 px-3 mb-6 shadow">
-            <span className="bg-white text-[#8E3CF7] rounded-full w-8 h-8 flex items-center justify-center font-bold">
-              {restaurantName.charAt(0)}
-            </span>
-            <h2 className="text-sm font-medium text-white truncate">
-              {restaurantName}
-            </h2>
-          </div>
-        )}
+      {/* Logo */}
+      <Link className="flex justify-center mb-6 mt-1" to="/">
+        <img
+          src={logo}
+          alt="Logo"
+          className={`${isCollapsed ? "w-10" : "w-20"} transition`}
+        />
+      </Link>
 
-        {topMenuItems.map((item, idx) => {
-          const hasChildren = !!item.children?.length;
+      {/* Restaurant Name */}
+      {!isCollapsed && restaurantName && (
+        <div className="flex gap-2 items-center bg-white/20 py-2 px-3 rounded-md mb-6">
+          <span className="bg-white text-[#8E3CF7] rounded-full w-8 h-8 
+          flex justify-center items-center font-bold">
+            {restaurantName.charAt(0)}
+          </span>
+          <span className="text-sm truncate">{restaurantName}</span>
+        </div>
+      )}
+
+      {/* Menu */}
+      <nav className="flex-1 space-y-1 overflow-y-auto">
+        {[...topMenuItems, ...bottomMenuItems].map((item, index) => {
+          const hasChildren = item.children?.length;
+
           return (
-            <div key={idx}>
-              {item.to && !hasChildren && (
-                <SidebarLink
-                  to={item.to}
-                  label={item.label}
-                  icon={item.icon}
-                  active={isActive(item.to)}
-                />
-              )}
-
+            <div key={index}>
+              {/* Parent with submenu */}
               {hasChildren && (
                 <>
+                
                   <button
                     onClick={() => toggleMenu(item.label)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded transition-colors duration-150 ${
+                    className={`flex items-center w-full  py-2 rounded-lg transition ${
+                      isCollapsed ? "justify-center" : "px-3 gap-3 justify-between"
+                    } ${
                       openMenus[item.label]
-                        ? "bg-white text-[#8E3CF7] font-semibold"
-                        : "text-white hover:bg-white hover:text-[#8E3CF7]"
+                        ? "bg-white text-[#8E3CF7]"
+                        : "hover:bg-white hover:text-[#8E3CF7]"
                     }`}
                   >
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center justify-center!important space-x-2">
                       {item.icon && <MenuIcon name={item.icon} />}
-                      <span>{item.label}</span>
+                      {!isCollapsed && <span>{item.label}</span>}
                     </div>
+                    {!isCollapsed &&
                     <MenuIcon
                       name={openMenus[item.label] ? "dropdown-up" : "dropdown"}
-                    />
+                    />}
                   </button>
-                  {openMenus[item.label] && (
-                    <ul className="ml-4 mt-1 space-y-1">
-                      {item?.children?.map((subItem, subIdx) => (
-                        <SidebarLink
-                          key={subIdx}
-                          to={subItem.to!}
-                          label={subItem.label}
-                          icon={subItem.icon}
-                          active={isActive(subItem.to)}
-                        />
+
+                  {!isCollapsed && openMenus[item.label] && (
+                    <ul className="ml-7 mt-1 space-y-1">
+                      {item.children?.map((child, subIndex) => (
+                        <Link
+                          key={subIndex}
+                          to={child.to!}
+                          className={`flex items-center py-1 transition ${
+                            isActive(child.to!)
+                              ? "text-white font-bold"
+                              : "opacity-80 hover:opacity-100"
+                          }`}
+                        >
+                          <MenuIcon name={child.icon!} />
+                          <span className="ml-2 text-sm">{child.label}</span>
+                        </Link>
                       ))}
                     </ul>
                   )}
                 </>
+              )}
+
+              {/* Direct Link Items */}
+
+            {!hasChildren && item.label !== "Sign out" && (
+              isCollapsed ? (
+                <Tooltip text={item.label} position="right">
+                  <Link
+                    to={item.to!}
+                    className={`flex items-center py-2 rounded-lg transition ${
+                      isCollapsed ? "justify-center" : "px-3 gap-3"
+                    } ${
+                      isActive(item.to!)
+                        ? "bg-white text-[#8E3CF7]"
+                        : "hover:bg-white hover:text-[#8E3CF7]"
+                    }`}
+                  >
+                    <MenuIcon name={item.icon!} />
+                    {!isCollapsed && <span>{item.label}</span>}
+                  </Link>
+                </Tooltip>
+              ) : (
+                <Link
+                  to={item.to!}
+                  className={`flex items-center py-2 rounded-lg transition ${
+                    isCollapsed ? "justify-center" : "px-3 gap-3"
+                  } ${
+                    isActive(item.to!)
+                      ? "bg-white text-[#8E3CF7]"
+                      : "hover:bg-white hover:text-[#8E3CF7]"
+                  }`}
+                >
+                  <MenuIcon name={item.icon!} />
+                  {!isCollapsed && <span>{item.label}</span>}
+                </Link>
+              )
+            )}
+            
+                
+            
+
+              {/* Logout */}
+              {item.label === "Sign out" && (
+                <button
+                  onClick={handleLogout}
+                  className={`w-full flex items-center py-2 rounded-lg transition ${
+                    isCollapsed ? "justify-center" : "px-3 gap-3"
+                  } hover:bg-white hover:text-[#8E3CF7]`}
+                >
+                  <MenuIcon name={item.icon!} />
+                  {!isCollapsed && (
+                    <span>{isLoggingOut ? <Spinner /> : "Sign out"}</span>
+                  )}
+                </button>
               )}
             </div>
           );
         })}
       </nav>
-
-      <div className="space-y-2">
-        {bottomMenuItems.map((item, idx) => {
-          const hasChildren = !!item.children?.length;
-
-          // Handle "Sign out" separately
-          if (item.label === "Sign out") {
-            return (
-              <button
-                key={idx}
-                onClick={handleLogout}
-                className="w-full flex items-center space-x-2 px-3 py-2 rounded text-white hover:bg-white hover:text-[#8E3CF7] transition-colors"
-              >
-                {item.icon && <MenuIcon name={item.icon} />}
-                {isLoggingOut ? <Spinner /> : <span>{item.label}</span>}
-              </button>
-            );
-          }
-
-          return (
-            <div key={idx}>
-              {item.to && !hasChildren && (
-                <SidebarLink
-                  to={item.to}
-                  label={item.label}
-                  icon={item.icon}
-                  active={isActive(item.to)}
-                />
-              )}
-              {hasChildren && (
-                <>
-                  <button
-                    onClick={() => toggleMenu(item.label)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded hover:bg-[#ffff] text-black focus:outline-none ${
-                      openMenus[item.label] ? "bg-[#fff]" : ""
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2">
-                      {item.icon && <MenuIcon name={item.icon} />}
-                      <span>{item.label}</span>
-                    </div>
-                    <MenuIcon
-                      name={openMenus[item.label] ? "dropdown-up" : "dropdown"}
-                    />
-                  </button>
-                  {openMenus[item.label] && (
-                    <ul className="ml-4 mt-1 space-y-1">
-                      {item?.children?.map((subItem, subIdx) => (
-                        <SidebarLink
-                          key={subIdx}
-                          to={subItem.to!}
-                          label={subItem.label}
-                          icon={subItem.icon}
-                          active={isActive(subItem.to)}
-                        />
-                      ))}
-                    </ul>
-                  )}
-                </>
-              )}
-            </div>
-          );
-        })}
-      </div>
     </aside>
   );
 };
 
-interface SidebarLinkProps {
-  to: string;
-  label: string;
-  icon?: string;
-  active?: boolean;
-}
-
-const SidebarLink: React.FC<SidebarLinkProps> = ({
-  to,
-  label,
-  icon,
-  active,
-}) => (
-  <Link
-    to={to}
-    className={`flex items-center space-x-2 px-3 py-2 rounded transition-colors duration-150 ${
-      active
-        ? "bg-white text-[#8E3CF7] font-semibold"
-        : "text-white hover:bg-white hover:text-[#8E3CF7]"
-    }`}
-  >
-    {icon && <MenuIcon name={icon} />}
-    <span>{label}</span>
-  </Link>
-);
-
 export default Sidebar;
+

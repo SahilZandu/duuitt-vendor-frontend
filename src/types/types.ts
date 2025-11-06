@@ -77,6 +77,19 @@ export type CartItem = {
   instructions?: string;
 };
 
+type deliveryDetails = {
+  address : string,
+  address_detail?:string,
+  geo_location?:string,
+  landmark?:string,
+  location_id?:string,
+  _id?:string,
+  name : string,
+  phone : string,
+  title : string,
+
+};
+
 export type OrderType = {
   order_id: string;
   user_name: string;
@@ -94,6 +107,7 @@ export type OrderType = {
   gst_percentage?: number;
   packing_fee?: number;
   platform_fee?: number;
+  delivery_address : deliveryDetails;
 };
 
 type VariantGroup = {

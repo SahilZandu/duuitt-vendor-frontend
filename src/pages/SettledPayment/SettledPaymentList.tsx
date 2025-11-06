@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import apiRequest from "../../api/apiInstance";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import Tooltip from '../../components/Ui/Tooltip';
 import type { Restaurant } from "../../api/ProfileUpdateApi";
 import type {
   OrderLog,
   PaymentFilterBody,
   SettledPaymentRow,
 } from "../../types/types";
-
+import MenuIcon from "../../lib/MenuIcon";
 // Create a type for the partial restaurant data that comes from the API
 type PartialRestaurant = Pick<Restaurant, "name" | "address"> & {
   _id?: string;
@@ -168,7 +169,7 @@ const SettledPaymentList = () => {
       ],
     ];
 
-    const mainTable = autoTable(doc, {
+    autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
       startY: y + 10,
@@ -212,10 +213,13 @@ const SettledPaymentList = () => {
         new Date(log.order_date ?? "").toLocaleDateString(),
       ]);
 
+      const lastAutoTableY = (doc as any)?.lastAutoTable?.finalY;
+      const nextStartY = (typeof lastAutoTableY === "number" ? lastAutoTableY : y + 10) + 10;
+
       autoTable(doc, {
         head: [orderTableColumns],
         body: orderTableRows,
-        startY: (mainTable as any)?.finalY + 10,
+        startY: nextStartY,
         theme: "grid",
         styles: { fontSize: 9, halign: "center" },
         headStyles: { fillColor: [34, 197, 94], textColor: [255, 255, 255] },
@@ -234,34 +238,7 @@ const SettledPaymentList = () => {
     doc.save(`payout_invoice_${row.restaurant_id?.name || "restaurant"}.pdf`);
   };
 
-  // Apply Filter button
-  const handleFilterSubmit = async () => {
-    setLoading(true);
-    try {
-      const body: PaymentFilterBody = {
-        date_filter: dateFilter,
-      };
 
-      if (dateFilter === "custom") {
-        if (startDate) body.start_date = startDate;
-        if (endDate) body.end_date = endDate;
-      } else if (dateFilter !== "all") {
-        if (startDate) body.start_date = startDate;
-        if (endDate) body.end_date = endDate;
-      }
-
-      const res = await apiRequest(
-        "post",
-        "/food-order/get-vendor-success-payment-list",
-        body
-      );
-      setRows(res.data?.data || []);
-    } catch (err) {
-      console.error("Failed to fetch settled payments:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="p-6">
@@ -279,12 +256,12 @@ const SettledPaymentList = () => {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="border rounded px-3 py-2 text-black focus:outline focus:ring-2 focus:ring-purple-400"
+            className="border rounded w-[100%] px-5 py-2 text-black focus:outline-none focus:ring-2 focus:ring-purple-400"
           />
           <select
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="border rounded px-3 py-2 text-black"
+            className="border rounded px-3 py-2 focus:outline-none text-black border-none focus:border-none focus:ring-0"
           >
             <option value="all">All</option>
             <option value="day">Today</option>
@@ -310,14 +287,14 @@ const SettledPaymentList = () => {
             </>
           )}
 
-          {dateFilter && (
+          {/* {dateFilter && (
             <button
               onClick={handleFilterSubmit}
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
             >
               Apply Filter
             </button>
-          )}
+          )} */}
         </div>
       </div>
 
@@ -382,18 +359,23 @@ const SettledPaymentList = () => {
                         </span>
                       </td>
                       <td className="p-2 border border-purple-600 text-center">
+                        <Tooltip text={'view orders'} position='right' >
                         <button
                           onClick={() => openOrderLog(row)}
                           className="px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 mr-2"
                         >
-                          View Orders
+                         <MenuIcon name="eye" />
                         </button>
+                        </Tooltip>
+
+                       <Tooltip text={'download pdf'} position='right'>
                         <button
                           onClick={() => exportPDF(row)}
                           className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                         >
-                          Download PDF
+                         <MenuIcon name="download" />
                         </button>
+                       </Tooltip>
                       </td>
                     </tr>
                   ))

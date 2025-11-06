@@ -4,6 +4,7 @@ import { mdiArrowLeft, mdiDelete, mdiPlus } from "@mdi/js";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance from "../../../api/apiInstance";
+ 
 
 interface Variant {
   name: string;
@@ -175,16 +176,25 @@ const AddFoodItem = () => {
   };
 
   const generateCombinations = () => {
-    if (variantGroups.length < 2) return;
-    const firstGroup = variantGroups[0].variant;
-    const secondGroup = variantGroups[1].variant;
-    const combos: Combination[] = [];
-    firstGroup.forEach((f) =>
-      secondGroup.forEach((s) =>
-        combos.push({ first_gp: f.name, second_gp: s.name, price: "" })
-      )
-    );
-    setCombinations(combos);
+    let newCombinations: Combination[] = [];
+
+    if (variantGroups.length === 1) {
+      newCombinations = variantGroups[0].variant.map((v) => ({
+        first_gp: v.name,
+        second_gp: "",
+        price: "",
+      }));
+    } else if (variantGroups.length === 2) {
+      newCombinations = variantGroups[0].variant.flatMap((v1) =>
+        variantGroups[1].variant.map((v2) => ({
+          first_gp: v1.name,
+          second_gp: v2.name,
+          price: "",
+        }))
+      );
+    }
+
+    setCombinations(newCombinations);
   };
 
   const updateCombinationPrice = (index: number, value: string) => {
@@ -257,40 +267,55 @@ const AddFoodItem = () => {
     if (!base_price || isNaN(Number(base_price)) || Number(base_price) < 0) {
       newErrors.base_price = "Enter a valid base price.";
     }
-    if (product_type === "variable" && variantGroups.length < 2) {
+    if (product_type === "variable" && variantGroups.length < 1) {
       newErrors.variantGroups =
-        "At least two variant groups required for variable products.";
+        "At least one variant group required for variable products.";
     }
 
     if(!image){
       newErrors.image = "Image is required."
     }
-    // if (product_type === "variable") {
-    //   if (variantGroups.length < 1) {
-    //     newErrors.variantGroups = "At least 1 variant groups required.";
-    //   } else {
-    //     variantGroups.forEach((group, gIndex) => {
-    //       if (!group.group.trim()) {
-    //         newErrors[`variantGroup_${gIndex}`] = `Variant group ${
-    //           gIndex + 1
-    //         } name is required.`;
-    //       }
-    //       if (group.variant.length === 0) {
-    //         newErrors[
-    //           `variantGroup_${gIndex}_variants`
-    //         ] = `Add at least one variant in group ${gIndex + 1}.`;
-    //       } else {
-    //         group.variant.forEach((v, vIndex) => {
-    //           if (!v.name.trim()) {
-    //             newErrors[`variant_${gIndex}_${vIndex}`] = `Variant ${
-    //               vIndex + 1
-    //             } in group ${gIndex + 1} must have a name.`;
-    //           }
-    //         });
-    //       }
-    //     });
-    //   }
-    // }
+
+    // variant 
+    if (product_type === "variable") {
+      if (variantGroups.length < 1) {
+        newErrors.variantGroups = "At least 1 variant groups required.";
+      } else {
+        variantGroups.forEach((group, gIndex) => {
+          if (!group.group.trim()) {
+            newErrors[`variantGroup_${gIndex}`] = `Variant group ${
+              gIndex + 1
+            } name is required.`;
+          }
+          if (group.variant.length === 0) {
+            newErrors[
+              `variantGroup_${gIndex}_variants`
+            ] = `Add at least one variant in group ${gIndex + 1}.`;
+          } else {
+            group.variant.forEach((v, vIndex) => {
+              if (!v.name.trim()) {
+                newErrors[`variant_${gIndex}_${vIndex}`] = `Variant ${
+                  vIndex + 1
+                } in group ${gIndex + 1} must have a name.`;
+              }
+            });
+          }
+        });
+      }
+    }
+    // Combinations 
+    if (combinations.length > 0) {
+      combinations.forEach((combo, idx) => {
+        if (
+          !combo.price ||
+          isNaN(Number(combo.price)) ||
+          Number(combo.price) < 0
+        ) {
+          newErrors[`combination_${idx}`] =
+            "Each combination must have a valid price.";
+        }
+      });
+    }
 
     // 🔹 Addon validation (only if user added addons)
     if (addonGroups.length > 0) {
@@ -335,7 +360,10 @@ const AddFoodItem = () => {
 
   // 🔹 Submit
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      toast.error("Please fix the validation errors.");
+      return;
+    }
     try {
       const formData = new FormData();
       const restaurant_id = localStorage.getItem("restaurant_id");
@@ -525,7 +553,9 @@ const AddFoodItem = () => {
                 Add Variant Group
               </button>
             )}
-
+            {errors.variantGroups && (
+                <p className="text-red-500 text-sm mt-1">{errors.variantGroups}</p>
+            )}
             {/* Variant Groups */}
             {variantGroups.length > 0 && (
               <div
@@ -535,12 +565,14 @@ const AddFoodItem = () => {
                     : "md:grid-cols-1"
                 }`}
               >
+                 
                 {variantGroups.map((group, gIndex) => (
                   <div
                     key={gIndex}
                     className="border p-4 rounded-md bg-gray-50 shadow-sm"
                   >
                     {/* Group Name */}
+                   
                     <div className="flex justify-between items-center mb-3 gap-2">
                       <input
                         type="text"
@@ -576,6 +608,7 @@ const AddFoodItem = () => {
                           }
                           className="flex-2 px-3 py-2 border rounded focus:ring-2 focus:ring-blue-300"
                         />
+                        
                         {/* <input
                         type="number"
                         placeholder="Add variant Price"
@@ -608,18 +641,43 @@ const AddFoodItem = () => {
                     </button>
                   </div>
                 ))}
+
+                {/* Variant group validation errors */}
+                {variantGroups.map((group, gIndex) => (
+                  <div key={`variant-errors-${gIndex}`}>
+                    {errors[`variantGroup_${gIndex}`] && (
+                      <p className="text-red-500 text-sm mt-1">{errors[`variantGroup_${gIndex}`]}</p>
+                    )}
+                    {errors[`variantGroup_${gIndex}_variants`] && (
+                      <p className="text-red-500 text-sm mt-1">{errors[`variantGroup_${gIndex}_variants`]}</p>
+                    )}
+                    {group.variant.map((_, vIndex) => (
+                      errors[`variant_${gIndex}_${vIndex}`]
+                        ? (
+                            <p key={`variant-${gIndex}-${vIndex}`} className="text-red-500 text-sm mt-1">
+                              {errors[`variant_${gIndex}_${vIndex}`]}
+                            </p>
+                          )
+                        : null
+                    ))}
+                  </div>
+                ))}
+
               </div>
+
             )}
 
             {/* Generate Combinations */}
-            {variantGroups.length === 2 && (
+            {variantGroups.length > 0 && (
               <>
+                {variantGroups.some((g) => g.variant.length > 0) && (
                 <button
-                  onClick={generateCombinations}
-                  className="mt-4 bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+                 onClick={generateCombinations}
+                 className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 mt-4"
                 >
                   Generate Combinations
                 </button>
+                )}
 
                 {combinations.length > 0 && (
                   <div className="mt-6">
@@ -630,10 +688,14 @@ const AddFoodItem = () => {
                       {combinations.map((combo, index) => (
                         <div
                           key={index}
-                          className="flex gap-2 items-center p-2 border rounded"
                         >
+                         <div  
+                          className="flex gap-2 items-center p-2 border rounded"
+                         >
                           <span className="flex-1 font-medium">
-                            {combo.first_gp} + {combo.second_gp}
+                          {combo.second_gp
+                        ? `${combo.first_gp} + ${combo.second_gp}`
+                        : combo.first_gp}
                           </span>
                           <input
                             type="number"
@@ -644,6 +706,15 @@ const AddFoodItem = () => {
                             }
                             className="w-24 px-3 py-2 border rounded focus:ring-2 focus:ring-blue-300"
                           />
+                         </div>
+                          
+                         <div>
+                           {errors[`combination_${index}`] ? (
+                          <p key={`combo_err_${index}`} className="text-red-500 text-sm">
+                          {errors[`combination_${index}`]}
+                          </p>
+                          ) : null}
+                         </div>
                         </div>
                       ))}
                     </div>
@@ -670,6 +741,7 @@ const AddFoodItem = () => {
               </div>
 
               <div className="grid md:grid-cols-3 grid-cols-1 gap-4 mb-4">
+              <div className="flex flex-col">
                 <input
                   type="text"
                   placeholder="Addon Group Name"
@@ -679,6 +751,10 @@ const AddFoodItem = () => {
                   }
                   className="border px-3 py-2 rounded"
                 />
+                {errors[`addonGroup_${gIndex}`] && 
+                  <p className="text-red-500 text-sm">{errors[`addonGroup_${gIndex}`]}</p>
+                }
+              </div>
                 <input
                   type="number"
                   min={1}
@@ -692,6 +768,11 @@ const AddFoodItem = () => {
                   }
                   className="border px-3 py-2 rounded"
                 />
+                 {/* error related to max addon groups  */}
+                 {errors[`addonGroup_${gIndex}_max`] && 
+                  <p className="text-red-500 text-sm">{errors[`addonGroup_${gIndex}_max`]}</p>
+                  }
+                  
                 <select
                   value={group.is_price_related}
                   onChange={(e) =>
@@ -705,6 +786,10 @@ const AddFoodItem = () => {
                 </select>
               </div>
 
+                {/* errors related to items in adon group */}
+                {errors[`addonGroup_${gIndex}_items`] && 
+                  <p className="text-red-500 text-sm">{errors[`addonGroup_${gIndex}_items`]}</p>
+                }
               {/* Items */}
               {group.addon.map((item, iIndex) => (
                 <div key={iIndex} className="flex gap-2 mb-2">
@@ -734,6 +819,18 @@ const AddFoodItem = () => {
                   >
                     <Icon path={mdiDelete} size={0.8} />
                   </button>
+                </div>
+              ))}
+
+              {/* Additional concise error loop per item */}
+              {group.addon.map((_, iIndex) => (
+                <div key={`addon-errors-${gIndex}-${iIndex}`}>
+                  {errors[`addon_${gIndex}_${iIndex}`] && 
+                    <p className="text-red-500 text-sm">{errors[`addon_${gIndex}_${iIndex}`]}</p>
+                  }
+                  {errors[`addon_${gIndex}_${iIndex}_price`] && 
+                    <p className="text-red-500 text-sm">{errors[`addon_${gIndex}_${iIndex}_price`]}</p>
+                  }
                 </div>
               ))}
 

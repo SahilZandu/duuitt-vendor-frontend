@@ -10,7 +10,6 @@ const FoodItemDetail = () => {
     const navigate = useNavigate();
     const [foodItem, setFoodItem] = useState<FoodItem | null>(null);
     const [loading, setLoading] = useState(true);
-    const IMAGE_BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL;
 
     useEffect(() => {
         const fetchItem = async () => {
@@ -51,7 +50,7 @@ const FoodItemDetail = () => {
 
             <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
                 <img
-                    src={foodItem.image ? `${IMAGE_BASE_URL}${foodItem.image}` : "/default-food.jpg"}
+                    src={foodItem.image ? `${foodItem.image}` : "/default-food.jpg"}
                     alt={foodItem.name}
                     crossOrigin="anonymous"
                     className="w-full h-72 object-cover rounded-lg shadow"

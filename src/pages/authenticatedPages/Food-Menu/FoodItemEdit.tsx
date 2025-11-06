@@ -336,6 +336,7 @@ const FoodItemEdit = () => {
   // 🔹 Validation function
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
+    console.log('addon group :', addonGroups);
 
     // Basic Info
     if (!productData.name.trim()) newErrors.name = "Product name is required.";
@@ -389,12 +390,13 @@ const FoodItemEdit = () => {
         }
       });
     }
-
     // Addons
     addonGroups.forEach((group, gIdx) => {
+      console.log('group',group);
       if (!group.group.trim()) {
         newErrors[`addon_group_${gIdx}`] = "Addon group name is required.";
       }
+      console.log('error for group : ',newErrors[`addon_group_${gIdx}`])
       if (group.addon.length === 0) {
         newErrors[`addon_group_${gIdx}`] =
           "Each addon group must have at least one item.";
@@ -408,7 +410,7 @@ const FoodItemEdit = () => {
           (!item.price || isNaN(Number(item.price)) || Number(item.price) < 0)
         ) {
           newErrors[`addon_${gIdx}_${iIdx}_price`] =
-            "Enter a valid price for addon.";
+             "Enter a valid price for addon.";
         }
       });
     });
@@ -843,7 +845,8 @@ const FoodItemEdit = () => {
         {addonGroups.map((group, groupIndex) => (
           <div key={groupIndex} className="relative border rounded p-4 mb-4">
             {/* Group Name with Delete Button (flex layout) */}
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2 mb-2">
               <input
                 type="text"
                 value={group.group}
@@ -897,7 +900,14 @@ const FoodItemEdit = () => {
                 Price Related
               </label>
             </div>
-
+            <div key={`addon_group_${groupIndex}`} className=" pace-y-1 block">
+                {errors[`addon_group_${groupIndex}`] && (
+                  <p className="text-red-500 text-sm">
+                    {errors[`addon_group_${groupIndex}`]}
+                  </p>
+                )}
+            </div>
+            </div>
             {/* Addon Items */}
             {group.addon.map((item, i) => (
               <div key={i} className="flex gap-2 mb-2">

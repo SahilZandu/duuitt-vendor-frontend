@@ -79,21 +79,23 @@ const CommonCard: React.FC<CommonCardProps> = ({
       </div>
 
       {/* View Details Button */}
-    <div className="flex flex-row justify-around">
+    <div className="flex flex-row gap-3 justify-around">
       <div className="flex-1">
-      <div className="mt-4"> 
-      {onViewDetails && (
+        <div className="mt-4"> 
+         {onViewDetails && (
           <button
             onClick={onViewDetails}
             className="w-full bg-[#8E3CF7] text-white py-[10px] text-sm px-4 rounded hover:bg-purple-700 transition"
           >
             View Details
           </button>
-      )}
+          )}
+        </div>
       </div>
-      </div>
+
+      <div className="">
       {(onEdit || onDelete) && (
-        <div className="flex flex-1 items-center justify-evenly">
+        <div className="flex items-center justify-evenly gap-3">
           <div className="mt-4">
           {onEdit && (
             <button
@@ -120,6 +122,7 @@ const CommonCard: React.FC<CommonCardProps> = ({
 
         </div>
       )}
+      </div>
     </div>
     </div>
   );
