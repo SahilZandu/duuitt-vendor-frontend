@@ -83,10 +83,12 @@ const ProtectedRoute = () => {
 
   useEffect(() => {
     if (token) {
-      fetchVendor(); // refresh vendor whenever route is checked
+      localStorage.setItem('is_kyc_completed', String(vendor?.is_kyc_completed ?? 'jassi'));
+      fetchVendor(); 
     }
   }, [token, location.pathname]);
 
+  const isKycDone = localStorage.getItem('is_kyc_completed');
 
   if (!token) {
     return <Navigate to="/login" replace />;
@@ -95,7 +97,7 @@ const ProtectedRoute = () => {
   if (loading) return <Loader />;
 
   if (
-    !vendor?.is_kyc_completed &&
+    !isKycDone &&
     !(location.pathname === "/vendor-kyc" || location.pathname.startsWith("/vendor-kyc/kyc-detail"))
   ) {
     return <Navigate to="/vendor-kyc" replace />;

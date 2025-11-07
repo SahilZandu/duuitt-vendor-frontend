@@ -218,6 +218,7 @@ const KycDetail = () => {
         toast.success(`${type?.toUpperCase()} details updated successfully`);
         if (location.pathname.startsWith("/vendor-kyc")) {
           navigate(`/vendor-kyc`);
+          localStorage.setItem('is_kyc_completed', String(response?.data?.vendor?.is_kyc_completed ?? 'false'));
         } else {
           navigate(`/kyc-documents`);
         }
@@ -234,11 +235,19 @@ const KycDetail = () => {
   if (loading) {
     return <Loader />;
   }
-
   return (
     <div className="bg-white p-4">
       <button
-        onClick={() => navigate("/kyc-documents")}
+        onClick={() => {
+          if(location.pathname.startsWith('/vendor-kyc')){
+            navigate("/vendor-kyc");
+          }
+          else{
+            navigate("/kyc-documents");
+          }
+          
+        }}
+
         type="button"
         className="cursor-pointer mb-2 inline-flex items-center text-base px-3 py-1 bg-gray-200 rounded-lg"
       >
