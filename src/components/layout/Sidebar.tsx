@@ -50,20 +50,23 @@ const Sidebar: React.FC = () => {
     isCollapsed,
     toggleSidebar,
     openMenus,
+    setOpenMenus, 
     toggleMenu,
     isActive,
   } = useSidebar();
 
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [restaurantName, setRestaurantName] = useState<string>("");
+  const [activeSubmenu, setActiveSubmenu] = useState(""); // 👈 active submenu tracking
 
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     const restaurant = localStorage.getItem("restaurant_name");
+    console.log('active submenu : ',activeSubmenu);
     if (restaurant) setRestaurantName(restaurant);
-  }, [location.pathname]);
+  }, [location.pathname, activeSubmenu]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -86,6 +89,21 @@ const Sidebar: React.FC = () => {
       console.error("Failed to update offer status", error);
     }
   };
+  useEffect(() => {
+    // whenever route changes, update active submenu
+    setActiveSubmenu(location.pathname);
+  }, [location.pathname]);
+  // const toggleMenu = (label) => {
+  //   setOpenMenus((prev) => {
+  //     const newState = {};
+  //     Object.keys(prev).forEach((key) => {
+  //       newState[key] = false; // close all menus
+  //     });
+  //     newState[label] = !prev[label]; // toggle selected
+  //     return newState;
+  //   });
+  // };
+
   return (
     <aside
       className={`${
@@ -132,10 +150,9 @@ const Sidebar: React.FC = () => {
               {/* Parent with submenu */}
               {hasChildren && (
                 <>
-                
                   <button
                     onClick={() => toggleMenu(item.label)}
-                    className={`flex items-center w-full  py-2 rounded-lg transition ${
+                    className={`flex items-center w-full py-2 rounded-lg transition ${
                       isCollapsed ? "justify-center" : "px-3 gap-3 justify-between"
                     } ${
                       openMenus[item.label]
@@ -143,26 +160,29 @@ const Sidebar: React.FC = () => {
                         : "hover:bg-white hover:text-[#8E3CF7]"
                     }`}
                   >
-                    <div className="flex items-center justify-center!important space-x-2">
+                    <div className="flex items-center space-x-2">
                       {item.icon && <MenuIcon name={item.icon} />}
                       {!isCollapsed && <span>{item.label}</span>}
                     </div>
-                    {!isCollapsed &&
-                    <MenuIcon
-                      name={openMenus[item.label] ? "dropdown-up" : "dropdown"}
-                    />}
+                    {!isCollapsed && (
+                      <MenuIcon
+                        name={openMenus[item.label] ? "dropdown-up" : "dropdown"}
+                      />
+                    )}
                   </button>
 
+                  {/* Submenu */}
                   {!isCollapsed && openMenus[item.label] && (
                     <ul className="ml-7 mt-1 space-y-1">
                       {item.children?.map((child, subIndex) => (
                         <Link
                           key={subIndex}
                           to={child.to!}
-                          className={`flex items-center py-1 transition ${
-                            isActive(child.to!)
-                              ? "text-white font-bold"
-                              : "opacity-80 hover:opacity-100"
+                          onClick={() => setActiveSubmenu(child.to!)} // 👈 highlight on click
+                          className={`flex items-center py-1 px-2 rounded-md transition-all duration-200 ${
+                            location.pathname === child.to! || activeSubmenu === child.to!
+                              ? "bg-white text-[#8E3CF7] font-semibold"
+                              : "text-white/80 hover:bg-white hover:text-[#8E3CF7]"
                           }`}
                         >
                           <MenuIcon name={child.icon!} />
@@ -175,43 +195,49 @@ const Sidebar: React.FC = () => {
               )}
 
               {/* Direct Link Items */}
-
-            {!hasChildren && item.label !== "Sign out" && (
-              isCollapsed ? (
-                <Tooltip text={item.label} position="right">
-                  <Link
-                    to={item.to!}
-                    className={`flex items-center py-2 rounded-lg transition ${
-                      isCollapsed ? "justify-center" : "px-3 gap-3"
-                    } ${
-                      isActive(item.to!)
-                        ? "bg-white text-[#8E3CF7]"
-                        : "hover:bg-white hover:text-[#8E3CF7]"
-                    }`}
-                  >
-                    <MenuIcon name={item.icon!} />
-                    {!isCollapsed && <span>{item.label}</span>}
-                  </Link>
-                </Tooltip>
-              ) : (
-                <Link
-                  to={item.to!}
-                  className={`flex items-center py-2 rounded-lg transition ${
-                    isCollapsed ? "justify-center" : "px-3 gap-3"
-                  } ${
-                    isActive(item.to!)
-                      ? "bg-white text-[#8E3CF7]"
-                      : "hover:bg-white hover:text-[#8E3CF7]"
-                  }`}
-                >
-                  <MenuIcon name={item.icon!} />
-                  {!isCollapsed && <span>{item.label}</span>}
-                </Link>
-              )
-            )}
-            
-                
-            
+              {!hasChildren && item.label !== "Sign out" && (
+  isCollapsed ? (
+    <Tooltip text={item.label} position="right">
+      <Link
+        to={item.to!}
+        onClick={() => {
+          // 👇 close all open dropdowns & clear active submenu
+          setOpenMenus({});
+          setActiveSubmenu("");
+        }}
+        className={`flex items-center py-2 rounded-lg transition ${
+          isCollapsed ? "justify-center" : "px-3 gap-3"
+        } ${
+          isActive(item.to!)
+            ? "bg-white text-[#8E3CF7]"
+            : "hover:bg-white hover:text-[#8E3CF7]"
+        }`}
+      >
+        <MenuIcon name={item.icon!} />
+        {!isCollapsed && <span>{item.label}</span>}
+      </Link>
+    </Tooltip>
+  ) : (
+    <Link
+      to={item.to!}
+      onClick={() => {
+        // 👇 close all open dropdowns & clear active submenu
+        setOpenMenus({});
+        setActiveSubmenu("");
+      }}
+      className={`flex items-center py-2 rounded-lg transition ${
+        isCollapsed ? "justify-center" : "px-3 gap-3"
+      } ${
+        isActive(item.to!)
+          ? "bg-white text-[#8E3CF7]"
+          : "hover:bg-white hover:text-[#8E3CF7]"
+      }`}
+    >
+      <MenuIcon name={item.icon!} />
+      {!isCollapsed && <span>{item.label}</span>}
+    </Link>
+  )
+)}
 
               {/* Logout */}
               {item.label === "Sign out" && (

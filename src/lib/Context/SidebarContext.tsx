@@ -1,10 +1,11 @@
-import  { createContext, useContext, useState, type ReactNode } from "react";
+import  { createContext, useContext, useState, type Dispatch, type SetStateAction, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 interface SidebarContextType {
   isCollapsed: boolean;
   toggleSidebar: () => void;
   openMenus: Record<string, boolean>;
+  setOpenMenus: Dispatch<SetStateAction<Record<string, boolean>>>;
   toggleMenu: (menu: string) => void;
   isActive: (path: string) => boolean;
   handleLogout: () => void;
@@ -45,6 +46,7 @@ export const SidebarProvider = ({ children }: { children: ReactNode }) => {
         isCollapsed,
         toggleSidebar,
         openMenus,
+        setOpenMenus,
         toggleMenu,
         isActive,
         handleLogout,
