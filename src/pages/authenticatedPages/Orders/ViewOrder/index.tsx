@@ -268,7 +268,7 @@ const ViewOrder = () => {
             </td>
 
             {/* Total + Tooltip */}
-            <td className="px-4 py-3 text-right font-semibold text-gray-900">
+            <td className={`px-4 py-3 text-right font-semibold text-gray-900 ${hasAddons ? ('flex justify-end mr-0 text-right font cursor-pointer align-bottom content-right'): ('')}`}>
               ₹{itemTotal.toFixed(2)}
 
               {hasAddons && (
@@ -296,8 +296,9 @@ const ViewOrder = () => {
                     </div>
                   }
                 >
-                  <span className="ml-1 text-gray-400 font cursor-pointer">
-                    (!)
+
+                  <span className="ml-1 text-gray-800  font cursor-pointer flex align-top align-right">
+                    <MenuIcon className="w-3" name="pending" />
                   </span>
                 </Tooltip>
               )}
