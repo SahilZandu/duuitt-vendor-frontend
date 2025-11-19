@@ -8,6 +8,7 @@ import { ToastContainer } from "react-toastify";
 import { VendorProvider } from "./lib/Context/VendorContext";
 import { SettingsProvider } from "./lib/Context/SettingsContext";
 import { SidebarProvider } from "./lib/Context/SidebarContext";
+import { OrderNotificationProvider } from "./lib/Context/OrderNotificationContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -15,7 +16,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <VendorProvider>
         <SettingsProvider>
         <SidebarProvider>
-          <App />
+          <OrderNotificationProvider>
+            <App />
+          </OrderNotificationProvider>
         </ SidebarProvider>
         </SettingsProvider>
       </VendorProvider>

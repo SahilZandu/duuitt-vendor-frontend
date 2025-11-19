@@ -18,32 +18,32 @@ function Tabs<T extends string>({
   onTabChange,
 }: TabsProps<T>) {
   return (
-    <div className="bg-white p-4 rounded-xl shadow-md mb-6">
-      <div className="flex space-x-4 md:space-x-6 border-b border-gray-200">
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 mb-6 overflow-hidden">
+      <div className="flex overflow-x-auto scrollbar-hide">
         {tabs.map((tab: TabOption<T>) => {
           const isActive = activeTab === tab.value;
           return (
             <button
               key={tab.value}
               onClick={() => onTabChange(tab.value)}
-              className={`relative flex items-center gap-2 px-3 py-2 text-sm md:text-base font-medium transition-all duration-200 rounded-t-md
+              className={`relative flex items-center justify-center gap-2 px-4 sm:px-6 py-4 text-sm sm:text-base font-semibold transition-all duration-300 whitespace-nowrap flex-1 min-w-max
                 ${
                   isActive
-                    ? "text-[#8E3CF7] bg-gray-100 border-b-2 border-[#8E3CF7]"
-                    : "text-gray-600 hover:text-[#8E3CF7] hover:bg-gray-50"
+                    ? "text-white bg-gradient-to-r from-[#8E3CF7] to-[#A855F7] shadow-lg"
+                    : "text-gray-600 hover:text-[#8E3CF7] hover:bg-purple-50"
                 }`}
             >
               {tab.icon && (
                 <MenuIcon
                   name={tab.icon}
-                  className={`w-4 h-4 ${
-                    isActive ? "text-[#8E3CF7]" : "text-gray-500"
+                  className={`w-5 h-5 ${
+                    isActive ? "text-white" : "text-gray-500"
                   }`}
                 />
               )}
               <span>{tab.label}</span>
               {isActive && (
-                <span className="absolute -bottom-[2px] left-0 w-full h-[2px] bg-[#8E3CF7] animate-fadeIn"></span>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/40 animate-fadeIn"></div>
               )}
             </button>
           );
