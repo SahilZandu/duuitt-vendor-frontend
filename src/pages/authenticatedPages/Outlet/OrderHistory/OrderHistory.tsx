@@ -103,73 +103,107 @@ const OrderHistory = () => {
     ];
 
     return (
-        <div className="p-6">
-            <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
-                {/* <h1 className="text-2xl font-bold mb-4">Order History</h1> */}
-                <PageTitle title="Order History" />
+        <div className="p-6 min-h-screen bg-gray-50">
+            <div className="max-w-7xl mx-auto">
+                <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+                    <PageTitle title="Order History" />
 
-                {/* Filters */}
-                <div className="flex justify-between items-center gap-4 mb-4">
-                    <div className="flex items-center gap-2">
+                    {/* Filters */}
+                    <div className="flex flex-wrap items-center gap-3">
                         <select
                             id="statusFilter"
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value as any)}
-                            className="border px-3 py-2 rounded-md"
+                            className="border border-gray-300 px-4 py-2.5 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
                         >
                             <option value="all">All Orders</option>
                             <option value="completed">Completed</option>
                             <option value="declined">Declined</option>
                         </select>
-                    </div>
 
-                    {/* Search */}
-                    <input
-                        type="text"
-                        placeholder="Search orders..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="border px-3 py-2 rounded-md w-full max-w-xs"
-                    />
+                        {/* Search */}
+                        <div className="relative">
+                            <input
+                                type="text"
+                                placeholder="Search orders..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="border border-gray-300 pl-10 pr-4 py-2.5 rounded-lg w-64 bg-white shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
+                            />
+                            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    {loading ? (
+                        <div className="p-8">
+                            <Loader />
+                        </div>
+                    ) : (
+                        <DataTable
+                            columns={columns}
+                            data={orders}
+                            progressPending={loading}
+                            pagination
+                            highlightOnHover
+                            noDataComponent={<NoDataFound />}
+                            paginationRowsPerPageOptions={[10, 25, 50]}
+                            paginationPerPage={25}
+                            paginationComponentOptions={{
+                                rowsPerPageText: 'Rows per page:',
+                                rangeSeparatorText: 'of',
+                            }}
+                            customStyles={{
+                                table: {
+                                    style: {
+                                        borderRadius: '12px',
+                                    },
+                                },
+                                rows: {
+                                    style: {
+                                        borderBottom: '1px solid #f3f4f6',
+                                        fontSize: 14,
+                                        '&:hover': {
+                                            backgroundColor: '#faf5ff',
+                                        },
+                                    },
+                                },
+                                headRow: {
+                                    style: {
+                                        fontWeight: 600,
+                                        fontSize: 14,
+                                        color: '#fff',
+                                        backgroundColor: '#9333ea',
+                                        borderTopLeftRadius: '12px',
+                                        borderTopRightRadius: '12px',
+                                    },
+                                },
+                                headCells: {
+                                    style: {
+                                        paddingTop: '14px',
+                                        paddingBottom: '14px',
+                                    },
+                                },
+                                cells: {
+                                    style: {
+                                        paddingTop: '12px',
+                                        paddingBottom: '12px',
+                                    },
+                                },
+                                pagination: {
+                                    style: {
+                                        borderTop: '1px solid #f3f4f6',
+                                        backgroundColor: '#fafafa',
+                                    },
+                                },
+                            }}
+                        />
+                    )}
                 </div>
             </div>
-
-
-            {loading ? (
-                <Loader />
-            ) : (
-                <DataTable
-                    columns={columns}
-                    data={orders}
-                    progressPending={loading}
-                    pagination
-                    highlightOnHover
-                    noDataComponent={<NoDataFound/>}
-                    paginationRowsPerPageOptions={[10, 25, 50]}
-                    paginationPerPage={25}
-                    paginationComponentOptions={{
-                        rowsPerPageText: 'Rows per page:',
-                        rangeSeparatorText: 'of',
-                    }}
-                    customStyles={{
-                        rows: {
-                            style: {
-                                borderBottom: '1px solid #e5e7eb',
-                                fontSize: 14,
-                            },
-                        },
-                        headRow: {
-                            style: {
-                                fontWeight: 500,
-                                fontSize: 16,
-                                color: '#fff',
-                                backgroundColor: '#a855f7',
-                            },
-                        },
-                    }}
-                />
-            )}
-
         </div>
     );
 };

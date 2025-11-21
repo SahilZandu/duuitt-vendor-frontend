@@ -115,6 +115,7 @@ type VariantGroup = {
   variant: {
     _id: string;
     name: string;
+    price?: number;
   }[];
 };
 
@@ -129,6 +130,12 @@ type AddonGroup = {
   }[];
 };
 
+export type Combination = {
+  first_gp: string;
+  second_gp: string | null;
+  price: string;
+};
+
 export type FoodItem = {
   _id: string;
   name: string;
@@ -140,6 +147,7 @@ export type FoodItem = {
   veg_nonveg?: "veg" | "nonveg" | "egg";
   variants?: VariantGroup[];
   addon?: AddonGroup[];
+  combinations?: Combination[];
 };
 
 export interface EditingSlot {

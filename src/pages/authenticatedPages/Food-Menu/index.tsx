@@ -10,13 +10,13 @@ import MenuIcon from "../../../lib/MenuIcon";
 import PageTitle from "../../../components/Ui/PageTitle";
 
 const FoodMenu = () => {
-  // const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
+  const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<FoodItem[]>([]);
   const [visibleCount, setVisibleCount] = useState(9);
   const [loadingMore, setLoadingMore] = useState(false);
-  // const [search, setSearch] = useState("");
-  // const [vegFilter, setVegFilter] = useState("All");
-  // const [tagFilter, setTagFilter] = useState("All");
+  const [search, setSearch] = useState("");
+  const [priceFilter, setPriceFilter] = useState("All");
+  const [typeFilter, setTypeFilter] = useState("All");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const FoodMenu = () => {
         restaurant_id,
       });
       const data = response.data.data || [];
-      // setFoodItems(data);
+      setFoodItems(data);
       setFilteredItems(data);
     } catch (error) {
       console.error("Error fetching food items:", error);
@@ -43,30 +43,32 @@ const FoodMenu = () => {
     fetchFoodItems();
   }, []);
 
-  // useEffect(() => {
-  //     filterItems();
-  //     setVisibleCount(9); // Reset to first 9 on filter change
-  // }, [search, vegFilter, tagFilter, foodItems]);
+  useEffect(() => {
+    let filtered = [...foodItems];
 
-  // const filterItems = () => {
-  //     let items = [...foodItems];
+    if (search.trim()) {
+      filtered = filtered.filter((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase())
+      );
+    }
 
-  //     if (search.trim()) {
-  //         items = items.filter((item) =>
-  //             item.name.toLowerCase().includes(search.toLowerCase())
-  //         );
-  //     }
+    if (typeFilter !== "All") {
+      filtered = filtered.filter((item) => item.veg_nonveg === typeFilter);
+    }
 
-  //     if (vegFilter !== "All") {
-  //         items = items.filter((item) => item.veg_nonveg === vegFilter);
-  //     }
+    if (priceFilter !== "All") {
+      if (priceFilter === "0-100") {
+        filtered = filtered.filter((item) => (item.selling_price ?? 0) <= 100);
+      } else if (priceFilter === "100-300") {
+        filtered = filtered.filter((item) => (item.selling_price ?? 0) > 100 && (item.selling_price ?? 0) <= 300);
+      } else if (priceFilter === "300+") {
+        filtered = filtered.filter((item) => (item.selling_price ?? 0) > 300);
+      }
+    }
 
-  //     if (tagFilter !== "All") {
-  //         items = items.filter((item) => item.tag === tagFilter);
-  //     }
-
-  //     setFilteredItems(items);
-  // };
+    setFilteredItems(filtered);
+    setVisibleCount(9);
+  }, [search, foodItems, priceFilter, typeFilter]);
 
   const handleLoadMore = () => {
     setLoadingMore(true);
@@ -109,55 +111,57 @@ const FoodMenu = () => {
   return (
     <div className="p-4 h-[100vh] flex flex-col">
       {/* Sticky Filters */}
-      <div className="bg-white z-10 sticky top-0 p-4 flex flex-wrap gap-4 items-center justify-between border-b">
-        {/* <div className="flex flex-wrap gap-4 w-full sm:w-auto">
-                    <input
-                        type="text"
-                        placeholder="Search food..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="border px-4 py-2 rounded-md w-full sm:w-64"
-                    />
+      <div className="bg-white z-10 sticky top-0 p-4 border-b">
+        <div className="flex flex-wrap gap-4 items-center justify-between mb-4">
+          <PageTitle title="Food Menu" />
+          <Button
+            onClick={() => navigate("/food-menu/add-product")}
+            label="Add Product"
+            variant="primary"
+            iconLeft={<MenuIcon name="add" />}
+            className="bg-[#8E3CF7] hover:bg-purple-700 text-white px-4 py-2 rounded-md transition"
+          />
+        </div>
 
-                    <select
-                        value={vegFilter}
-                        onChange={(e) => setVegFilter(e.target.value)}
-                        className="border px-4 py-2 rounded-md"
-                    >
-                        <option value="All">All Types</option>
-                        <option value="Veg">Veg</option>
-                        <option value="Non-Veg">Non-Veg</option>
-                        <option value="Egg">Egg</option>
-                    </select>
+        {/* Filters Row */}
+        <div className="flex flex-wrap gap-3 items-center">
+          <input
+            type="text"
+            placeholder="Search food..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border border-gray-300 px-4 py-2 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-[#8E3CF7] focus:border-transparent"
+          />
 
-                    <select
-                        value={tagFilter}
-                        onChange={(e) => setTagFilter(e.target.value)}
-                        className="border px-4 py-2 rounded-md"
-                    >
-                        <option value="All">All Tags</option>
-                        <option value="Spicy">Spicy</option>
-                        <option value="Best Selling">Best Selling</option>
-                        <option value="Chef's Special">Chef's Special</option>
-                    </select>
-                </div> */}
-        <PageTitle title="Food Menu" />
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8E3CF7] focus:border-transparent"
+          >
+            <option value="All">All Types</option>
+            <option value="Veg">Veg</option>
+            <option value="Non-Veg">Non-Veg</option>
+            <option value="Egg">Egg</option>
+          </select>
 
-        {/* Add Product Button */}
-        <Button
-          onClick={() => navigate("/food-menu/add-product")}
-          label="Add Product"
-          variant="primary"
-          iconLeft={<MenuIcon name="add" />}
-          className="bg-[#8E3CF7] hover:bg-green-700 text-white px-4 py-2 rounded-md transition"
-        />
+          <select
+            value={priceFilter}
+            onChange={(e) => setPriceFilter(e.target.value)}
+            className="border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8E3CF7] focus:border-transparent"
+          >
+            <option value="All">All Prices</option>
+            <option value="0-100">Under ₹100</option>
+            <option value="100-300">₹100 - ₹300</option>
+            <option value="300+">Above ₹300</option>
+          </select>
+        </div>
       </div>
 
       {/* Scrollable List */}
       <div className="overflow-y-auto flex-1 pt-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {filteredItems.slice(0, visibleCount).map((item) => (
-            <div key={item._id} className="h-[400px]">
+            <div key={item._id}>
               <CommonCard
                 image={item?.image || "/placeholder.png"} // use image directly, fallback to placeholder
                 title={item.name}
